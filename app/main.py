@@ -319,6 +319,7 @@ def main():
     models = {}
     if configs.list_net is not None:
         for model_path in glob.glob('{}/*'.format(configs.list_net)):
+            print(model_path)
             task_name = os.path.basename(model_path)
             models[task_name] = ListwiseRankModel(task_name, model_path)
             print('Loaded cost model for %s' % task_name)
