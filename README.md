@@ -77,10 +77,11 @@ cd tests; sh train.sh
 cd tests; sh auto_train.sh
 ```
 
-### Download the Example Dataset
+### Download the Example Dataset and Pretrained Models
 
 ```bash
-aws s3 cp s3://hyuz-shared-data/gcv_t4_csv/depthwise_conv2d_nchw.cuda.csv .
+aws s3 cp --recursive s3://hyuz-shared-data/dataset_0726 tuning_dataset
+aws s3 cp --recursive s3://hyuz-shared-data/trained_models trained_models
 ```
 
 ### Use AutoGluon Tabular
