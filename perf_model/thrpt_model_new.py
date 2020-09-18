@@ -229,3 +229,6 @@ def main():
         test_rank_df.to_csv(args.split_rank_test_name)
     else:
         pass
+
+if __name__ == "__main__":
+    main()
