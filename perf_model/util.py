@@ -35,7 +35,7 @@ def logging_config(folder: Optional[str] = None,
                    console: bool = True) -> str:
     """Config the logging module"""
     if name is None:
-        name = inspect.stack()[1][1].split('.')[0]
+        name = inspect.stack()[-1][1].split('.')[0]
     if folder is None:
         folder = os.path.join(os.getcwd(), name)
     if not os.path.exists(folder):
