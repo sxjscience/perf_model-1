@@ -16,8 +16,6 @@ from sklearn.metrics import ndcg_score
 from sklearn.model_selection import train_test_split
 from util import analyze_valid_threshold, logging_config
 
-logging_config()
-
 
 def set_seed(seed):
     np.random.seed(seed)
@@ -214,6 +212,7 @@ def parse_args():
 
 
 def main():
+    logging_config()
     args = parse_args()
     set_seed(args.seed)
     logging_config(args.out_dir, 'thrpt_model')
