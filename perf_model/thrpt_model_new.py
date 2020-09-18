@@ -227,6 +227,10 @@ def main():
                                                               args.split_top_ratio,
                                                               args.split_rank_group_size,
                                                               args.split_rank_K)
+        print('Generate train data to {}, test data to {}, test rank data to {}'
+              .format(args.split_train_name,
+                      args.split_test_name,
+                      args.split_rank_test_name))
         train_df.to_csv(args.split_train_name)
         test_df.to_csv(args.split_test_name)
         test_rank_df.to_csv(args.split_rank_test_name)
