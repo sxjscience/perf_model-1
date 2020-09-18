@@ -116,6 +116,7 @@ def split_train_test_df(df, seed, ratio, top_sample_ratio=0.2, group_size=10, K=
             group_indices = (rng.choice(num_samples - 1, group_size - 1, True) + idx + 1) % num_samples
             group_indices = np.append(group_indices, idx)
             test_rank_df.append(group_indices)
+    test_rank_df = df.DataFrame(test_rank_df)
     return train_df, test_df, test_rank_df
 
 
