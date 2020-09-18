@@ -212,8 +212,8 @@ def parse_args():
 
 
 def main():
-    logging_config()
     args = parse_args()
+    logging_config()
     set_seed(args.seed)
     logging_config(args.out_dir, 'thrpt_model')
 
