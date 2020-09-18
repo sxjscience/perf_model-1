@@ -4,8 +4,7 @@ import argparse
 import logging
 import os
 import multiprocessing
-from concurrent.futures import ProcessPoolExecutor
-
+import json
 import matplotlib.pyplot as plt
 import torch as th
 import numpy as np
@@ -82,6 +81,9 @@ def split_train_test_df(df, seed, ratio, top_sample_ratio=0.2, group_size=10, K=
     test_rank_df
         The dataframe that is used to verify the ranking model.
         (#Test * K, group_size)
+    train_indices
+    test_indices
+    test_top_indices
     """
     rng = np.random.RandomState(seed)
     num_samples = len(df)
@@ -101,6 +103,7 @@ def split_train_test_df(df, seed, ratio, top_sample_ratio=0.2, group_size=10, K=
         test_indices = np.concatenate([top_thrpt_indices, other_test_thrpt_indices], axis=0)
         train_indices = other_thrpt_indices[:(-other_test_num)]
     else:
+        top_thrpt_indices = []
         perm = rng.permutation(len(df))
         train_indices = perm[:train_num]
         test_indices = perm[train_num:]
@@ -115,7 +118,8 @@ def split_train_test_df(df, seed, ratio, top_sample_ratio=0.2, group_size=10, K=
             group_indices = np.append(group_indices, idx)
             test_rank_df.append(group_indices)
     test_rank_df = pd.DataFrame(test_rank_df)
-    return train_df, test_df, test_rank_df
+    return train_df, test_df, test_rank_df,\
+           list(train_indices), list(test_indices), list(top_thrpt_indices)
 
 
 def get_data(data_path, thrpt_threshold=0):
@@ -193,6 +197,8 @@ def parse_args():
                             help='Name of the testing split.')
     split_args.add_argument('--split_rank_test_name', default=None,
                             help='Name of the rank test model.')
+    split_args.add_argument('--split_info_name', default=None,
+                            help='Name of the split info.')
     split_args.add_argument('--split_test_ratio', default=0.1,
                             help='Ratio of the test set in the split.')
     split_args.add_argument('--split_top_ratio', default=0.2,
@@ -221,19 +227,26 @@ def main():
 
     if args.split_test:
         df = get_data(args.dataset)
-        train_df, test_df, test_rank_df = split_train_test_df(df,
-                                                              args.seed,
-                                                              args.split_test_ratio,
-                                                              args.split_top_ratio,
-                                                              args.split_rank_group_size,
-                                                              args.split_rank_K)
+        train_df, test_df, test_rank_df, train_indices, test_indices, test_top_indices =\
+            split_train_test_df(df,
+                                args.seed,
+                                args.split_test_ratio,
+                                args.split_top_ratio,
+                                args.split_rank_group_size,
+                                args.split_rank_K)
         print('Generate train data to {}, test data to {}, test rank data to {}'
               .format(args.split_train_name,
                       args.split_test_name,
                       args.split_rank_test_name))
+        if args.split_info_name is None:
+            args.split_info_name = args.split_rank_test_name + '.split_info'
         train_df.to_csv(args.split_train_name)
         test_df.to_csv(args.split_test_name)
         test_rank_df.to_csv(args.split_rank_test_name)
+        with open(args.split_info_name, 'w', encoding='utf-8') as out_f:
+            json.dump({'train_indices': train_indices,
+                       'test_indices': test_indices,
+                       'test_top_indices': test_top_indices}, out_f)
     else:
         pass
 
