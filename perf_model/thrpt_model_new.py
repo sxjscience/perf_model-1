@@ -118,8 +118,13 @@ def split_train_test_df(df, seed, ratio, top_sample_ratio=0.2, group_size=10, K=
             group_indices = np.append(group_indices, idx)
             test_rank_df.append(group_indices)
     test_rank_df = pd.DataFrame(test_rank_df)
-    return train_df, test_df, test_rank_df,\
-           list(train_indices), list(test_indices), list(top_thrpt_indices)
+    if isinstance(train_indices, np.ndarray):
+        train_indices = train_indices.tolist()
+    if isinstance(test_indices, np.ndarray):
+        test_indices = test_indices.tolist()
+    if isinstance(top_thrpt_indices, np.ndarray):
+        top_thrpt_indices = top_thrpt_indices.tolist()
+    return train_df, test_df, test_rank_df, train_indices, test_indices, top_thrpt_indices
 
 
 def get_data(data_path, thrpt_threshold=0):
