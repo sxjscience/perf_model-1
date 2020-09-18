@@ -78,8 +78,8 @@ def split_train_test_df(df, seed, ratio, top_sample_ratio=0.2, group_size=10, K=
     test_df
         The testing dataframe. This contains samples in the test set,
         and can be used for regression analysis
-    test_rank_df
-        The dataframe that is used to verify the ranking model.
+    test_rank_array
+        The numpy array that is used to verify the ranking model.
         (#Test * K, group_size)
     """
     rng = np.random.RandomState(seed)
@@ -114,8 +114,8 @@ def split_train_test_df(df, seed, ratio, top_sample_ratio=0.2, group_size=10, K=
             group_indices = (rng.choice(num_samples - 1, group_size - 1, True) + idx + 1) % num_samples
             group_indices = np.append(group_indices, idx)
             test_rank_df.append(group_indices)
-    test_rank_df = pd.DataFrame(test_rank_df)
-    return train_df, test_df, test_rank_df
+    test_rank_array = np.array(test_rank_df)
+    return train_df, test_df, test_rank_array
 
 
 def get_data(data_path, thrpt_threshold=0):
@@ -221,7 +221,7 @@ def main():
 
     if args.split_test:
         df = get_data(args.dataset)
-        train_df, test_df, test_rank_df =\
+        train_df, test_df, test_rank_arr =\
             split_train_test_df(df,
                                 args.seed,
                                 args.split_test_ratio,
@@ -234,7 +234,7 @@ def main():
                       args.split_rank_test_name))
         train_df.to_csv(args.split_train_name)
         test_df.to_csv(args.split_test_name)
-        test_rank_df.to_csv(args.split_rank_test_name)
+        np.save(args.split_rank_test_name, test_rank_arr)
     else:
         pass
 
