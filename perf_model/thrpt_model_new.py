@@ -225,7 +225,7 @@ def main():
                                                               args.seed,
                                                               args.split_test_ratio,
                                                               args.split_top_ratio,
-                                                              args.split_rank_group_sizes,
+                                                              args.split_rank_group_size,
                                                               args.split_rank_K)
         train_df.to_csv(args.split_train_name)
         test_df.to_csv(args.split_test_name)
