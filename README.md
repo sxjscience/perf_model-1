@@ -1,5 +1,14 @@
-## Train Ranking Models with Neural Network
+## Download the Example Dataset and Pretrained Models
 
+```bash
+aws s3 cp --recursive s3://hyuz-shared-data/dataset_0726 tuning_dataset
+aws s3 cp --recursive s3://hyuz-shared-data/trained_models trained_models
+```
+
+## Train Ranking Models with Neural Network
+```
+python3 perf_model/thrpt_model_new.py --
+```
 
 
 ## Train Listwise Rank Model with Catboost
@@ -75,24 +84,6 @@ python3 app/main.py --list-net ./skylake_models --target "llvm -mcpu=skylake-avx
 cd tests; sh train.sh
 ```
 
-### Run Training with AutoGluon (not working yet)
-
-```bash
-cd tests; sh auto_train.sh
-```
-
-### Download the Example Dataset and Pretrained Models
-
-```bash
-aws s3 cp --recursive s3://hyuz-shared-data/dataset_0726 tuning_dataset
-aws s3 cp --recursive s3://hyuz-shared-data/trained_models trained_models
-```
-
-### Use AutoGluon Tabular
-
-```bash
-python thrpt_model.py --dataset depthwise_conv2d_nchw.cuda.csv --algo auto --out_dir thrpt_autogluon
-```
 
 ### Learning to Rank (Pairwise) + NN
 

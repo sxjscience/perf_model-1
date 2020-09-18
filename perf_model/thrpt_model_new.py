@@ -182,7 +182,7 @@ def parse_args():
     parser.add_argument('--split_test', action='store_true',
                         help='When turned on, we will try to split the data into training, '
                              'and testing.')
-    split_args = parser.add_argument_group('data_split')
+    split_args = parser.add_argument_group('data split arguments')
     split_args.add_argument('--dataset',
                             type=str,
                             required=True,
@@ -193,6 +193,8 @@ def parse_args():
                             help='Name of the testing split.')
     split_args.add_argument('--split_rank_test_name', default=None,
                             help='Name of the rank test model.')
+    split_args.add_argument('--split_test_ratio', default=0.1,
+                            help='Ratio of the test set in the split.')
     split_args.add_argument('--split_top_ratio', default=0.2,
                             help='Ratio of the top samples that will be split to the test set.')
     split_args.add_argument('--split_rank_group_size', default=10,
@@ -221,6 +223,7 @@ def main():
         df = get_data(args.dataset)
         train_df, test_df, test_rank_df = split_train_test_df(df,
                                                               args.seed,
+                                                              args.split_test_ratio,
                                                               args.split_top_ratio,
                                                               args.split_rank_group_sizes,
                                                               args.split_rank_K)
@@ -229,6 +232,7 @@ def main():
         test_rank_df.to_csv(args.split_rank_test_name)
     else:
         pass
+
 
 if __name__ == "__main__":
     main()
