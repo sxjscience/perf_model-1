@@ -1,3 +1,5 @@
+set -ex
+
 mkdir split_tuning_dataset
 for fold in `ls tuning_dataset`;
 do
