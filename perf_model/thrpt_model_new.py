@@ -199,7 +199,7 @@ def parse_args():
                             help='Ratio of the top samples that will be split to the test set.')
     split_args.add_argument('--split_rank_group_size', default=10,
                             help='Size of each rank group.')
-    split_args.add_argument('--split_rank_K', default=10,
+    split_args.add_argument('--split_rank_K', default=20,
                             help='K of each rank group.')
     parser.add_argument('--algo',
                         choices=['cat', 'nn'],
