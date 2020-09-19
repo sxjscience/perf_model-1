@@ -232,7 +232,7 @@ def main():
               .format(args.split_train_name,
                       args.split_test_name,
                       args.split_rank_test_name))
-        train_df.rest_index(inplace=True)
+        train_df.reset_index(inplace=True)
         test_df.reset_index(inplace=True)
         train_df.to_csv(args.split_train_name)
         test_df.to_csv(args.split_test_name)
