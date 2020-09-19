@@ -10,11 +10,19 @@ import random
 import pandas as pd
 
 
+def read_pd(path):
+    try:
+        df = pd.read_csv(path)
+    except Exception:
+        df = pd.read_parquet(path)
+    return df
+
+
 def analyze_valid_threshold(dataset):
     """Analyze throughputs and determine the invalid threshold."""
     MAX_INVALID_THD = 10
 
-    df = pd.read_csv(dataset)
+    df = read_pd(dataset)
     stats = pd.cut(x=df['thrpt'],
                    include_lowest=True,
                    bins=np.arange(0, ceil(max(df['thrpt'])) + 1, 0.1)).value_counts().sort_index()

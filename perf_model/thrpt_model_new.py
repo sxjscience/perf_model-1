@@ -13,7 +13,7 @@ import pandas as pd
 import tqdm
 from sklearn.metrics import ndcg_score
 from sklearn.model_selection import train_test_split
-from util import analyze_valid_threshold, logging_config
+from util import analyze_valid_threshold, logging_config, read_pd
 
 
 def set_seed(seed):
@@ -138,7 +138,7 @@ def get_data(data_path, thrpt_threshold=0):
         invalid_thd = analyze_valid_threshold(data_path)
     else:
         invalid_thd = 0
-    df = pd.read_csv(data_path)
+    df = read_pd(data_path)
     # Pre-filter the invalid through-puts.
     # For these throughputs, we can directly obtain the result from the ValidNet
     logging.info('Invalid throughput is set to %.1f GFLOP/s', invalid_thd)
