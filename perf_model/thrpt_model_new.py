@@ -195,7 +195,7 @@ def parse_args():
                             help='Name of the rank test model.')
     split_args.add_argument('--split_test_ratio', default=0.1,
                             help='Ratio of the test set in the split.')
-    split_args.add_argument('--split_top_ratio', default=0.2,
+    split_args.add_argument('--split_top_ratio', default=0.05,
                             help='Ratio of the top samples that will be split to the test set.')
     split_args.add_argument('--split_rank_group_size', default=10,
                             help='Size of each rank group.')
