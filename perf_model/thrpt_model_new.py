@@ -232,6 +232,7 @@ def main():
               .format(args.split_train_name,
                       args.split_test_name,
                       args.split_rank_test_name))
+        print(train_df)
         train_df.copy().to_csv(args.split_train_name)
         test_df.copy().to_csv(args.split_test_name)
         np.save(args.split_rank_test_name, test_rank_arr)
