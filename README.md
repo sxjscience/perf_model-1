@@ -5,6 +5,11 @@ aws s3 cp --recursive s3://hyuz-shared-data/dataset_0726 tuning_dataset
 aws s3 cp --recursive s3://hyuz-shared-data/trained_models trained_models
 ```
 
+We can generate the dataset as follows:
+```
+bash split_data.sh
+```
+
 ## Train Ranking Models with Neural Network
 ```
 python3 perf_model/thrpt_model_new.py --
