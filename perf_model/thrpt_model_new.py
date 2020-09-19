@@ -215,11 +215,9 @@ def parse_args():
 
 def main():
     args = parse_args()
-    logging_config(folder='.', name='thrpt_model')
     set_seed(args.seed)
-    logging_config(args.out_dir, 'thrpt_model')
-
     if args.split_test:
+        logging_config(args.out_dir, 'split_data')
         df = get_data(args.dataset)
         train_df, test_df, test_rank_arr =\
             split_train_test_df(df,
@@ -228,18 +226,19 @@ def main():
                                 args.split_top_ratio,
                                 args.split_rank_group_size,
                                 args.split_rank_K)
-        print('Generate train data to {}, test data to {}, test rank data to {}'
-              .format(args.split_train_name,
-                      args.split_test_name,
-                      args.split_rank_test_name))
+        logging.info('Generate train data to {}, test data to {}, test rank data to {}'
+                     .format(args.split_train_name,
+                             args.split_test_name,
+                             args.split_rank_test_name))
         train_df.reset_index(inplace=True)
         test_df.reset_index(inplace=True)
         train_df.to_csv(args.split_train_name)
         test_df.to_csv(args.split_test_name)
         np.save(args.split_rank_test_name, test_rank_arr)
-        print('  #Train = {}, #Test = {}, #Ranking Test Groups = {}'.format(len(train_df),
-                                                                            len(test_df),
-                                                                            len(test_rank_arr)))
+        logging.info('  #Train = {}, #Test = {}, #Ranking Test Groups = {}'
+                     .format(len(train_df),
+                             len(test_df),
+                             len(test_rank_arr)))
     else:
         pass
 
