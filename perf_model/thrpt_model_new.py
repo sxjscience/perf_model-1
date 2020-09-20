@@ -185,8 +185,7 @@ class CatRegressor:
         params = {
             'loss_function': 'RMSE',
             'task_type': 'GPU',
-            # 'iterations': 5000,
-            # 'learning_rate': 1E-2,
+            'iterations': 10000,
             'verbose': True,
             'train_dir': train_dir,
             'random_seed': seed
@@ -217,8 +216,6 @@ class CatRegressor:
         preds = self.model.predict(features.reshape((-1, features_shape[-1])))
         preds = preds.reshape(features_shape[:-1])
         preds = np.max(preds, 0)
-        print(preds)
-        ch = input()
         return preds
 
     def evaluate(self, features, labels, mode='regression'):
