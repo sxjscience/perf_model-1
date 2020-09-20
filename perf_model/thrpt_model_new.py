@@ -118,8 +118,7 @@ def split_train_test_df(df, seed, ratio, top_sample_ratio=0.2, group_size=10, K=
     return train_df, test_df, test_rank_array
 
 
-def get_data\
-                (data_path, thrpt_threshold=0):
+def get_data(data_path, thrpt_threshold=0):
     """Load data from the data path
 
     Parameters
@@ -162,17 +161,54 @@ def get_data\
     return df, used_keys
 
 
+def get_feature_label(df):
+    feature_keys = [ele for ele in df.keys() if ele != 'thrpt']
+    features = df[feature_keys].to_numpy()
+    labels = df['thrpt'].to_numpy()
+    return features, labels
+
+
+def train_cat_regression(train_df, valid_df, train_valid_df,
+                         valid_rank_indices,
+                         all_df, test_df, test_rank_indices, args):
+    import catboost
+    train_features, train_labels = get_feature_label(train_df)
+    train_pool = catboost.Pool(data=train_features,
+                               label=train_labels)
+    params = {
+        'loss_function': 'mse',
+        'task_type': 'GPU',
+        'iterations': 2000,
+        'verbose': True,
+        'train_dir': args.out_dir,
+        'random_seed': args.seed
+    }
+    
+
+
+def train_cat_ranking(train_df, valid_df, train_valid_df,
+                      valid_rank_indices,
+                      all_df, test_df, test_rank_indices, args):
+    import catboost
+    train_features, train_labels = get_feature_label(train_df)
+
+
+
 def parse_args():
     parser = argparse.ArgumentParser(description='Performance Model')
     parser.add_argument('--seed',
                         type=int,
                         default=100,
                         help='Seed for the training.')
-    parser.add_argument('--train_dataset',
+    parser.add_argument('--train_prefix',
                         type=str,
                         default=None,
-                        help='path to the training csv file.')
-    parser.add_argument('--test_dataset',
+                        help='Prefix of the training dataset.')
+    parser.add_argument('--test_regression_dataset',
+                        type=str,
+                        default=None,
+                        help='path to the test csv file.')
+    parser.add_argument('--test_rank_dataset',
                         type=str,
                         default=None,
                         help='path to the test csv file.')
@@ -207,13 +243,12 @@ def parse_args():
     split_args.add_argument('--split_rank_K', default=10,
                             help='K of each rank group.')
     parser.add_argument('--algo',
-                        choices=['cat', 'nn'],
-                        default='cat',
+                        choices=['cat_regression',
+                                 'cat_ranking'
+                                 'nn_regression',
+                                 'nn_ranking'],
+                        default='cat_regression',
                         help='The algorithm to use.')
-    parser.add_argument('--problem_type',
-                        choices=['regression', 'ranking'],
-                        default='ranking',
-                        help='The problem type')
     args = parser.parse_args()
     return args
 
