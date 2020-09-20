@@ -343,6 +343,7 @@ def main():
             with open(args.used_key_path, 'w') as of:
                 json.dump(used_keys, of)
     else:
+        logging_config(args.out_dir, 'train')
         train_df = read_pd(args.data_prefix + '.train.pq')
         valid_df = read_pd(args.data_prefix + '.valid.pq')
         test_df = read_pd(args.data_prefix + '.test.pq')
