@@ -11,10 +11,15 @@ import pandas as pd
 
 
 def read_pd(path):
-    try:
-        df = pd.read_csv(path)
-    except Exception:
-        df = pd.read_parquet(path)
+    df = None
+    for reader in [pd.read_csv, pd.read_parquet, pd.read_pickle]:
+        try:
+            df = reader(path)
+            break
+        except Exception:
+            continue
+    if df is None:
+        raise RuntimeError('Cannot load {}'.format(path))
     return df
 
 

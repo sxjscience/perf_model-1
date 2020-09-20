@@ -237,8 +237,8 @@ def main():
                              args.split_rank_test_name))
         train_df.reset_index(drop=True, inplace=True)
         test_df.reset_index(drop=True, inplace=True)
-        train_df.to_csv(args.split_train_name)
-        test_df.to_csv(args.split_test_name)
+        train_df.to_parquet(args.split_train_name)
+        test_df.to_parquet(args.split_test_name)
         np.save(args.split_rank_test_name, test_rank_arr)
         logging.info('  #Train = {}, #Test = {}, #Ranking Test Groups = {}'
                      .format(len(train_df),
