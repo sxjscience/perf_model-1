@@ -221,8 +221,9 @@ class CatRegressor:
     def evaluate(self, features, labels, mode='regression'):
         preds = self.predict(features)
         if mode == 'regression':
-            mse = np.mean(np.square(preds - labels))
-            return {'mse': mse}
+            rmse = np.sqrt(np.mean(np.square(preds - labels)))
+            mae = np.mean(np.abs(preds - labels))
+            return {'rmse': rmse, 'mae': mae}
         elif mode == 'ranking':
             # We calculate two things, the NDCG score and the MRR score.
             ndcg_score = ndcg_score(y_true=labels, y_score=preds)
@@ -233,6 +234,7 @@ class CatRegressor:
             return {'ndcg': ndcg_score, 'mrr': mrr}
         else:
             raise NotImplementedError
+
 
 class CatRanker:
     def __init__(self, model=None):
@@ -256,49 +258,6 @@ class CatRanker:
                                  label=valid_labels)
         self.model.fit(train_pool, eval_set=dev_pool)
         pass
-
-
-def train_cat_regression(train_df, valid_df, test_df,
-                         valid_rank_features, valid_rank_labels,
-                         test_rank_features, test_rank_labels, args):
-    import catboost
-    train_features, train_labels = get_feature_label(train_df)
-    valid_features, valid_labels = get_feature_label(valid_df)
-    test_features, test_labels = get_feature_label(test_df)
-    train_pool = catboost.Pool(data=train_features,
-                               label=train_labels)
-    dev_pool = catboost.Pool(data=valid_features,
-                             label=valid_labels)
-    params = {
-        'loss_function': 'MAE',
-        'task_type': 'GPU',
-        'iterations': 2000,
-        'verbose': True,
-        'train_dir': args.out_dir,
-        'random_seed': args.seed
-    }
-    model = catboost.CatBoost(params)
-    model.fit(train_pool, eval_set=dev_pool)
-    valid_pred = model.predict(valid_features)
-    test_pred = model.predict(test_features)
-    valid_mse = np.mean(np.square(valid_pred - valid_labels))
-
-
-
-def train_cat_ranking(train_df, valid_df, train_valid_df,
-                      valid_rank_indices,
-                      all_df, test_df, test_rank_indices, args):
-    import catboost
-    train_features, train_labels = get_feature_label(train_df)
-    params = {
-        'loss_function': args.rank_loss_function,
-        'custom_metric': ['NDCG', 'AverageGain:top=10'],
-        'task_type': 'GPU',
-        'iterations': args.niter,
-        'verbose': True,
-        'train_dir': args.out_dir,
-        'random_seed': args.seed
-    }
 
 
 def parse_args():
