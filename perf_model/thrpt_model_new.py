@@ -307,18 +307,10 @@ def parse_args():
                         type=int,
                         default=100,
                         help='Seed for the training.')
-    parser.add_argument('--train_prefix',
+    parser.add_argument('--data_prefix',
                         type=str,
                         default=None,
-                        help='Prefix of the training dataset.')
-    parser.add_argument('--test_regression_dataset',
-                        type=str,
-                        default=None,
-                        help='path to the test csv file.')
-    parser.add_argument('--test_rank_dataset',
-                        type=str,
-                        default=None,
-                        help='path to the test csv file.')
+                        help='Prefix of the training/validation/testing dataset.')
     parser.add_argument('--out_dir',
                         type=str,
                         default='thrpt_model_out',
@@ -392,7 +384,38 @@ def main():
             with open(args.used_key_path, 'w') as of:
                 json.dump(used_keys, of)
     else:
-        pass
+        train_df = read_pd(args.data_prefix + '.train.pq')
+        valid_df = read_pd(args.data_prefix + '.valid.pq')
+        test_df = read_pd(args.data_prefix + '.test.pq')
+        rank_valid = np.load(args.data_prefix + '.rank_valid.npz')
+        rank_test = np.load(args.data_prefix + '.rank_test.npz')
+        with open(args.data_prefix + '.used_key.json', 'r') as in_f:
+            used_key = json.load(in_f)
+        train_df = train_df[used_key]
+        valid_df = valid_df[used_key]
+        test_df = test_df[used_key]
+        if args.algo == 'cat_regression':
+            model = CatRegressor()
+            model.fit(train_df, valid_df, train_dir=args.out_dir, seed=args.seed)
+            model.save(args.out_dir)
+            valid_features, valid_labels = get_feature_label(valid_df)
+            test_features, test_labels = get_feature_label(test_df)
+            valid_score = model.evaluate(valid_features, valid_labels, 'regression')
+            test_score = model.evaluate(test_features, test_labels, 'regression')
+            valid_ranking_score = model.evaluate(rank_valid['rank_features'],
+                                                 rank_valid['rank_labels'],
+                                                 'ranking')
+            test_ranking_score = model.evaluate(rank_test['rank_features'],
+                                                rank_test['rank_labels'],
+                                                'ranking')
+            valid_score.update(valid_ranking_score)
+            test_score.update(test_ranking_score)
+            logging.info('Valid Score=', valid_score)
+            logging.info('Test Score=', test_score)
+            with open(os.path.join(args.out_dir, 'valid_scores.json'), 'w') as out_f:
+                json.dump(valid_score, out_f)
+            with open(os.path.join(args.out_dir, 'test_scores.json'), 'w') as out_f:
+                json.dump(test_score, out_f)
 
 
 if __name__ == "__main__":
