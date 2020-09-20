@@ -216,6 +216,7 @@ class CatRegressor:
         features_shape = features.shape
         preds = self.model.predict(features.reshape((-1, features_shape[-1])))
         preds = preds.reshape(features_shape[:-1])
+        preds = np.max(preds, 0)
         print(preds)
         ch = input()
         return preds
