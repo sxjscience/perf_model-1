@@ -1,4 +1,5 @@
 set -ex
+mkdir -p split_dataset
 
 for fold in `ls tuning_dataset`;
 do
@@ -21,5 +22,10 @@ do
                 --split_test_name ${prefix_name}.valid.csv \
                 --split_rank_test_name ${prefix_name}.rank_valid.npy \
                 --seed 123
+        mv ${prefix_name}.train.csv split_dataset
+        mv ${prefix_name}.valid.csv split_dataset
+        mv ${prefix_name}.test.csv split_dataset
+        mv ${prefix_name}.rank_valid.npy split_dataset
+        mv ${prefix_name}.rank_test.npy split_dataset
     done;
 done;
