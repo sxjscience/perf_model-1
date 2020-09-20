@@ -183,7 +183,7 @@ class CatRegressor:
 
     def fit(self, train_df, valid_df, train_dir, seed):
         params = {
-            'loss_function': 'MAE',
+            'loss_function': 'RMSE',
             'task_type': 'GPU',
             'iterations': 2000,
             'verbose': True,
@@ -212,8 +212,7 @@ class CatRegressor:
         self.model.save_model(os.path.join(out_dir, 'list_rank_net'), format='python')
 
     def predict(self, features):
-        if features.ndim > 2:
-            features_shape = features.shape
+        features_shape = features.shape
         preds = self.model.predict(features.reshape((-1, features_shape[-1])))
         preds = preds.reshape(features_shape[:-1])
         return preds
