@@ -27,7 +27,7 @@ do
         mv ${prefix_name}.valid.pq split_tuning_dataset/${fold}
         mv ${prefix_name}.train_val.pq split_tuning_dataset/${fold}
         mv ${prefix_name}.test.pq split_tuning_dataset/${fold}
-        mv ${prefix_name}.rank_valid.npy split_tuning_dataset/${fold}
-        mv ${prefix_name}.rank_test.npy split_tuning_dataset/${fold}
+        mv ${prefix_name}.rank_valid.npz split_tuning_dataset/${fold}
+        mv ${prefix_name}.rank_test.npz split_tuning_dataset/${fold}
     done;
 done;
