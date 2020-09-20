@@ -78,9 +78,8 @@ def split_train_test_df(df, seed, ratio, top_sample_ratio=0.2, group_size=10, K=
     test_df
         The testing dataframe. This contains samples in the test set,
         and can be used for regression analysis
-    test_rank_array
-        The numpy array that is used to verify the ranking model.
-        (#Test * K, group_size)
+    test_rank_group_features
+    test_rank_group_labels
     """
     rng = np.random.RandomState(seed)
     num_samples = len(df)
@@ -108,14 +107,20 @@ def split_train_test_df(df, seed, ratio, top_sample_ratio=0.2, group_size=10, K=
     test_df = df.iloc[test_indices]
     # Get ranking dataframe, for each sample in the test set, randomly sample
     # group_size - 1 elements
-    test_rank_df = []
+    test_rank_arr = []
     for i, idx in enumerate(test_indices):
         for _ in range(K):
             group_indices = (rng.choice(num_samples - 1, group_size - 1, True) + idx + 1) % num_samples
             group_indices = np.append(group_indices, idx)
-            test_rank_df.append(group_indices)
-    test_rank_array = np.array(test_rank_df)
-    return train_df, test_df, test_rank_array
+            test_rank_arr.append(group_indices)
+    # Shape (#samples, #group_size)
+    test_rank_array = np.array(test_rank_arr)
+    all_features, all_labels = get_feature_label(df)
+    # Shape (#samples, #group_size, #features)
+    rank_group_features = np.take(all_features, test_rank_array, axis=0)
+    # Shape (#samples, #group_size)
+    rank_group_labels = np.take(all_labels, test_rank_array, axis=0)
+    return train_df, test_df, rank_group_features, rank_group_labels
 
 
 def get_data(data_path, thrpt_threshold=0):
@@ -168,13 +173,19 @@ def get_feature_label(df):
     return features, labels
 
 
+
+
 def train_cat_regression(train_df, valid_df, train_valid_df,
                          valid_rank_indices,
                          all_df, test_df, test_rank_indices, args):
     import catboost
     train_features, train_labels = get_feature_label(train_df)
+    valid_features, valid_labels = get_feature_label(valid_df)
+    test_features, test_labels = get_feature_label(test_df)
     train_pool = catboost.Pool(data=train_features,
                                label=train_labels)
+    dev_pool = catboost.Pool(data=valid_features,
+                             label=valid_labels)
     params = {
         'loss_function': 'mse',
         'task_type': 'GPU',
@@ -183,6 +194,11 @@ def train_cat_regression(train_df, valid_df, train_valid_df,
         'train_dir': args.out_dir,
         'random_seed': args.seed
     }
+    model = catboost.CatBoost(params)
+    model.fit(train_pool, eval_set=dev_pool)
+    valid_pred = model.predict(valid_features)
+    test_pred = model.predict(test_features)
+    mse = np.mean(np.square(valid_pred - valid_labels))
 
 
 
@@ -191,7 +207,15 @@ def train_cat_ranking(train_df, valid_df, train_valid_df,
                       all_df, test_df, test_rank_indices, args):
     import catboost
     train_features, train_labels = get_feature_label(train_df)
-
+    params = {
+        'loss_function': args.rank_loss_function,
+        'custom_metric': ['NDCG', 'AverageGain:top=10'],
+        'task_type': 'GPU',
+        'iterations': args.niter,
+        'verbose': True,
+        'train_dir': args.out_dir,
+        'random_seed': args.seed
+    }
 
 
 def parse_args():
@@ -259,7 +283,7 @@ def main():
     if args.split_test:
         logging_config(args.out_dir, 'split_data')
         df, used_keys = get_data(args.dataset)
-        train_df, test_df, test_rank_arr =\
+        train_df, test_df, test_rank_group_features, test_rank_group_labels =\
             split_train_test_df(df,
                                 args.seed,
                                 args.split_test_ratio,
@@ -274,11 +298,13 @@ def main():
         test_df.reset_index(drop=True, inplace=True)
         train_df.to_parquet(args.split_train_name)
         test_df.to_parquet(args.split_test_name)
-        np.save(args.split_rank_test_name, test_rank_arr)
+        np.savez(args.split_rank_test_name,
+                 rank_features=test_rank_group_features,
+                 rank_labels=test_rank_group_labels)
         logging.info('  #Train = {}, #Test = {}, #Ranking Test Groups = {}'
                      .format(len(train_df),
                              len(test_df),
-                             len(test_rank_arr)))
+                             len(test_rank_group_features)))
         if args.save_used_keys:
             with open(args.used_key_path, 'w') as of:
                 json.dump(used_keys, of)
