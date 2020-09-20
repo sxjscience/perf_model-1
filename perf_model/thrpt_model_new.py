@@ -216,6 +216,8 @@ class CatRegressor:
         features_shape = features.shape
         preds = self.model.predict(features.reshape((-1, features_shape[-1])))
         preds = preds.reshape(features_shape[:-1])
+        print(preds)
+        ch = input()
         return preds
 
     def evaluate(self, features, labels, mode='regression'):
@@ -370,8 +372,8 @@ def main():
                                                 'ranking')
             valid_score.update(valid_ranking_score)
             test_score.update(test_ranking_score)
-            logging.info('Valid Score=', valid_score)
-            logging.info('Test Score=', test_score)
+            logging.info('Valid Score={}'.format(valid_score))
+            logging.info('Test Score={}'.format(test_score))
             with open(os.path.join(args.out_dir, 'valid_scores.json'), 'w') as out_f:
                 json.dump(valid_score, out_f)
             with open(os.path.join(args.out_dir, 'test_scores.json'), 'w') as out_f:
