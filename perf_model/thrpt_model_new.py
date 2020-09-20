@@ -5,10 +5,12 @@ import logging
 import os
 import multiprocessing
 import json
+import torch
 import matplotlib.pyplot as plt
 import torch as th
 import numpy as np
 import random
+import catboost
 import pandas as pd
 import tqdm
 from sklearn.metrics import ndcg_score
@@ -79,7 +81,9 @@ def split_train_test_df(df, seed, ratio, top_sample_ratio=0.2, group_size=10, K=
         The testing dataframe. This contains samples in the test set,
         and can be used for regression analysis
     test_rank_group_features
+        (#samples, #group_size, #features)
     test_rank_group_labels
+        (#samples, #group_size)
     """
     rng = np.random.RandomState(seed)
     num_samples = len(df)
@@ -114,7 +118,7 @@ def split_train_test_df(df, seed, ratio, top_sample_ratio=0.2, group_size=10, K=
             group_indices = np.append(group_indices, idx)
             test_rank_arr.append(group_indices)
     # Shape (#samples, #group_size)
-    test_rank_array = np.array(test_rank_arr)
+    test_rank_array = np.array(test_rank_arr, dtype=np.int64)
     all_features, all_labels = get_feature_label(df)
     # Shape (#samples, #group_size, #features)
     rank_group_features = np.take(all_features, test_rank_array, axis=0)
@@ -173,11 +177,90 @@ def get_feature_label(df):
     return features, labels
 
 
+class CatRegressor:
+    def __init__(self, model=None):
+        self.model = model
+
+    def fit(self, train_df, valid_df, train_dir, seed):
+        params = {
+            'loss_function': 'mse',
+            'task_type': 'GPU',
+            'iterations': 2000,
+            'verbose': True,
+            'train_dir': train_dir,
+            'random_seed': seed
+        }
+        self.model = catboost.CatBoost(params)
+        train_features, train_labels = get_feature_label(train_df)
+        valid_features, valid_labels = get_feature_label(valid_df)
+        train_pool = catboost.Pool(data=train_features,
+                                   label=train_labels)
+        dev_pool = catboost.Pool(data=valid_features,
+                                 label=valid_labels)
+        self.model.fit(train_pool, eval_set=dev_pool)
+
+    @classmethod
+    def load(cls, path):
+        try:
+            model = catboost.CatBoost().load_model(path)
+            return cls(model=model)
+        except NameError:  # CatBoost is unavailable. Try to load Python model.
+            pass
+
+    def save(self, out_dir):
+        self.model.save_model(os.path.join(out_dir, 'list_rank_net.cbm'))
+        self.model.save_model(os.path.join(out_dir, 'list_rank_net'), format='python')
+
+    def predict(self, features):
+        if features.ndim > 2:
+            features_shape = features.shape
+        preds = self.model.predict(features.reshape((-1, features_shape[-1])))
+        preds = preds.reshape(features_shape[:-1])
+        return preds
+
+    def evaluate(self, features, labels, mode='regression'):
+        preds = self.predict(features)
+        if mode == 'regression':
+            mse = np.mean(np.square(preds - labels))
+            return {'mse': mse}
+        elif mode == 'ranking':
+            # We calculate two things, the NDCG score and the MRR score.
+            ndcg_score = ndcg_score(y_true=labels, y_score=preds)
+            ranks = np.argsort(-preds, axis=-1) + 1
+            true_max_indices = np.argmax(labels, axis=-1)
+            rank_of_max = ranks[np.arange(len(true_max_indices)), true_max_indices]
+            mrr = np.mean(1.0 / rank_of_max)
+            return {'ndcg': ndcg_score, 'mrr': mrr}
+        else:
+            raise NotImplementedError
+
+class CatRanker:
+    def __init__(self, model=None):
+        self.model = model
+
+    def fit(self, train_df, valid_ranking_features, valid_ranking_labels, train_dir, seed):
+        params = {
+            'loss_function': 'YetiRank',
+            'custom_metric': ['NDCG', 'AverageGain:top=10'],
+            'task_type': 'GPU',
+            'iterations': 2000,
+            'verbose': True,
+            'train_dir': train_dir,
+            'random_seed': seed
+        }
+        self.model = catboost.CatBoost(params)
+        train_features, train_labels = get_feature_label(train_df)
+        train_pool = catboost.Pool(data=train_features,
+                                   label=train_labels)
+        dev_pool = catboost.Pool(data=valid_features,
+                                 label=valid_labels)
+        self.model.fit(train_pool, eval_set=dev_pool)
+        pass
 
 
-def train_cat_regression(train_df, valid_df, train_valid_df,
-                         valid_rank_indices,
-                         all_df, test_df, test_rank_indices, args):
+def train_cat_regression(train_df, valid_df, test_df,
+                         valid_rank_features, valid_rank_labels,
+                         test_rank_features, test_rank_labels, args):
     import catboost
     train_features, train_labels = get_feature_label(train_df)
     valid_features, valid_labels = get_feature_label(valid_df)
@@ -198,7 +281,7 @@ def train_cat_regression(train_df, valid_df, train_valid_df,
     model.fit(train_pool, eval_set=dev_pool)
     valid_pred = model.predict(valid_features)
     test_pred = model.predict(test_features)
-    mse = np.mean(np.square(valid_pred - valid_labels))
+    valid_mse = np.mean(np.square(valid_pred - valid_labels))
 
 
 
