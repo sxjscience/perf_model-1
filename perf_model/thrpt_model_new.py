@@ -270,7 +270,7 @@ def train_cat_regression(train_df, valid_df, test_df,
     dev_pool = catboost.Pool(data=valid_features,
                              label=valid_labels)
     params = {
-        'loss_function': 'mse',
+        'loss_function': 'MAE',
         'task_type': 'GPU',
         'iterations': 2000,
         'verbose': True,
