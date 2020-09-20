@@ -118,7 +118,8 @@ def split_train_test_df(df, seed, ratio, top_sample_ratio=0.2, group_size=10, K=
     return train_df, test_df, test_rank_array
 
 
-def get_data(data_path, thrpt_threshold=0):
+def get_data\
+                (data_path, thrpt_threshold=0):
     """Load data from the data path
 
     Parameters
@@ -158,7 +159,7 @@ def get_data(data_path, thrpt_threshold=0):
     logging.info('Original keys=%s, Not used keys=%s', list(df.keys()),
                  not_used_keys)
     df = df[used_keys]
-    return df
+    return df, used_keys
 
 
 def parse_args():
@@ -187,6 +188,10 @@ def parse_args():
                             type=str,
                             required=True,
                             help='path to the input csv file.')
+    split_args.add_argument('--save_used_keys', action='store_true',
+                            help='Store the used keys.')
+    split_args.add_argument('--used_key_path', default=None,
+                            help='Path of the used key.')
     split_args.add_argument('--split_train_name', default=None,
                             help='Name of the training split.')
     split_args.add_argument('--split_test_name', default=None,
@@ -218,7 +223,7 @@ def main():
     set_seed(args.seed)
     if args.split_test:
         logging_config(args.out_dir, 'split_data')
-        df = get_data(args.dataset)
+        df, used_keys = get_data(args.dataset)
         train_df, test_df, test_rank_arr =\
             split_train_test_df(df,
                                 args.seed,
@@ -239,6 +244,9 @@ def main():
                      .format(len(train_df),
                              len(test_df),
                              len(test_rank_arr)))
+        if args.save_used_keys:
+            with open(args.used_key_path, 'w') as of:
+                json.dump(used_keys, of)
     else:
         pass
 
