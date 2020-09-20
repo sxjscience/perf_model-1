@@ -3,7 +3,7 @@ mkdir -p split_tuning_dataset
 
 for fold in `ls tuning_dataset`;
 do
-    mkdir split_tuning_dataset/${fold}
+    mkdir -p split_tuning_dataset/${fold}
     for fname in `ls tuning_dataset/$fold/*.csv`;
     do
         prefix_name=${fname:0:-4}
