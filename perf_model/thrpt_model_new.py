@@ -321,7 +321,7 @@ def parse_args():
     split_args = parser.add_argument_group('data split arguments')
     split_args.add_argument('--dataset',
                             type=str,
-                            required=True,
+                            default=None,
                             help='path to the input csv file.')
     split_args.add_argument('--save_used_keys', action='store_true',
                             help='Store the used keys.')
