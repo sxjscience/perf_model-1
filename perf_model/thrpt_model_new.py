@@ -183,7 +183,7 @@ class CatRegressor:
 
     def fit(self, train_df, valid_df, train_dir, seed):
         params = {
-            'loss_function': 'mse',
+            'loss_function': 'MAE',
             'task_type': 'GPU',
             'iterations': 2000,
             'verbose': True,
