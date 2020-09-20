@@ -186,7 +186,7 @@ class CatRegressor:
             'loss_function': 'RMSE',
             'task_type': 'GPU',
             'iterations': 5000,
-            'learning_rate': 1E-3,
+            'learning_rate': 1E-2,
             'verbose': True,
             'train_dir': train_dir,
             'random_seed': seed
