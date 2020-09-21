@@ -333,7 +333,7 @@ class NNRanker:
                                          batch_size=batch_size,
                                          group_size=group_size)
         dataloader = DataLoader(dataset, batch_sampler=batch_sampler, num_workers=4)
-        optimizer = torch.optim.SGD(self.net.parameters(), lr=lr)
+        optimizer = torch.optim.Adam(self.net.parameters(), lr=lr)
         loss_fn = get_ranking_loss(self._rank_loss_fn)
         dataloader = iter(dataloader)
         for niter in range(num_iters):
