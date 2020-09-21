@@ -10,7 +10,7 @@ We can generate the dataset as follows:
 bash split_data.sh
 ```
 
-## Train Ranking Models with Neural Network
+## Train Performance Models with Different Algorithms 
 ```
 python3 perf_model/thrpt_model_new.py \
     --algo cat_regression \
