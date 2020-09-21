@@ -8,7 +8,7 @@ from .losses import approxNDCGLoss, listMLE
 
 def get_activation(act_type):
     if act_type == 'leaky':
-        return nn.LeakyReLU()
+        return nn.LeakyReLU(0.1)
     elif act_type == 'elu':
         return nn.ELU()
     else:
