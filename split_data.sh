@@ -18,7 +18,7 @@ do
                 --seed 123
         mv ${prefix_name}.train.pq split_tuning_dataset/${fold}
         mv ${prefix_name}.test.pq split_tuning_dataset/${fold}
-        mv ${prefix_name}.rank_test.npz split_tuning_dataset/${fold}
+        mv ${prefix_name}.rank_test.* split_tuning_dataset/${fold}
         mv ${prefix_name}.used_key.json split_tuning_dataset/${fold}
     done;
 done;
