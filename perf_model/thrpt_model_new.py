@@ -427,6 +427,8 @@ def parse_args():
                                  'nn'],
                         default='cat_regression',
                         help='The algorithm to use.')
+    parser.add_argument('--iter_mult', default=500, type=int,
+                        help='Lambda value of the ranking loss.')
     parser.add_argument('--rank_lambda', default=1.0, type=float,
                         help='Lambda value of the ranking loss.')
     args = parser.parse_args()
@@ -498,8 +500,7 @@ def main():
                 json.dump(test_score, out_f)
         elif args.algo == 'nn':
             model = NNRanker()
-            print(args.rank_lambda)
-            model.fit(train_df, rank_lambda=args.rank_lambda)
+            model.fit(train_df, rank_lambda=args.rank_lambda, iter_mult=args.iter_mult)
             test_features, test_labels = get_feature_label(test_df)
             test_score = model.evaluate(test_features, test_labels, 'regression')
             test_ranking_score_all = model.evaluate(rank_test_all['rank_features'],
@@ -514,6 +515,8 @@ def main():
                                         test_ranking_score_valid.items()}
             test_score.update(test_ranking_score_valid)
             logging.info('Test Score={}'.format(test_score))
+        else:
+            raise NotImplementedError
 
 
 if __name__ == "__main__":
