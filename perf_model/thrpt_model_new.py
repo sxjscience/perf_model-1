@@ -353,10 +353,12 @@ class NNRanker:
 
     def predict(self, features):
         features_shape = features.shape
+        features = torch.tensor(features)
         self.net.cpu()
         self.net.eval()
         preds = self.net(features.reshape((-1, features_shape[-1])))
         preds = preds.reshape(features_shape[:-1])
+        preds = preds.numpy()
         return preds
 
     def evaluate(self, features, labels, mode='ranking'):
