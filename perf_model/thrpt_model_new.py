@@ -343,6 +343,7 @@ class NNRanker:
             loss = loss_fn(y_pred=ranking_scores,
                            y_true=torch.argsort(ranking_labels, dim=-1, descending=True))
             loss.backward()
+            print(loss)
             optimizer.step()
 
     def predict(self, features):
