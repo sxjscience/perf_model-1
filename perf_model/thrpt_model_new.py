@@ -498,6 +498,7 @@ def main():
                 json.dump(test_score, out_f)
         elif args.algo == 'nn':
             model = NNRanker()
+            print(args.rank_lambda)
             model.fit(train_df, rank_lambda=args.rank_lambda)
             test_features, test_labels = get_feature_label(test_df)
             test_score = model.evaluate(test_features, test_labels, 'regression')
