@@ -3,7 +3,7 @@ import torch.nn as nn
 import numpy as np
 import torch.nn.functional as F
 from torch.distributions.dirichlet import Dirichlet
-from allrank.models.losses import approxNDCGLoss, listMLE
+from .losses import approxNDCGLoss, listMLE
 
 
 def get_activation(act_type):
