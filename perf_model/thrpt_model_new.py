@@ -359,8 +359,7 @@ class NNRanker:
             ranking_scores = ranking_scores.reshape((batch_size, group_size))
             loss_regression = torch.square(ranking_scores - ranking_labels).mean()
             loss_ranking = loss_fn(y_pred=ranking_scores,
-                                                 y_true=th.argsort(ranking_labels, dim=-1,
-                                                                   descending=True))
+                                   y_true=ranking_labels)
             loss = loss_regression + lambda_rank * loss_ranking
             loss.backward()
             optimizer.step()
