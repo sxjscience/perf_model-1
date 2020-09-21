@@ -301,8 +301,9 @@ class NNRanker:
                                     act_type=self._act_type)
         self.net.cuda()
         self.net.train()
-        mean_val = labels.mean()
-        std_val = labels.std()
+        valid_labels = labels[labels > 0]
+        mean_val = valid_labels.mean()
+        std_val = valid_labels.std()
         self._mean_val = mean_val
         self._std_val = std_val
         th_features = th.tensor(features, dtype=th.float32)
