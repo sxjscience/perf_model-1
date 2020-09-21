@@ -208,8 +208,8 @@ class CatRegressor:
             pass
 
     def save(self, out_dir):
-        self.model.save_model(os.path.join(out_dir, 'list_rank_net.cbm'))
-        self.model.save_model(os.path.join(out_dir, 'list_rank_net'), format='python')
+        self.model.save_model(os.path.join(out_dir, 'cat_regression.cbm'))
+        self.model.save_model(os.path.join(out_dir, 'cat_regression'), format='python')
 
     def predict(self, features):
         features_shape = features.shape
