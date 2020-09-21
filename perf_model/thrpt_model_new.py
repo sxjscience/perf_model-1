@@ -109,19 +109,20 @@ def split_train_test_df(df, seed, ratio, top_sample_ratio=0.2, group_size=10, K=
     test_df = df.iloc[test_indices]
     # Get ranking dataframe, for each sample in the test set, randomly sample
     # group_size - 1 elements
+    num_test_samples = len(test_indices)
     test_rank_arr = []
-    for i, idx in enumerate(test_indices):
+    for i in range(num_test_samples):
         for _ in range(K):
-            group_indices = (rng.choice(num_samples - 1, group_size - 1, True) + idx + 1) % num_samples
-            group_indices = np.append(group_indices, idx)
+            group_indices = (rng.choice(num_test_samples - 1, group_size - 1, True) + i + 1) % num_test_samples
+            group_indices = np.append(group_indices, i)
             test_rank_arr.append(group_indices)
     # Shape (#samples, #group_size)
     test_rank_array = np.array(test_rank_arr, dtype=np.int64)
-    all_features, all_labels = get_feature_label(df)
+    test_features, test_labels = get_feature_label(test_df)
     # Shape (#samples, #group_size, #features)
-    rank_group_features = np.take(all_features, test_rank_array, axis=0)
+    rank_group_features = np.take(test_features, test_rank_array, axis=0)
     # Shape (#samples, #group_size)
-    rank_group_labels = np.take(all_labels, test_rank_array, axis=0)
+    rank_group_labels = np.take(test_labels, test_rank_array, axis=0)
     return train_df, test_df, rank_group_features, rank_group_labels
 
 
