@@ -317,9 +317,9 @@ class NNRanker:
         self._mean_val = None
         self._std_val = None
 
-    def fit(self, train_df, batch_size=512, group_size=10,
-            num_iters=5000, lr=1E-3):
+    def fit(self, train_df, batch_size=512, group_size=10, lr=1E-3, iter_mult=20):
         features, labels = get_feature_label(train_df)
+        num_iters = (len(features) // batch_size) * iter_mult
         if self.net is None:
             self.net = RankingModel(in_units=features.shape[1],
                                     units=self._units,
@@ -353,8 +353,8 @@ class NNRanker:
             ranking_scores = self.net(ranking_features)
             ranking_scores = ranking_scores.reshape((batch_size, group_size))
             loss_regression = torch.square(ranking_scores - ranking_labels).mean()
-            loss_ranking = 10 * loss_fn(y_pred=ranking_scores,
-                                        y_true=th.argsort(ranking_labels, dim=-1, descending=True))
+            loss_ranking = loss_fn(y_pred=ranking_scores,
+                                   y_true=th.argsort(ranking_labels, dim=-1, descending=True))
             loss = loss_regression + loss_ranking
             loss.backward()
             print('Regression Loss:', loss_regression, 'Ranking Loss:', loss_ranking)
