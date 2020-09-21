@@ -261,8 +261,9 @@ class CatRanker:
                 'random_seed': seed
             }
             self.model = catboost.CatBoost(params)
+            init_model = None
         else:
-            
+            init_model = self.model
         train_features, train_labels = get_feature_label(train_df)
         train_pool = catboost.Pool(data=train_features,
                                    label=train_labels)
