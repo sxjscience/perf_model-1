@@ -317,7 +317,7 @@ class NNRanker:
         self._mean_val = None
         self._std_val = None
 
-    def fit(self, train_df, batch_size=512, group_size=10, lr=1E-3, iter_mult=20):
+    def fit(self, train_df, batch_size=512, group_size=10, lr=1E-3, iter_mult=100):
         features, labels = get_feature_label(train_df)
         num_iters = (len(features) // batch_size) * iter_mult
         if self.net is None:
