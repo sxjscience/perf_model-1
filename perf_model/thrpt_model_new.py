@@ -315,7 +315,8 @@ class NNRanker:
         self._act_type = act_type
         self._rank_loss_fn = rank_loss_fn
 
-    def fit(self, train_df, batch_size=512, group_size=10, num_iters=2000, lr=1E-3):
+    def fit(self, train_df, batch_size=1024, group_size=10,
+            num_iters=2000, lr=1E-2):
         features, labels = get_feature_label(train_df)
         if self.net is None:
             self.net = RankingModel(in_units=features.shape[1],
@@ -343,7 +344,30 @@ class NNRanker:
                            y_true=torch.argsort(ranking_labels, dim=-1, descending=True))
             loss.backward()
             optimizer.step()
-            print(loss)
+
+    def predict(self, features):
+        features_shape = features.shape
+        preds = self.net(features.reshape((-1, features_shape[-1])))
+        preds = preds.reshape(features_shape[:-1])
+        return preds
+
+    def evaluate(self, features, labels, mode='ranking'):
+        preds = self.predict(features)
+        if mode == 'ranking':
+            # We calculate two things, the NDCG score and the MRR score.
+            ndcg_val = ndcg_score(y_true=labels, y_score=preds)
+            ndcg_K3_val = ndcg_score(y_true=labels, y_score=preds, k=3)
+            absolute_ndcg_score = ndcg_score(y_true=np.argsort(-labels), y_score=preds)
+            ranks = np.argsort(-preds, axis=-1) + 1
+            true_max_indices = np.argmax(labels, axis=-1)
+            rank_of_max = ranks[np.arange(len(true_max_indices)), true_max_indices]
+            mrr = np.mean(1.0 / rank_of_max)
+            return {'ndcg': ndcg_val,
+                    'ndcg_k3': ndcg_K3_val,
+                    'abs_ndcg': absolute_ndcg_score,
+                    'mrr': mrr, 'rank_of_top': 1 / mrr}
+        else:
+            raise NotImplementedError
 
 
 def parse_args():
@@ -463,6 +487,19 @@ def main():
         elif args.algo == 'nn_ranking':
             model = NNRanker()
             model.fit(train_df)
+            test_score = {}
+            test_ranking_score_all = model.evaluate(rank_test_all['rank_features'],
+                                                    rank_test_all['rank_labels'],
+                                                    'ranking')
+            test_ranking_score_all = {k + '_all': v for k, v in test_ranking_score_all.items()}
+            test_score.update(test_ranking_score_all)
+            test_ranking_score_valid = model.evaluate(rank_test_valid['rank_features'],
+                                                      rank_test_valid['rank_labels'],
+                                                      'ranking')
+            test_ranking_score_valid = {k + '_valid': v for k, v in
+                                        test_ranking_score_valid.items()}
+            test_score.update(test_ranking_score_valid)
+            logging.info('Test Score={}'.format(test_score))
 
 
 if __name__ == "__main__":
