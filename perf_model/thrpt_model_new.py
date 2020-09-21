@@ -319,7 +319,6 @@ class NNRanker:
         log_regression_loss = 0
         log_ranking_loss = 0
         log_cnt = 0
-        rank_lambda = th.tensor(rank_lambda, dtype=th.float32).cuda()
         for niter in range(num_iters):
             ranking_features, ranking_labels = next(dataloader)
             ranking_labels = (ranking_labels - mean_val) / std_val
@@ -428,7 +427,7 @@ def parse_args():
                                  'nn'],
                         default='cat_regression',
                         help='The algorithm to use.')
-    parser.add_argument('--rank_lambda', default=1.0,
+    parser.add_argument('--rank_lambda', default=1.0, dtype=float,
                         help='Lambda value of the ranking loss.')
     args = parser.parse_args()
     return args
