@@ -14,7 +14,7 @@ bash split_data.sh
 
 ## Train Performance Models with Different Algorithms 
 ```
-python3 perf_model/thrpt_model_new.py \
+python3 -m perf_model/thrpt_model_new.py \
     --algo cat_regression \
     --data_prefix split_tuning_dataset/gcv_t4_csv/depthwise_conv2d_nchw.cuda \
     --out_dir depthwise_conv2d_nchw.cuda/cat_regression
