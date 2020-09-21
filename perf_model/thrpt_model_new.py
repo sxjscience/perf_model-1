@@ -337,7 +337,8 @@ class NNRanker:
         dataloader = iter(dataloader)
         for niter in range(num_iters):
             ranking_features, ranking_labels = next(dataloader)
-            ranking_features.cuda()
+            ranking_features = ranking_features.cuda()
+            ranking_labels = ranking_labels.cuda()
             ranking_labels.cuda()
             optimizer.zero_grad()
             ranking_labels = ranking_labels.reshape((batch_size, group_size))
