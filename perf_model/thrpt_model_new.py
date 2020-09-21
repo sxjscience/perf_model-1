@@ -193,7 +193,6 @@ class CatRegressor:
             self.model = catboost.CatBoost(params)
             init_model = None
         else:
-            incremental_learning = True
             init_model = self.model
         train_features, train_labels = get_feature_label(train_df)
         train_pool = catboost.Pool(data=train_features,
@@ -233,7 +232,7 @@ class CatRegressor:
             return {'rmse': rmse, 'mae': mae}
         elif mode == 'ranking':
             # We calculate two things, the NDCG score and the MRR score.
-            ndcg_val = ndcg_score(y_true=labels, y_score=preds)
+            ndcg_val = ndcg_score(y_true=np.log(labels + 1.0), y_score=preds)
             ranks = np.argsort(-preds, axis=-1) + 1
             true_max_indices = np.argmax(labels, axis=-1)
             rank_of_max = ranks[np.arange(len(true_max_indices)), true_max_indices]
