@@ -296,6 +296,7 @@ class NNRanker:
         log_interval = (len(features) + batch_size - 1) // batch_size * (iter_mult // 20)
         num_iters = ((len(features) + batch_size - 1) // batch_size) * iter_mult
         if self.net is None:
+            self._in_units = features.shape[1]
             self.net = RankingModel(in_units=features.shape[1],
                                     units=self._units,
                                     num_layers=self._num_layers,
