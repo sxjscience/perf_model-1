@@ -43,6 +43,10 @@ def create_config():
                         type=int,
                         default=32,
                         help='Number of top configs to be measured')
+    parser.add_argument('--n-trial',
+                        type=int,
+                        default=5000,
+                        help='The number of trials')
     parser.add_argument('--graph',
                         action='store_true',
                         help='Enable graph tuning (X86 only)')
@@ -154,6 +158,7 @@ def tune_kernels(tasks,
                  measure_option,
                  tuner='random',
                  early_stopping=None,
+                 n_trial=5000,
                  log_filename='tuning.log'):
     """Tune kernels with the ranking model."""
 
@@ -168,7 +173,6 @@ def tune_kernels(tasks,
 
     for i, task in enumerate(tasks):
         prefix = "[Task %2d/%2d] " % (i + 1, len(tasks))
-        n_trial = 5000  #len(task.config_space)
 
         callbacks = []
 
@@ -334,6 +338,7 @@ def main():
         'log_filename': 'tune.log',
         'tuner': 'round',
         'early_stopping': None,
+        'n_trial': configs.n_trial,
         'measure_option': measure_option,
     }
 
