@@ -17,7 +17,7 @@ from torch.utils.data import DataLoader
 from torch.utils.data.dataset import TensorDataset
 from sklearn.metrics import ndcg_score
 from .util import analyze_valid_threshold, logging_config, read_pd
-from .nn_ranker import RankGroupSampler, RankingModel
+from .nn_ranker import RankGroupSampler, RankingModel, get_ranking_loss
 
 
 def set_seed(seed):
@@ -298,9 +298,31 @@ class CatRanker:
 
 
 class NNRanker:
-    def fit(self, train_df, batch_size=512, group_size=10,
-            valid_ranking_features=None, valid_ranking_labels=None):
+    def __init__(self, in_units=None, units=32, num_layers=3,
+                 dropout=0.1, act_type='elu',
+                 rank_loss_fn='approx_ndcg'):
+        if in_units is None:
+            self.net = None
+        else:
+            self.net = RankingModel(in_units=in_units,
+                                    units=units,
+                                    num_layers=num_layers,
+                                    dropout=dropout,
+                                    act_type=act_type)
+        self._units = units
+        self._num_layers = num_layers
+        self._dropout = dropout
+        self._act_type = act_type
+        self._rank_loss_fn = rank_loss_fn
+
+    def fit(self, train_df, batch_size=512, group_size=10, num_iters=2000, lr=1E-3):
         features, labels = get_feature_label(train_df)
+        if self.net is None:
+            self.net = RankingModel(in_units=features.shape[1],
+                                    units=self._units,
+                                    num_layers=self._num_layers,
+                                    dropout=self._dropout,
+                                    act_type=self._act_type)
         th_features = th.tensor(features, dtype=th.float32)
         th_labels = th.tensor(labels, dtype=th.float32)
         dataset = TensorDataset(th_features, th_labels)
@@ -308,9 +330,20 @@ class NNRanker:
                                          batch_size=batch_size,
                                          group_size=group_size)
         dataloader = DataLoader(dataset, batch_sampler=batch_sampler, num_workers=4)
-        for sample in dataloader:
-            print(sample)
-            ch = input()
+        optimizer = torch.optim.Adam(self.net.parameters(), lr=lr)
+        loss_fn = get_ranking_loss(self._rank_loss_fn)
+        for niter in range(num_iters):
+            ranking_features, ranking_labels = next(dataloader)
+            optimizer.zero_grad()
+            ranking_features = ranking_features.reshape((batch_size, group_size,
+                                                         features.shape[1]))
+            ranking_labels = ranking_labels.reshape((batch_size, group_size))
+            ranking_scores = self.net(ranking_features)
+            loss = loss_fn(y_pred=ranking_scores,
+                           y_true=torch.argsort(ranking_labels, dim=-1, descending=True))
+            loss.backward()
+            optimizer.step()
+            print(loss)
 
 
 def parse_args():

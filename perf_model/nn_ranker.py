@@ -16,10 +16,12 @@ def get_activation(act_type):
 
 
 def get_ranking_loss(loss_type):
-    if loss_type == 'approxNDCG':
+    if loss_type == 'approx_ndcg':
         return approxNDCGLoss
-    elif loss_type == 'listMLE':
+    elif loss_type == 'list_mle':
         return listMLE
+    else:
+        raise NotImplementedError
 
 
 class RankingModel(nn.Module):
@@ -46,12 +48,12 @@ class RankingModel(nn.Module):
         Parameters
         ----------
         X
-            Shape (batch_size, units)
+            Shape (batch_size, *, units)
 
         Returns
         -------
         scoress
-            Shape (batch_size,)
+            Shape (batch_size, *)
         """
         return self.net(X)[:, 0]
 
