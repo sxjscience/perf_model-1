@@ -298,7 +298,7 @@ class CatRanker:
 
 
 class NNRanker:
-    def __init__(self, in_units=None, units=32, num_layers=3,
+    def __init__(self, in_units=None, units=128, num_layers=3,
                  dropout=0.1, act_type='elu',
                  rank_loss_fn='approx_ndcg'):
         if in_units is None:
@@ -316,7 +316,7 @@ class NNRanker:
         self._rank_loss_fn = rank_loss_fn
 
     def fit(self, train_df, batch_size=1024, group_size=10,
-            num_iters=2000, lr=1E-3):
+            num_iters=2000, lr=1E-2):
         features, labels = get_feature_label(train_df)
         if self.net is None:
             self.net = RankingModel(in_units=features.shape[1],
