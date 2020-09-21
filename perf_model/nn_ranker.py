@@ -3,6 +3,7 @@ import torch.nn as nn
 import numpy as np
 import torch.nn.functional as F
 from torch.distributions.dirichlet import Dirichlet
+from allrank.models.losses import approxNDCGLoss, listMLE
 
 
 def get_activation(act_type):
@@ -12,6 +13,13 @@ def get_activation(act_type):
         return nn.ELU()
     else:
         raise NotImplementedError
+
+
+def get_ranking_loss(loss_type):
+    if loss_type == 'approxNDCG':
+        return approxNDCGLoss
+    elif loss_type == 'listMLE':
+        return listMLE
 
 
 class RankingModel(nn.Module):
