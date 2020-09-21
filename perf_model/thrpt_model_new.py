@@ -326,6 +326,8 @@ class NNRanker:
                                     act_type=self._act_type)
         self.net.cuda()
         self.net.train()
+        mean_val = labels.mean()
+        std_val = labels.std()
         th_features = th.tensor(features, dtype=th.float32)
         th_labels = th.tensor(labels, dtype=th.float32)
         dataset = TensorDataset(th_features, th_labels)
@@ -338,6 +340,7 @@ class NNRanker:
         dataloader = iter(dataloader)
         for niter in range(num_iters):
             ranking_features, ranking_labels = next(dataloader)
+            ranking_labels = (ranking_labels - mean_val) / std_val
             ranking_features = ranking_features.cuda()
             ranking_labels = ranking_labels.cuda()
             ranking_labels.cuda()
