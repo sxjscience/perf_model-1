@@ -271,7 +271,8 @@ class CatRegressor:
 class NNRanker:
     def __init__(self, in_units=None, units=256, num_layers=2,
                  dropout=0.1, act_type='leaky',
-                 rank_loss_fn='approx_ndcg'):
+                 rank_loss_fn='approx_ndcg',
+                 mean_val=None, std_val=None):
         if in_units is None:
             self.net = None
         else:
@@ -280,13 +281,14 @@ class NNRanker:
                                     num_layers=num_layers,
                                     dropout=dropout,
                                     act_type=act_type)
+        self._in_units = in_units
         self._units = units
         self._num_layers = num_layers
         self._dropout = dropout
         self._act_type = act_type
         self._rank_loss_fn = rank_loss_fn
-        self._mean_val = None
-        self._std_val = None
+        self._mean_val = mean_val
+        self._std_val = std_val
 
     def fit(self, train_df, batch_size=512, group_size=10, lr=1E-3,
             iter_mult=500, rank_lambda=1.0):
@@ -353,7 +355,25 @@ class NNRanker:
 
     def save(self, out_dir):
         os.makedirs(out_dir)
-        torch.save(self.net, )
+        torch.save(self.net.state_dict(), os.path.join(out_dir, 'model_states.th'))
+        model_cfg = {'in_units': self._in_units,
+                     'units': self._units,
+                     'num_layers': self._num_layers,
+                     'dropout': self._dropout,
+                     'act_type': self._act_type,
+                     'rank_loss_fn': self._rank_loss_fn,
+                     'mean_val': self._mean_val,
+                     'std_val': self._std_val}
+        with open(os.path.join(out_dir, 'model_config.json'), 'w') as out_f:
+            json.dump(model_cfg, out_f)
+
+    @classmethod
+    def load(cls, model_dir):
+        with open(os.path.join(model_dir, 'model_config.json'), 'r') as in_f:
+            cfg = json.load(in_f)
+        model = cls(**cfg)
+        model.net.load_state_dict(torch.load(os.path.join(model_dir, 'model_states.th')))
+        return model
 
     def predict(self, features):
         features_shape = features.shape
@@ -509,6 +529,7 @@ def main():
         elif args.algo == 'nn':
             model = NNRanker()
             model.fit(train_df, rank_lambda=args.rank_lambda, iter_mult=args.iter_mult)
+            model.save(args.out_dir)
             test_features, test_labels = get_feature_label(test_df)
             test_score = model.evaluate(test_features, test_labels, 'regression')
             test_ranking_score_all = model.evaluate(rank_test_all['rank_features'],
