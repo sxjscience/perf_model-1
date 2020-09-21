@@ -389,6 +389,7 @@ def main():
         train_df = read_pd(args.data_prefix + '.train.pq')
         test_df = read_pd(args.data_prefix + '.test.pq')
         rank_test_all = np.load(args.data_prefix + '.rank_test.all.npz')
+        rank_test_valid = np.load(args.data_prefix + '.rank_test.valid.npz')
         with open(args.data_prefix + '.used_key.json', 'r') as in_f:
             used_key = json.load(in_f)
         train_df = train_df[used_key]
@@ -399,9 +400,12 @@ def main():
             model.save(args.out_dir)
             test_features, test_labels = get_feature_label(test_df)
             test_score = model.evaluate(test_features, test_labels, 'regression')
-            test_ranking_score = model.evaluate(rank_test['rank_features'],
-                                                rank_test['rank_labels'],
+            test_ranking_score = model.evaluate(rank_test_all['rank_features'],
+                                                rank_test_all['rank_labels'],
                                                 'ranking')
+            test_ranking_score_valid = model.evaluate(rank_test_valid['rank_features'],
+                                                      rank_test_valid['rank_labels'],
+                                                      'ranking')
             test_score.update(test_ranking_score)
             logging.info('Test Score={}'.format(test_score))
             with open(os.path.join(args.out_dir, 'test_scores.json'), 'w') as out_f:
