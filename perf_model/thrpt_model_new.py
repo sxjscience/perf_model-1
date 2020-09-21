@@ -88,41 +88,37 @@ def split_train_test_df(df, seed, ratio, top_sample_ratio=0.2, group_size=10, K=
     num_samples = len(df)
     test_num = int(np.ceil(ratio * num_samples))
     train_num = len(df) - test_num
-    top_test_num = int(test_num * top_sample_ratio)
-    other_test_num = test_num - top_test_num
-    if top_test_num > 0:
-        # The test samples contain the top throughput samples + random samples
-        thrpt = df['thrpt']
-        idx = np.argsort(thrpt)
-        top_thrpt_indices = idx[-top_test_num:]
-        other_thrpt_indices = idx[:(-top_test_num)]
-        rng.shuffle(other_thrpt_indices)
-        other_test_thrpt_indices = other_thrpt_indices[-other_test_num:]
-        test_indices = np.concatenate([top_thrpt_indices, other_test_thrpt_indices], axis=0)
-        train_indices = other_thrpt_indices[:(-other_test_num)]
-    else:
-        top_thrpt_indices = []
-        perm = rng.permutation(len(df))
-        train_indices = perm[:train_num]
-        test_indices = perm[train_num:]
+    thrpt = df['thrpt'].to_numpy()
+
+    # Perform stratified sampling.
+    # Here, we only consider two buckets: those with thrpt == 0 (invalid), and those that are valid.
+    all_valid_indices = (thrpt > 0).nonzero()[0]
+    all_invalid_indices = (thrpt == 0).nonzero()[0]
+    rng.shuffle(all_valid_indices)
+    rng.shuffle(all_invalid_indices)
+    valid_test_num = int(np.ceil(len(all_valid_indices) * ratio))
+    invalid_test_num = test_num - valid_test_num
+    test_indices = np.concatenate([all_valid_indices[:valid_test_num],
+                                   all_invalid_indices[:invalid_test_num]], axis=0)
+    train_indices = np.concatenate([all_valid_indices[valid_test_num:],
+                                    all_invalid_indices[invalid_test_num:]], axis=0)
     train_df = df.iloc[train_indices]
     test_df = df.iloc[test_indices]
-    # Get ranking dataframe, for each sample in the test set, randomly sample
-    # group_size - 1 elements
-    num_test_samples = len(test_indices)
+    # Get ranking dataframe, we choose the valid thrpts in the test set and sample groups.
     test_rank_arr = []
-    for i in range(num_test_samples):
+    for idx in all_valid_indices[:valid_test_num]:
         for _ in range(K):
-            group_indices = (rng.choice(num_test_samples - 1, group_size - 1, True) + i + 1) % num_test_samples
-            group_indices = np.append(group_indices, i)
+            group_indices = (rng.choice(num_samples - 1,
+                                        group_size - 1, True) + idx + 1) % num_samples
+            group_indices = np.append(group_indices, idx)
             test_rank_arr.append(group_indices)
     # Shape (#samples, #group_size)
     test_rank_array = np.array(test_rank_arr, dtype=np.int64)
-    test_features, test_labels = get_feature_label(test_df)
+    all_features, all_labels = get_feature_label(df)
     # Shape (#samples, #group_size, #features)
-    rank_group_features = np.take(test_features, test_rank_array, axis=0)
+    rank_group_features = np.take(all_features, test_rank_array, axis=0)
     # Shape (#samples, #group_size)
-    rank_group_labels = np.take(test_labels, test_rank_array, axis=0)
+    rank_group_labels = np.take(all_labels, test_rank_array, axis=0)
     return train_df, test_df, rank_group_features, rank_group_labels
 
 
@@ -319,7 +315,7 @@ def parse_args():
                             help='Ratio of the top samples that will be split to the test set.')
     split_args.add_argument('--split_rank_group_size', default=10,
                             help='Size of each rank group.')
-    split_args.add_argument('--split_rank_K', default=10,
+    split_args.add_argument('--split_rank_K', default=20,
                             help='K of each rank group.')
     parser.add_argument('--algo',
                         choices=['cat_regression',
