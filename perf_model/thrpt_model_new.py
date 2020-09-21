@@ -316,7 +316,7 @@ class NNRanker:
         self._rank_loss_fn = rank_loss_fn
 
     def fit(self, train_df, batch_size=512, group_size=10,
-            num_iters=2000, lr=1E-2):
+            num_iters=2000, lr=1E-3):
         features, labels = get_feature_label(train_df)
         if self.net is None:
             self.net = RankingModel(in_units=features.shape[1],
