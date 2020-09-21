@@ -320,17 +320,16 @@ class NNRanker:
         log_cnt = 0
         for niter in range(num_iters):
             ranking_features, ranking_labels = next(dataloader)
-            ranking_labels = (ranking_labels - mean_val) / std_val
+            norm_ranking_labels = (ranking_labels - mean_val) / std_val
             ranking_features = ranking_features.cuda()
-            ranking_labels = ranking_labels.cuda()
-            ranking_labels.cuda()
+            norm_ranking_labels = norm_ranking_labels.cuda()
             optimizer.zero_grad()
-            ranking_labels = ranking_labels.reshape((batch_size, group_size))
+            norm_ranking_labels = norm_ranking_labels.reshape((batch_size, group_size))
             ranking_scores = self.net(ranking_features)
             ranking_scores = ranking_scores.reshape((batch_size, group_size))
-            loss_regression = torch.abs(ranking_scores - ranking_labels).mean()
+            loss_regression = torch.abs(ranking_scores - norm_ranking_labels).mean()
             loss_ranking = loss_fn(y_pred=ranking_scores,
-                                   y_true=ranking_labels)
+                                   y_true=ranking_labels / std_val)
             loss = loss_regression + rank_lambda * loss_ranking
             loss.backward()
             optimizer.step()
@@ -368,7 +367,7 @@ class NNRanker:
             # We calculate two things, the NDCG score and the MRR score.
             ndcg_val = ndcg_score(y_true=labels, y_score=preds)
             ndcg_K3_val = ndcg_score(y_true=labels, y_score=preds, k=3)
-            normalized_ndcg_score = ndcg_score(y_true=(labels - self._mean_val) / self._std_val,
+            normalized_ndcg_score = ndcg_score(y_true=labels / self._std_val,
                                                y_score=preds)
             ranks = np.argsort(-preds, axis=-1) + 1
             true_max_indices = np.argmax(labels, axis=-1)
