@@ -248,17 +248,21 @@ class CatRanker:
     def __init__(self, model=None):
         self.model = model
 
-    def fit(self, train_df, valid_ranking_features, valid_ranking_labels, train_dir, seed):
-        params = {
-            'loss_function': 'YetiRank',
-            'custom_metric': ['NDCG', 'AverageGain:top=10'],
-            'task_type': 'GPU',
-            'iterations': 2000,
-            'verbose': True,
-            'train_dir': train_dir,
-            'random_seed': seed
-        }
-        self.model = catboost.CatBoost(params)
+    def fit(self, train_df, valid_ranking_features=None, valid_ranking_labels=None,
+            train_dir='.', seed=123):
+        if self.model is None:
+            params = {
+                'loss_function': 'YetiRank',
+                'custom_metric': ['NDCG', 'AverageGain:top=10'],
+                'task_type': 'GPU',
+                'iterations': 2000,
+                'verbose': True,
+                'train_dir': train_dir,
+                'random_seed': seed
+            }
+            self.model = catboost.CatBoost(params)
+        else:
+            
         train_features, train_labels = get_feature_label(train_df)
         train_pool = catboost.Pool(data=train_features,
                                    label=train_labels)
