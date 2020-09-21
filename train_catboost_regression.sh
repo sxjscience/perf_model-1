@@ -1,3 +1,5 @@
+set -ex
+
 mkdir -p model_results
 for train_file in `ls split_tuning_dataset/*/*.train.pq`;
 do
