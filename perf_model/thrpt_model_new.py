@@ -231,7 +231,7 @@ class CatRegressor:
             true_max_indices = np.argmax(labels, axis=-1)
             rank_of_max = ranks[np.arange(len(true_max_indices)), true_max_indices]
             mrr = np.mean(1.0 / rank_of_max)
-            return {'ndcg': ndcg_val, 'mrr': mrr}
+            return {'ndcg': ndcg_val, 'mrr': mrr, 'rank_of_top': 1 / mrr}
         else:
             raise NotImplementedError
 
