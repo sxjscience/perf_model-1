@@ -300,7 +300,7 @@ class CatRanker:
 class NNRanker:
     def __init__(self, in_units=None, units=128, num_layers=3,
                  dropout=0.1, act_type='elu',
-                 rank_loss_fn='list_mle'):
+                 rank_loss_fn='approx_ndcg'):
         if in_units is None:
             self.net = None
         else:
@@ -346,7 +346,7 @@ class NNRanker:
             ranking_scores = self.net(ranking_features)
             ranking_scores = ranking_scores.reshape((batch_size, group_size))
             loss = loss_fn(y_pred=ranking_scores,
-                           y_true=torch.argsort(ranking_labels, dim=-1, descending=True))
+                           y_true=ranking_labels)
             loss.backward()
             print(loss)
             optimizer.step()
