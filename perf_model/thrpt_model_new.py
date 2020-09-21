@@ -324,6 +324,7 @@ class NNRanker:
                                     num_layers=self._num_layers,
                                     dropout=self._dropout,
                                     act_type=self._act_type)
+        self.net.cuda()
         th_features = th.tensor(features, dtype=th.float32)
         th_labels = th.tensor(labels, dtype=th.float32)
         dataset = TensorDataset(th_features, th_labels)
