@@ -215,7 +215,7 @@ class CatRegressor:
         features_shape = features.shape
         preds = self.model.predict(features.reshape((-1, features_shape[-1])))
         preds = preds.reshape(features_shape[:-1])
-        preds = np.max(preds, 0)
+        preds = np.maximum(preds, 0)
         return preds
 
     def evaluate(self, features, labels, mode='regression'):
