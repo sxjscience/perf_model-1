@@ -289,7 +289,7 @@ class NNRanker:
         self._std_val = None
 
     def fit(self, train_df, batch_size=512, group_size=10, lr=1E-3,
-            iter_mult=500, lambda_rank=1.0):
+            iter_mult=500, rank_lambda=1.0):
         features, labels = get_feature_label(train_df)
         log_interval = (len(features) + batch_size - 1) // batch_size * (iter_mult // 20)
         num_iters = ((len(features) + batch_size - 1) // batch_size) * iter_mult
@@ -331,7 +331,7 @@ class NNRanker:
             loss_regression = torch.abs(ranking_scores - ranking_labels).mean()
             loss_ranking = loss_fn(y_pred=ranking_scores,
                                    y_true=ranking_labels)
-            loss = loss_regression + lambda_rank * loss_ranking
+            loss = loss_regression + rank_lambda * loss_ranking
             loss.backward()
             optimizer.step()
             with torch.no_grad():
@@ -498,7 +498,7 @@ def main():
                 json.dump(test_score, out_f)
         elif args.algo == 'nn':
             model = NNRanker()
-            model.fit(train_df, lambda_rank=args.rank_lambda)
+            model.fit(train_df, rank_lambda=args.rank_lambda)
             test_features, test_labels = get_feature_label(test_df)
             test_score = model.evaluate(test_features, test_labels, 'regression')
             test_ranking_score_all = model.evaluate(rank_test_all['rank_features'],
