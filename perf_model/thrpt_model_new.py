@@ -346,7 +346,7 @@ class NNRanker:
             ranking_scores = self.net(ranking_features)
             ranking_scores = ranking_scores.reshape((batch_size, group_size))
             loss = loss_fn(y_pred=ranking_scores,
-                           y_true=ranking_labels)
+                           y_true=th.argsort(ranking_labels, dim=-1, descending=True))
             loss.backward()
             print(loss)
             optimizer.step()
