@@ -427,7 +427,7 @@ def parse_args():
                                  'nn'],
                         default='cat_regression',
                         help='The algorithm to use.')
-    parser.add_argument('--rank_lambda', default=1.0, dtype=float,
+    parser.add_argument('--rank_lambda', default=1.0, type=float,
                         help='Lambda value of the ranking loss.')
     args = parser.parse_args()
     return args
