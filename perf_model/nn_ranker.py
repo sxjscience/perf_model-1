@@ -48,12 +48,12 @@ class RankingModel(nn.Module):
         Parameters
         ----------
         X
-            Shape (batch_size, *, units)
+            Shape (batch_size, units)
 
         Returns
         -------
-        scoress
-            Shape (batch_size, *)
+        scores
+            Shape (batch_size,)
         """
         return self.net(X)[:, 0]
 

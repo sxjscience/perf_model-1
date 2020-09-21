@@ -336,10 +336,9 @@ class NNRanker:
         for niter in range(num_iters):
             ranking_features, ranking_labels = next(dataloader)
             optimizer.zero_grad()
-            ranking_features = ranking_features.reshape((batch_size, group_size,
-                                                         features.shape[1]))
             ranking_labels = ranking_labels.reshape((batch_size, group_size))
             ranking_scores = self.net(ranking_features)
+            ranking_scores = ranking_scores.reshape((batch_size, group_size))
             loss = loss_fn(y_pred=ranking_scores,
                            y_true=torch.argsort(ranking_labels, dim=-1, descending=True))
             loss.backward()
