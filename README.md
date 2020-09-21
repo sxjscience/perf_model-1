@@ -83,6 +83,8 @@ As can be seen, each tuning task must have a corresponding folder name with trai
 Now we can finally auto-tune a DNN model:
 
 ```bash
+python3 app/main.py --list-net ./trained_models/listwise_t4 \
+                    --target "cuda -model=t4" --gcv MobileNetV2_1.0
 python3 app/main.py --list-net ./skylake_models --target "llvm -mcpu=skylake-avx512" --gcv MobileNetV2_1.0
 ```
 

@@ -13,8 +13,11 @@ import random
 import catboost
 import pandas as pd
 import tqdm
+from torch.utils.data import DataLoader
+from torch.utils.data.dataset import TensorDataset
 from sklearn.metrics import ndcg_score
 from .util import analyze_valid_threshold, logging_config, read_pd
+from .nn_ranker import RankGroupSampler, RankingModel
 
 
 def set_seed(seed):
@@ -295,10 +298,19 @@ class CatRanker:
 
 
 class NNRanker:
-    def fit(self, train_df, batch_size=32, group_size=10,
+    def fit(self, train_df, batch_size=512, group_size=10,
             valid_ranking_features=None, valid_ranking_labels=None):
-        pass
-
+        features, labels = get_feature_label(train_df)
+        th_features = th.tensor(features, dtype=th.float32)
+        th_labels = th.tensor(labels, dtype=th.float32)
+        dataset = TensorDataset(th_features, th_labels)
+        batch_sampler = RankGroupSampler(thrpt=train_df['thrpt'],
+                                         batch_size=batch_size,
+                                         group_size=group_size)
+        dataloader = DataLoader(dataset, batch_sampler=batch_sampler, num_workers=4)
+        for sample in dataloader:
+            print(sample)
+            ch = input()
 
 
 def parse_args():
@@ -416,7 +428,8 @@ def main():
             with open(os.path.join(args.out_dir, 'test_scores.json'), 'w') as out_f:
                 json.dump(test_score, out_f)
         elif args.algo == 'nn_ranking':
-            pass
+            model = NNRanker()
+            model.fit(train_df)
 
 
 if __name__ == "__main__":
