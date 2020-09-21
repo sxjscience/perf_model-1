@@ -289,7 +289,7 @@ class NNRanker:
         self._std_val = None
 
     def fit(self, train_df, batch_size=512, group_size=10, lr=1E-3,
-            iter_mult=500, lambda_rank=10.0):
+            iter_mult=500, lambda_rank=1.0):
         features, labels = get_feature_label(train_df)
         log_interval = (len(features) + batch_size - 1) // batch_size * (iter_mult // 20)
         num_iters = ((len(features) + batch_size - 1) // batch_size) * iter_mult
