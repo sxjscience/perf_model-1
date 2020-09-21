@@ -319,7 +319,7 @@ class NNRanker:
 
     def fit(self, train_df, batch_size=512, group_size=10, lr=1E-3, iter_mult=100):
         features, labels = get_feature_label(train_df)
-        num_iters = (len(features) // batch_size) * iter_mult
+        num_iters = ((len(features) + batch_size - 1) // batch_size) * iter_mult
         if self.net is None:
             self.net = RankingModel(in_units=features.shape[1],
                                     units=self._units,
