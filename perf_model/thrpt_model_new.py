@@ -365,14 +365,11 @@ def main():
     else:
         logging_config(args.out_dir, 'train')
         train_df = read_pd(args.data_prefix + '.train.pq')
-        valid_df = read_pd(args.data_prefix + '.valid.pq')
         test_df = read_pd(args.data_prefix + '.test.pq')
-        rank_valid = np.load(args.data_prefix + '.rank_valid.npz')
         rank_test = np.load(args.data_prefix + '.rank_test.npz')
         with open(args.data_prefix + '.used_key.json', 'r') as in_f:
             used_key = json.load(in_f)
         train_df = train_df[used_key]
-        valid_df = valid_df[used_key]
         test_df = test_df[used_key]
         if args.algo == 'cat_regression':
             model = CatRegressor()
