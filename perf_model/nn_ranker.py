@@ -26,7 +26,7 @@ def get_ranking_loss(loss_type):
 
 class RankingModel(nn.Module):
     def __init__(self, in_units, units=128, num_layers=3,
-                 dropout=0.1, act_type='leaky'):
+                 dropout=0.05, act_type='leaky'):
         super(RankingModel, self).__init__()
         layers = []
         for i in range(num_layers):
@@ -34,7 +34,7 @@ class RankingModel(nn.Module):
                                     out_features=units,
                                     bias=False))
             in_units = units
-            # layers.append(nn.BatchNorm1d(in_units))
+            layers.append(nn.BatchNorm1d(in_units))
             layers.append(get_activation(act_type))
             layers.append(nn.Dropout(dropout))
         layers.append(nn.Linear(in_features=in_units,
