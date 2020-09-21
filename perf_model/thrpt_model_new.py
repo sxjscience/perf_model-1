@@ -315,7 +315,7 @@ class NNRanker:
         self._act_type = act_type
         self._rank_loss_fn = rank_loss_fn
 
-    def fit(self, train_df, batch_size=1024, group_size=10,
+    def fit(self, train_df, batch_size=512, group_size=10,
             num_iters=2000, lr=1E-2):
         features, labels = get_feature_label(train_df)
         if self.net is None:
@@ -325,6 +325,7 @@ class NNRanker:
                                     dropout=self._dropout,
                                     act_type=self._act_type)
         self.net.cuda()
+        self.net.train()
         th_features = th.tensor(features, dtype=th.float32)
         th_labels = th.tensor(labels, dtype=th.float32)
         dataset = TensorDataset(th_features, th_labels)
@@ -352,6 +353,8 @@ class NNRanker:
 
     def predict(self, features):
         features_shape = features.shape
+        self.net.cpu()
+        self.net.eval()
         preds = self.net(features.reshape((-1, features_shape[-1])))
         preds = preds.reshape(features_shape[:-1])
         return preds
