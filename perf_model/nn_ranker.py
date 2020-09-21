@@ -25,11 +25,11 @@ class RankingModel(nn.Module):
 
 
 class RankGroupSampler:
-    def __init__(self, batch_size, length, group_size):
+    def __init__(self, num_samples, batch_size=512, group_size=10):
         self._batch_size = batch_size
-        self._length = length
+        self._num_samples = num_samples
         self._group_size = group_size
-        self._distribution = th.ones((batch_size, length)) / length
+        self._distribution = th.ones((batch_size, num_samples)) / num_samples
 
     def __iter__(self):
         with th.no_grad():
