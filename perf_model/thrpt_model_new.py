@@ -321,16 +321,16 @@ class NNRanker:
         log_cnt = 0
         for niter in range(num_iters):
             ranking_features, ranking_labels = next(dataloader)
-            norm_ranking_labels = (ranking_labels - mean_val) / std_val
+            ranking_labels = (ranking_labels - mean_val) / std_val
             ranking_features = ranking_features.cuda()
-            norm_ranking_labels = norm_ranking_labels.cuda()
+            ranking_labels = ranking_labels.cuda()
             optimizer.zero_grad()
-            norm_ranking_labels = norm_ranking_labels.reshape((batch_size, group_size))
+            ranking_labels = ranking_labels.reshape((batch_size, group_size))
             ranking_scores = self.net(ranking_features)
             ranking_scores = ranking_scores.reshape((batch_size, group_size))
-            loss_regression = torch.abs(ranking_scores - norm_ranking_labels).mean()
+            loss_regression = torch.abs(ranking_scores - ranking_labels).mean()
             loss_ranking = loss_fn(y_pred=ranking_scores,
-                                   y_true=ranking_labels / std_val)
+                                   y_true=ranking_labels / std_val + mean_val / std_val)
             loss = loss_regression + rank_lambda * loss_ranking
             loss.backward()
             optimizer.step()
