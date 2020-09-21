@@ -354,7 +354,7 @@ class NNRanker:
                     log_cnt = 0
 
     def save(self, out_dir):
-        os.makedirs(out_dir)
+        os.makedirs(out_dir, exist_ok=True)
         torch.save(self.net.state_dict(), os.path.join(out_dir, 'model_states.th'))
         model_cfg = {'in_units': self._in_units,
                      'units': self._units,
