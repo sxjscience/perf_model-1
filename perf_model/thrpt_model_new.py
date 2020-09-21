@@ -14,7 +14,6 @@ import catboost
 import pandas as pd
 import tqdm
 from sklearn.metrics import ndcg_score
-from sklearn.model_selection import train_test_split
 from .util import analyze_valid_threshold, logging_config, read_pd
 
 
