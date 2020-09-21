@@ -79,10 +79,16 @@ def split_train_test_df(df, seed, ratio, top_sample_ratio=0.2, group_size=10, K=
     test_df
         The testing dataframe. This contains samples in the test set,
         and can be used for regression analysis
-    test_rank_group_features
-        (#samples, #group_size, #features)
-    test_rank_group_labels
-        (#samples, #group_size)
+    test_rank_group_all_tuple
+        - test_rank_group_features_all
+            (#samples, #group_size, #features)
+        - test_rank_group_labels_all
+            (#samples, #group_size)
+    test_rank_group_valid_tuple
+        - test_rank_group_features_valid
+            (#samples, #group_size, #features)
+        - test_rank_group_labels_valid
+            (#samples, #group_size)
     """
     rng = np.random.RandomState(seed)
     num_samples = len(df)
@@ -104,7 +110,10 @@ def split_train_test_df(df, seed, ratio, top_sample_ratio=0.2, group_size=10, K=
                                     all_invalid_indices[invalid_test_num:]], axis=0)
     train_df = df.iloc[train_indices]
     test_df = df.iloc[test_indices]
-    # Get ranking dataframe, we choose the valid thrpts in the test set and sample groups.
+    # Get ranking dataframe, we sample two datasets:
+    # 1) We sample the valid thrpts in the test set and draw other samples from the whole dataset
+    # 2) We only sample groups from the valid thrpts.
+    all_features, all_labels = get_feature_label(df)
     test_rank_arr = []
     for idx in all_valid_indices[:valid_test_num]:
         for _ in range(K):
@@ -114,12 +123,25 @@ def split_train_test_df(df, seed, ratio, top_sample_ratio=0.2, group_size=10, K=
             test_rank_arr.append(group_indices)
     # Shape (#samples, #group_size)
     test_rank_array = np.array(test_rank_arr, dtype=np.int64)
-    all_features, all_labels = get_feature_label(df)
     # Shape (#samples, #group_size, #features)
-    rank_group_features = np.take(all_features, test_rank_array, axis=0)
+    rank_group_features_all = np.take(all_features, test_rank_array, axis=0)
     # Shape (#samples, #group_size)
-    rank_group_labels = np.take(all_labels, test_rank_array, axis=0)
-    return train_df, test_df, rank_group_features, rank_group_labels
+    rank_group_labels_all = np.take(all_labels, test_rank_array, axis=0)
+
+    test_rank_arr = []
+    for idx in all_valid_indices[:valid_test_num]:
+        for _ in range(K):
+            group_indices = (rng.choice(len(all_valid_indices) - 1,
+                                        group_size - 1, True) + idx + 1) % len(all_valid_indices)
+            group_indices = all_valid_indices[group_indices]
+            group_indices = np.append(group_indices, idx)
+            test_rank_arr.append(group_indices)
+    test_rank_array = np.array(test_rank_arr, dtype=np.int64)
+    rank_group_features_valid = np.take(all_features, test_rank_array, axis=0)
+    rank_group_labels_valid = np.take(all_labels, test_rank_array, axis=0)
+    return train_df, test_df,\
+           (rank_group_features_all, rank_group_labels_all),\
+           (rank_group_features_valid, rank_group_labels_valid)
 
 
 def get_data(data_path, thrpt_threshold=0):
@@ -307,8 +329,8 @@ def parse_args():
                             help='Name of the training split.')
     split_args.add_argument('--split_test_name', default=None,
                             help='Name of the testing split.')
-    split_args.add_argument('--split_rank_test_name', default=None,
-                            help='Name of the rank test model.')
+    split_args.add_argument('--split_rank_test_prefix', default=None,
+                            help='Prefix of the rank test datasets.')
     split_args.add_argument('--split_test_ratio', default=0.1,
                             help='Ratio of the test set in the split.')
     split_args.add_argument('--split_top_ratio', default=0.0,
@@ -334,7 +356,7 @@ def main():
     if args.split_test:
         logging_config(args.out_dir, 'split_data')
         df, used_keys = get_data(args.dataset)
-        train_df, test_df, test_rank_group_features, test_rank_group_labels =\
+        train_df, test_df, test_rank_group_sample_all, test_rank_group_sample_valid =\
             split_train_test_df(df,
                                 args.seed,
                                 args.split_test_ratio,
@@ -344,18 +366,21 @@ def main():
         logging.info('Generate train data to {}, test data to {}, test rank data to {}'
                      .format(args.split_train_name,
                              args.split_test_name,
-                             args.split_rank_test_name))
+                             args.split_rank_test_prefix))
         train_df.reset_index(drop=True, inplace=True)
         test_df.reset_index(drop=True, inplace=True)
         train_df.to_parquet(args.split_train_name)
         test_df.to_parquet(args.split_test_name)
-        np.savez(args.split_rank_test_name,
-                 rank_features=test_rank_group_features,
-                 rank_labels=test_rank_group_labels)
+        np.savez(args.split_rank_test_prefix + '.all.npz',
+                 rank_features=test_rank_group_sample_all[0],
+                 rank_labels=test_rank_group_sample_all[1])
+        np.savez(args.split_rank_test_prefix + '.valid.npz',
+                 rank_features=test_rank_group_sample_valid[0],
+                 rank_labels=test_rank_group_sample_valid[1])
         logging.info('  #Train = {}, #Test = {}, #Ranking Test Groups = {}'
                      .format(len(train_df),
                              len(test_df),
-                             len(test_rank_group_features)))
+                             len(test_rank_group_sample_all[0])))
         if args.save_used_keys:
             with open(args.used_key_path, 'w') as of:
                 json.dump(used_keys, of)
@@ -363,7 +388,7 @@ def main():
         logging_config(args.out_dir, 'train')
         train_df = read_pd(args.data_prefix + '.train.pq')
         test_df = read_pd(args.data_prefix + '.test.pq')
-        rank_test = np.load(args.data_prefix + '.rank_test.npz')
+        rank_test_all = np.load(args.data_prefix + '.rank_test.all.npz')
         with open(args.data_prefix + '.used_key.json', 'r') as in_f:
             used_key = json.load(in_f)
         train_df = train_df[used_key]

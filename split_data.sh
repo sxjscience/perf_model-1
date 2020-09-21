@@ -14,7 +14,7 @@ do
                 --dataset $fname \
                 --split_train_name ${prefix_name}.train.pq \
                 --split_test_name ${prefix_name}.test.pq \
-                --split_rank_test_name ${prefix_name}.rank_test.npz \
+                --split_rank_test_prefix ${prefix_name}.rank_test \
                 --seed 123
         mv ${prefix_name}.train.pq split_tuning_dataset/${fold}
         mv ${prefix_name}.test.pq split_tuning_dataset/${fold}
