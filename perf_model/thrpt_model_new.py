@@ -252,12 +252,14 @@ class CatRegressor:
             # We calculate two things, the NDCG score and the MRR score.
             ndcg_val = ndcg_score(y_true=labels, y_score=preds)
             ndcg_K3_val = ndcg_score(y_true=labels, y_score=preds, k=3)
+            absolute_ndcg_score = ndcg_score(y_true=np.argsort(-labels), y_score=preds)
             ranks = np.argsort(-preds, axis=-1) + 1
             true_max_indices = np.argmax(labels, axis=-1)
             rank_of_max = ranks[np.arange(len(true_max_indices)), true_max_indices]
             mrr = np.mean(1.0 / rank_of_max)
             return {'ndcg': ndcg_val,
                     'ndcg_k3': ndcg_K3_val,
+                    'abs_ndcg': absolute_ndcg_score,
                     'mrr': mrr, 'rank_of_top': 1 / mrr}
         else:
             raise NotImplementedError
