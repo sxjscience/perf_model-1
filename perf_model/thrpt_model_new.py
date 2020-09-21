@@ -300,7 +300,7 @@ class CatRanker:
 class NNRanker:
     def __init__(self, in_units=None, units=128, num_layers=3,
                  dropout=0.1, act_type='elu',
-                 rank_loss_fn='approx_ndcg'):
+                 rank_loss_fn='list_mle'):
         if in_units is None:
             self.net = None
         else:
