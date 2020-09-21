@@ -268,35 +268,6 @@ class CatRegressor:
             raise NotImplementedError
 
 
-class CatRanker:
-    def __init__(self, model=None):
-        self.model = model
-
-    def fit(self, train_df, valid_ranking_features=None, valid_ranking_labels=None,
-            train_dir='.', seed=123):
-        if self.model is None:
-            params = {
-                'loss_function': 'YetiRank',
-                'custom_metric': ['NDCG', 'AverageGain:top=10'],
-                'task_type': 'GPU',
-                'iterations': 2000,
-                'verbose': True,
-                'train_dir': train_dir,
-                'random_seed': seed
-            }
-            self.model = catboost.CatBoost(params)
-            init_model = None
-        else:
-            init_model = self.model
-        train_features, train_labels = get_feature_label(train_df)
-        train_pool = catboost.Pool(data=train_features,
-                                   label=train_labels)
-        dev_pool = catboost.Pool(data=valid_features,
-                                 label=valid_labels)
-        self.model.fit(train_pool, eval_set=dev_pool)
-        pass
-
-
 class NNRanker:
     def __init__(self, in_units=None, units=256, num_layers=2,
                  dropout=0.1, act_type='leaky',
@@ -389,18 +360,23 @@ class NNRanker:
 
     def evaluate(self, features, labels, mode='ranking'):
         preds = self.predict(features)
-        if mode == 'ranking':
+        if mode == 'regression':
+            rmse = np.sqrt(np.mean(np.square(preds - labels)))
+            mae = np.mean(np.abs(preds - labels))
+            return {'rmse': rmse, 'mae': mae}
+        elif mode == 'ranking':
             # We calculate two things, the NDCG score and the MRR score.
             ndcg_val = ndcg_score(y_true=labels, y_score=preds)
             ndcg_K3_val = ndcg_score(y_true=labels, y_score=preds, k=3)
-            absolute_ndcg_score = ndcg_score(y_true=np.argsort(-labels), y_score=preds)
+            normalized_ndcg_score = ndcg_score(y_true=(labels - self._mean_val) / self._std_val,
+                                               y_score=preds)
             ranks = np.argsort(-preds, axis=-1) + 1
             true_max_indices = np.argmax(labels, axis=-1)
             rank_of_max = ranks[np.arange(len(true_max_indices)), true_max_indices]
             mrr = np.mean(1.0 / rank_of_max)
             return {'ndcg': ndcg_val,
                     'ndcg_k3': ndcg_K3_val,
-                    'abs_ndcg': absolute_ndcg_score,
+                    'norm_ndcg': normalized_ndcg_score,
                     'mrr': mrr, 'rank_of_top': 1 / mrr}
         else:
             raise NotImplementedError
@@ -448,9 +424,7 @@ def parse_args():
                             help='K of each rank group.')
     parser.add_argument('--algo',
                         choices=['cat_regression',
-                                 'cat_ranking'
-                                 'nn_regression',
-                                 'nn_ranking'],
+                                 'nn'],
                         default='cat_regression',
                         help='The algorithm to use.')
     args = parser.parse_args()
@@ -520,10 +494,11 @@ def main():
             logging.info('Test Score={}'.format(test_score))
             with open(os.path.join(args.out_dir, 'test_scores.json'), 'w') as out_f:
                 json.dump(test_score, out_f)
-        elif args.algo == 'nn_ranking':
+        elif args.algo == 'nn':
             model = NNRanker()
             model.fit(train_df)
-            test_score = {}
+            test_features, test_labels = get_feature_label(test_df)
+            test_score = model.evaluate(test_features, test_labels, 'regression')
             test_ranking_score_all = model.evaluate(rank_test_all['rank_features'],
                                                     rank_test_all['rank_labels'],
                                                     'ranking')
