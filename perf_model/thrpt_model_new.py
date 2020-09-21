@@ -304,7 +304,7 @@ class NNRanker:
         th_features = th.tensor(features, dtype=th.float32)
         th_labels = th.tensor(labels, dtype=th.float32)
         dataset = TensorDataset(th_features, th_labels)
-        batch_sampler = RankGroupSampler(thrpt=train_df['thrpt'],
+        batch_sampler = RankGroupSampler(thrpt=labels,
                                          batch_size=batch_size,
                                          group_size=group_size)
         dataloader = DataLoader(dataset, batch_sampler=batch_sampler, num_workers=4)
