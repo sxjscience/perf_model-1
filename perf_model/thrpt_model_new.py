@@ -302,10 +302,14 @@ class NNRanker:
         self.net.cuda()
         self.net.train()
         valid_labels = labels[labels > 0]
-        mean_val = valid_labels.mean()
-        std_val = valid_labels.std()
-        self._mean_val = mean_val
-        self._std_val = std_val
+        if self._mean_val is None:
+            mean_val = valid_labels.mean()
+            std_val = valid_labels.std()
+            self._mean_val = mean_val
+            self._std_val = std_val
+        else:
+            mean_val = self._mean_val
+            std_val = self._std_val
         th_features = th.tensor(features, dtype=th.float32)
         th_labels = th.tensor(labels, dtype=th.float32)
         dataset = TensorDataset(th_features, th_labels)
@@ -346,6 +350,10 @@ class NNRanker:
                     log_regression_loss = 0
                     log_ranking_loss = 0
                     log_cnt = 0
+
+    def save(self, out_dir):
+        os.makedirs(out_dir)
+        torch.save(self.net, )
 
     def predict(self, features):
         features_shape = features.shape
