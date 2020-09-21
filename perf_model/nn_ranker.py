@@ -60,7 +60,7 @@ class RankingModel(nn.Module):
 
 class RankGroupSampler:
     def __init__(self, thrpt, batch_size=512, group_size=10,
-                 beta_params=(1.0, 1.0)):
+                 beta_params=(3.0, 1.0)):
         self._batch_size = batch_size
         self._num_samples = len(thrpt)
         self._thrpt = thrpt
