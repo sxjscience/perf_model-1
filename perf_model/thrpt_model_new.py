@@ -181,23 +181,31 @@ class CatRegressor:
     def __init__(self, model=None):
         self.model = model
 
-    def fit(self, train_df, valid_df, train_dir, seed):
-        params = {
-            'loss_function': 'RMSE',
-            'task_type': 'GPU',
-            'iterations': 10000,
-            'verbose': True,
-            'train_dir': train_dir,
-            'random_seed': seed
-        }
-        self.model = catboost.CatBoost(params)
+    def fit(self, train_df, valid_df=None, train_dir='.', seed=123):
+        if self.model is None:
+            params = {
+                'loss_function': 'RMSE',
+                'task_type': 'GPU',
+                'iterations': 10000,
+                'verbose': True,
+                'train_dir': train_dir,
+                'random_seed': seed
+            }
+            self.model = catboost.CatBoost(params)
+            init_model = None
+        else:
+            incremental_learning = True
+            init_model = self.model
         train_features, train_labels = get_feature_label(train_df)
-        valid_features, valid_labels = get_feature_label(valid_df)
         train_pool = catboost.Pool(data=train_features,
                                    label=train_labels)
-        dev_pool = catboost.Pool(data=valid_features,
-                                 label=valid_labels)
-        self.model.fit(train_pool, eval_set=dev_pool)
+        if valid_df is not None:
+            valid_features, valid_labels = get_feature_label(valid_df)
+            dev_pool = catboost.Pool(data=valid_features,
+                                     label=valid_labels)
+        else:
+            dev_pool = None
+        self.model.fit(train_pool, eval_set=dev_pool, init_model=init_model)
 
     @classmethod
     def load(cls, path):
