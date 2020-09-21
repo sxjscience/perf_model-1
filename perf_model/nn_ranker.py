@@ -34,7 +34,7 @@ class RankingModel(nn.Module):
                                     out_features=units,
                                     bias=False))
             in_units = units
-            layers.append(nn.BatchNorm1d(in_units))
+            # layers.append(nn.BatchNorm1d(in_units))
             layers.append(get_activation(act_type))
             layers.append(nn.Dropout(dropout))
         layers.append(nn.Linear(in_features=in_units,
