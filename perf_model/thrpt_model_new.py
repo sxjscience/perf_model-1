@@ -348,14 +348,12 @@ class NNRanker:
             ranking_labels = ranking_labels.reshape((batch_size, group_size))
             ranking_scores = self.net(ranking_features)
             ranking_scores = ranking_scores.reshape((batch_size, group_size))
-            print(ranking_scores)
-            print(ranking_labels)
             loss_regression = torch.square(ranking_scores - ranking_labels).mean()
             loss_ranking = loss_fn(y_pred=ranking_scores,
                                    y_true=th.argsort(ranking_labels, dim=-1, descending=True))
             loss = loss_regression + loss_ranking
             loss.backward()
-            print(loss)
+            print('Regression Loss:', loss_regression, 'Ranking Loss:', loss_ranking)
             optimizer.step()
 
     def predict(self, features):
