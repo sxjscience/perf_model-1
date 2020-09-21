@@ -427,6 +427,8 @@ def parse_args():
                                  'nn'],
                         default='cat_regression',
                         help='The algorithm to use.')
+    parser.add_argument('--rank_lambda', default=1.0,
+                        help='Lambda value of the ranking loss.')
     args = parser.parse_args()
     return args
 
@@ -496,7 +498,7 @@ def main():
                 json.dump(test_score, out_f)
         elif args.algo == 'nn':
             model = NNRanker()
-            model.fit(train_df)
+            model.fit(train_df, lambda_rank=args.rank_lambda)
             test_features, test_labels = get_feature_label(test_df)
             test_score = model.evaluate(test_features, test_labels, 'regression')
             test_ranking_score_all = model.evaluate(rank_test_all['rank_features'],
