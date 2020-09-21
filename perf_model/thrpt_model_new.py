@@ -88,7 +88,6 @@ def split_train_test_df(df, seed, ratio, top_sample_ratio=0.2, group_size=10, K=
     num_samples = len(df)
     test_num = int(ratio * num_samples)
     train_num = len(df) - test_num
-    assert top_sample_ratio > 0
     top_test_num = int(test_num * top_sample_ratio)
     other_test_num = test_num - top_test_num
     if top_test_num > 0:
