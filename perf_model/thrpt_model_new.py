@@ -231,12 +231,15 @@ class CatRegressor:
             return {'rmse': rmse, 'mae': mae}
         elif mode == 'ranking':
             # We calculate two things, the NDCG score and the MRR score.
-            ndcg_val = ndcg_score(y_true=np.log(labels + 1.0), y_score=preds)
+            ndcg_val = ndcg_score(y_true=labels, y_score=preds)
+            ndcg_K3_val = ndcg_score(y_true=labels, y_score=preds, k=3)
             ranks = np.argsort(-preds, axis=-1) + 1
             true_max_indices = np.argmax(labels, axis=-1)
             rank_of_max = ranks[np.arange(len(true_max_indices)), true_max_indices]
             mrr = np.mean(1.0 / rank_of_max)
-            return {'ndcg': ndcg_val, 'mrr': mrr, 'rank_of_top': 1 / mrr}
+            return {'ndcg': ndcg_val,
+                    'ndcg_k3': ndcg_K3_val,
+                    'mrr': mrr, 'rank_of_top': 1 / mrr}
         else:
             raise NotImplementedError
 
@@ -268,6 +271,13 @@ class CatRanker:
                                  label=valid_labels)
         self.model.fit(train_pool, eval_set=dev_pool)
         pass
+
+
+class NNRanker:
+    def fit(self, train_df, batch_size=32, group_size=10,
+            valid_ranking_features=None, valid_ranking_labels=None):
+        pass
+
 
 
 def parse_args():
@@ -366,26 +376,19 @@ def main():
         test_df = test_df[used_key]
         if args.algo == 'cat_regression':
             model = CatRegressor()
-            model.fit(train_df, valid_df, train_dir=args.out_dir, seed=args.seed)
+            model.fit(train_df, valid_df=None, train_dir=args.out_dir, seed=args.seed)
             model.save(args.out_dir)
-            valid_features, valid_labels = get_feature_label(valid_df)
             test_features, test_labels = get_feature_label(test_df)
-            valid_score = model.evaluate(valid_features, valid_labels, 'regression')
             test_score = model.evaluate(test_features, test_labels, 'regression')
-            valid_ranking_score = model.evaluate(rank_valid['rank_features'],
-                                                 rank_valid['rank_labels'],
-                                                 'ranking')
             test_ranking_score = model.evaluate(rank_test['rank_features'],
                                                 rank_test['rank_labels'],
                                                 'ranking')
-            valid_score.update(valid_ranking_score)
             test_score.update(test_ranking_score)
-            logging.info('Valid Score={}'.format(valid_score))
             logging.info('Test Score={}'.format(test_score))
-            with open(os.path.join(args.out_dir, 'valid_scores.json'), 'w') as out_f:
-                json.dump(valid_score, out_f)
             with open(os.path.join(args.out_dir, 'test_scores.json'), 'w') as out_f:
                 json.dump(test_score, out_f)
+        elif args.algo == 'nn_ranking':
+            pass
 
 
 if __name__ == "__main__":
