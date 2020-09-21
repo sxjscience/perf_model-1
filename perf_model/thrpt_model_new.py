@@ -317,8 +317,10 @@ class NNRanker:
         self._mean_val = None
         self._std_val = None
 
-    def fit(self, train_df, batch_size=512, group_size=10, lr=1E-3, iter_mult=500):
+    def fit(self, train_df, batch_size=512, group_size=10, lr=1E-3,
+            iter_mult=500, lambda_rank=0.0):
         features, labels = get_feature_label(train_df)
+        log_interval = (len(features) + batch_size - 1) // batch_size
         num_iters = ((len(features) + batch_size - 1) // batch_size) * iter_mult
         if self.net is None:
             self.net = RankingModel(in_units=features.shape[1],
@@ -342,6 +344,9 @@ class NNRanker:
         optimizer = torch.optim.Adam(self.net.parameters(), lr=lr, amsgrad=True)
         loss_fn = get_ranking_loss(self._rank_loss_fn)
         dataloader = iter(dataloader)
+        log_regression_loss = 0
+        log_ranking_loss = 0
+        log_cnt = 0
         for niter in range(num_iters):
             ranking_features, ranking_labels = next(dataloader)
             ranking_labels = (ranking_labels - mean_val) / std_val
@@ -354,11 +359,23 @@ class NNRanker:
             ranking_scores = ranking_scores.reshape((batch_size, group_size))
             loss_regression = torch.abs(ranking_scores - ranking_labels).mean()
             loss_ranking = loss_fn(y_pred=ranking_scores,
-                                   y_true=th.argsort(ranking_labels, dim=-1, descending=True))
-            loss = loss_regression + loss_ranking
+                                                 y_true=th.argsort(ranking_labels, dim=-1,
+                                                                   descending=True))
+            loss = loss_regression + lambda_rank * loss_ranking
             loss.backward()
-            print('Regression Loss:', loss_regression, 'Ranking Loss:', loss_ranking)
             optimizer.step()
+            with torch.no_grad():
+                log_regression_loss += loss_regression
+                log_ranking_loss += loss_ranking
+                log_cnt += 1
+                if log_cnt >= log_interval:
+                    logging.info('[{}/{}] Regression Loss = {:.4f}, Ranking Loss = {:.4f}'
+                                 .format(niter + 1, num_iters,
+                                         log_regression_loss / log_cnt,
+                                         log_ranking_loss / log_cnt))
+                    log_regression_loss = 0
+                    log_ranking_loss = 0
+                    log_cnt = 0
 
     def predict(self, features):
         features_shape = features.shape
