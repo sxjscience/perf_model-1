@@ -314,6 +314,8 @@ class NNRanker:
         self._dropout = dropout
         self._act_type = act_type
         self._rank_loss_fn = rank_loss_fn
+        self._mean_val = None
+        self._std_val = None
 
     def fit(self, train_df, batch_size=512, group_size=10,
             num_iters=5000, lr=1E-3):
@@ -328,6 +330,8 @@ class NNRanker:
         self.net.train()
         mean_val = labels.mean()
         std_val = labels.std()
+        self._mean_val = mean_val
+        self._std_val = std_val
         th_features = th.tensor(features, dtype=th.float32)
         th_labels = th.tensor(labels, dtype=th.float32)
         dataset = TensorDataset(th_features, th_labels)
@@ -363,7 +367,7 @@ class NNRanker:
         with torch.no_grad():
             features = torch.tensor(features, dtype=th.float32)
             preds = self.net(features.reshape((-1, features_shape[-1])))
-            preds = preds.reshape(features_shape[:-1])
+            preds = preds.reshape(features_shape[:-1]) * self._std_val + self._mean_val
             preds = preds.numpy()
         return preds
 
