@@ -7,7 +7,7 @@ do
     for fname in `ls tuning_dataset/$fold/*.csv`;
     do
         prefix_name=${fname:0:-4}
-        python3 perf_model/thrpt_model_new.py  \
+        python3 -m perf_model.thrpt_model_new  \
                 --split_test \
                 --save_used_keys \
                 --used_key_path ${prefix_name}.used_key.json \
@@ -16,7 +16,7 @@ do
                 --split_test_name ${prefix_name}.test.pq \
                 --split_rank_test_name ${prefix_name}.rank_test.npz \
                 --seed 123
-        python3 perf_model/thrpt_model_new.py  \
+        python3 -m perf_model.thrpt_model_new  \
                 --split_test \
                 --dataset ${prefix_name}.train_val.pq \
                 --split_train_name ${prefix_name}.train.pq \
