@@ -1,7 +1,7 @@
 set -ex
 
 rank_lambda=5.0
-niter=5000
+iter_mult=500
 
 mkdir -p model_results/cat_regression
 for train_file in `ls split_tuning_dataset/*/*.train.pq`;
@@ -11,5 +11,7 @@ do
   python3 -m perf_model.thrpt_model_new \
       --algo nn \
       --data_prefix ${data_prefix} \
+      --rank_lambda ${rank_lambda} \
+      --iter_mult ${iter_mult} \
       --out_dir model_results/nn_${rank_lambda}_${niter}/${folder_prefix}
 done;
