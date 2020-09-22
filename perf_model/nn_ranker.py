@@ -85,6 +85,9 @@ class RankGroupSampler:
                                   size=(self._batch_size,))
             valid_nums = np.ceil(taus * self._group_size).astype(np.int32)
             invalid_nums = self._group_size - valid_nums
+            if len(self._valid_indices) == 0:
+                valid_nums[:] = self._group_size
+                invalid_nums[:] = 0
             batch_valid_indices = np.random.choice(self._valid_indices, sum(valid_nums),
                                                    replace=True)
             batch_invalid_indices = np.random.choice(self._invalid_indices, sum(invalid_nums),
