@@ -14,7 +14,7 @@ for dir_name in sorted(os.listdir(args.dir_path)):
         model = NNRanker.load(os.path.join(args.dir_path, dir_name, exp_name))
         data_prefix = os.path.join('split_tuning_dataset', dir_name, exp_name)
         test_df = read_pd(data_prefix + '.test.pq')
-        with open(args.data_prefix + '.used_key.json', 'r') as in_f:
+        with open(data_prefix + '.used_key.json', 'r') as in_f:
             used_key = json.load(in_f)
         test_df = test_df[used_key]
         rank_test_all = np.load(data_prefix + '.rank_test.all.npz')
