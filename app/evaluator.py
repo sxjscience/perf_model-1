@@ -283,6 +283,7 @@ class CatRegressionModel:
         self.load_models(model_path)
 
     def load_models(self, model_path):
+        print(model_path)
         self.model = CatRegressor.load(model_path)
 
     def valid_model_forward(self, features):
