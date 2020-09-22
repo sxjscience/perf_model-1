@@ -548,6 +548,8 @@ def main():
                                         test_ranking_score_valid.items()}
             test_score.update(test_ranking_score_valid)
             logging.info('Test Score={}'.format(test_score))
+            with open(os.path.join(args.out_dir, 'test_scores.json'), 'w') as out_f:
+                json.dump(test_score, out_f)
         else:
             raise NotImplementedError
 
