@@ -10,8 +10,8 @@ args = parser.parse_args()
 columns = ['name', 'rmse', 'mae', 'ndcg_all', 'ndcg_k3_all', 'mrr_all',
            'ndcg_valid', 'ndcg_k3_valid', 'mrr_valid']
 results = []
-for dir_name in os.listdir(args.dir_path):
-    for exp_name in os.listdir(os.path.join(args.dir_path, dir_name)):
+for dir_name in sorted(os.listdir(args.dir_path)):
+    for exp_name in sorted(os.listdir(os.path.join(args.dir_path, dir_name))):
         with open(os.path.join(args.dir_path, dir_name, exp_name, 'test_scores.json'), 'r') as in_f:
             dat = json.load(in_f)
             results.append((f'{dir_name}/{exp_name}',
