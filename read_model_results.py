@@ -19,4 +19,5 @@ for dir_name in os.listdir(args.dir_path):
                             dat['ndcg_all'], dat['ndcg_k3_all'], dat['mrr_all'],
                             dat['ndcg_valid'], dat['ndcg_k3_valid'], dat['mrr_valid']))
 df = pd.DataFrame(results, columns=columns)
-df.to_csv(f"{args.out_name}.csv")
+out_name = f"{args.out_name}.csv"
+df.to_csv(out_name)
