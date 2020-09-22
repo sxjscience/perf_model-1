@@ -13,7 +13,8 @@ import numpy as np
 
 import tvm
 import tvm.contrib.graph_runtime as runtime
-from evaluator import DummyBuilder, ListwiseRankModel, RankModelRunner, rank_progress
+from evaluator import DummyBuilder, ListwiseRankModel, NNRankModel, CatRegressionModel,\
+    RankModelRunner, rank_progress
 from round_tuner import RoundTuner
 from tvm import autotvm, relay
 from tvm.autotvm.graph_tuner import DPTuner, PBQPTuner
@@ -34,6 +35,8 @@ def create_config():
         'Model directory should be organized as: '
         'target-models/task-name/{valid_net.*, list_rank_net.cbm, feature.meta}'
     )
+    parser.add_argument('--model_type', default='cat_ranking',
+                        choices=['nn', 'cat_regression', 'cat_ranking'])
     parser.add_argument('--target', required=True, help='The target platform')
     parser.add_argument('--n-parallel',
                         type=int,
@@ -324,7 +327,14 @@ def main():
     if configs.list_net is not None:
         for model_path in glob.glob('{}/*'.format(configs.list_net)):
             task_name = os.path.basename(model_path)
-            models[task_name] = ListwiseRankModel(task_name, model_path)
+            if configs.model_type == 'cat_ranking':
+                models[task_name] = ListwiseRankModel(task_name, model_path)
+            elif configs.model_type == 'cat_regression':
+                models[task_name] = CatRegressionModel(task_name, model_path)
+            elif configs.model_type == 'nn':
+                models[task_name] = NNRankModel(task_name, model_path)
+            else:
+                raise NotImplementedError
             print('Loaded cost model for %s' % task_name)
 
     measure_option = autotvm.measure_option(
