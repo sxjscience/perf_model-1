@@ -273,6 +273,19 @@ class NNRankModel(RankModel):
         return scores
 
 
+class CatRegressionModel(RankModel):
+    def load_models(self, model_path):
+        self.model = CatRegressionModel.load(model_path)
+
+    def valid_model_forward(self, features):
+        """Valid Model Inference."""
+        return [True] * len(features)
+
+    def rank_model_forward(self, valids, features):
+        scores = self.model.predict(features)
+        return scores
+
+
 def rank_progress(total, prefix):
     """Display progress bar for ranking process.
 
