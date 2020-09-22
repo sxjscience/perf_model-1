@@ -270,7 +270,7 @@ class NNRankModel(RankModel):
 
     def rank_model_forward(self, valids, features):
         scores = self.model.predict(features)
-        return scores
+        return -scores
 
 
 class CatRegressionModel(RankModel):
@@ -283,7 +283,7 @@ class CatRegressionModel(RankModel):
 
     def rank_model_forward(self, valids, features):
         scores = self.model.predict(features)
-        return scores
+        return -scores
 
 
 def rank_progress(total, prefix):
