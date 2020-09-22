@@ -1,6 +1,6 @@
 set -ex
 
-rank_lambda=5.0
+rank_lambda=0.0
 iter_mult=200
 
 mkdir -p model_results/nn_${rank_lambda}_${iter_mult}
