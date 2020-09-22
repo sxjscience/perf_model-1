@@ -239,6 +239,7 @@ class CatRegressor:
         self.model.save_model(os.path.join(out_dir, 'cat_regression'), format='python')
 
     def predict(self, features):
+        features = np.array(features, dtype=np.float32)
         features_shape = features.shape
         preds = self.model.predict(features.reshape((-1, features_shape[-1])))
         preds = preds.reshape(features_shape[:-1])
@@ -379,6 +380,7 @@ class NNRanker:
         return model
 
     def predict(self, features):
+        features = np.array(features, dtype=np.float32)
         features_shape = features.shape
         self.net.cpu()
         self.net.eval()
