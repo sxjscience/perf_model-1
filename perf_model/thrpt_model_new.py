@@ -326,8 +326,8 @@ class NNRanker:
         log_regression_loss = 0
         log_ranking_loss = 0
         log_cnt = 0
-        for niter in range(num_iters):
-            ranking_features, ranking_labels = next(dataloader)
+        niter = 0
+        for ranking_features, ranking_labels in dataloader:
             ranking_labels = (ranking_labels - mean_val) / std_val
             ranking_features = ranking_features.cuda()
             ranking_labels = ranking_labels.cuda()
@@ -353,6 +353,9 @@ class NNRanker:
                     log_regression_loss = 0
                     log_ranking_loss = 0
                     log_cnt = 0
+            niter += 1
+            if niter >= num_iters:
+                break
 
     def save(self, out_dir):
         os.makedirs(out_dir, exist_ok=True)
