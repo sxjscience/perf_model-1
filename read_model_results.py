@@ -14,7 +14,7 @@ for dir_name in os.listdir(args.dir_path):
     for exp_name in os.listdir(os.path.join(args.dir_path, dir_name)):
         with open(os.path.join(args.dir_path, dir_name, exp_name, 'test_scores.json'), 'r') as in_f:
             dat = json.load(in_f)
-            results.append(('f{dir_name}/f{exp_name}',
+            results.append((f'{dir_name}/{exp_name}',
                             dat['rmse'], dat['mae'],
                             dat['ndcg_all'], dat['ndcg_k3_all'], dat['mrr_all'],
                             dat['ndcg_valid'], dat['ndcg_k3_valid'], dat['mrr_valid']))
