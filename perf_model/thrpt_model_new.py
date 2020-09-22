@@ -319,7 +319,7 @@ class NNRanker:
         batch_sampler = RankGroupSampler(thrpt=labels,
                                          batch_size=batch_size,
                                          group_size=group_size)
-        dataloader = DataLoader(dataset, batch_sampler=batch_sampler, num_workers=4)
+        dataloader = DataLoader(dataset, batch_sampler=batch_sampler, num_workers=8)
         optimizer = torch.optim.Adam(self.net.parameters(), lr=lr, amsgrad=False)
         loss_fn = get_ranking_loss(self._rank_loss_fn)
         dataloader = iter(dataloader)
