@@ -229,7 +229,7 @@ class CatRegressor:
     @classmethod
     def load(cls, path):
         try:
-            model = catboost.CatBoost().load_model(path)
+            model = catboost.CatBoost().load_model(os.path.join(path, 'cat_regression.cbm'))
             return cls(model=model)
         except NameError:  # CatBoost is unavailable. Try to load Python model.
             pass
