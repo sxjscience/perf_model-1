@@ -260,7 +260,11 @@ class ListwiseRankModel(RankModel):
         return [-s if v else 1e+5 for v, s in zip(valids, scores)]
 
 
-class NNRankModel(RankModel):
+class NNRankModel:
+    def __init__(self, task_name, model_path):
+        print(f'Loading the performance model from {model_path}. To solve {task_name}.')
+        self.load_models(model_path)
+
     def load_models(self, model_path):
         self.model = NNRanker.load(model_path)
 
@@ -273,7 +277,11 @@ class NNRankModel(RankModel):
         return scores
 
 
-class CatRegressionModel(RankModel):
+class CatRegressionModel:
+    def __init__(self, task_name, model_path):
+        print(f'Loading the performance model from {model_path}. To solve {task_name}.')
+        self.load_models(model_path)
+
     def load_models(self, model_path):
         self.model = CatRegressionModel.load(model_path)
 
