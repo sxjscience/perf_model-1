@@ -1,7 +1,7 @@
 set -ex
 
 rank_lambda=5.0
-iter_mult=500
+iter_mult=200
 
 mkdir -p model_results/nn_${rank_lambda}_${iter_mult}
 for train_file in `ls split_tuning_dataset/*/*.train.pq`;
