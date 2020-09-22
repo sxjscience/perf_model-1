@@ -13,5 +13,5 @@ do
       --data_prefix ${data_prefix} \
       --rank_lambda ${rank_lambda} \
       --iter_mult ${iter_mult} \
-      --out_dir model_results/nn_${rank_lambda}_${niter}/${folder_prefix}
+      --out_dir model_results/nn_${rank_lambda}_${iter_mult}/${folder_prefix}
 done;
