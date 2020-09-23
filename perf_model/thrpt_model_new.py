@@ -280,13 +280,12 @@ class CatBoostPoolIndicesGenerator:
         self.group_size = group_size
         self.generator = np.random.default_rng()
 
-    def __iter__(self):
-        while True:
-            out = []
-            for i in range(self.sample_num):
-                out.append(self.generator.choice(self.total, self.group_size, False))
-            indices = np.vstack(out)
-            yield indices
+    def __call__(self):
+        out = []
+        for i in range(self.sample_num):
+            out.append(self.generator.choice(self.total, self.group_size, False))
+        indices = np.vstack(out)
+        return indices
 
 
 class CatRanker(CatRegressor):
@@ -311,7 +310,7 @@ class CatRanker(CatRegressor):
                                                sample_num=step_sample_num,
                                                group_size=group_size)
         for i in range(num_fit_calls):
-            indices = next(sampler)
+            indices = sampler()
             step_features = np.take(features, indices, axis=0)
             step_thrpt = np.take(thrpt, indices, axis=0)
             step_groups = np.broadcast_to(np.arange(step_thrpt.shape[0]).reshape((-1, 1)),
