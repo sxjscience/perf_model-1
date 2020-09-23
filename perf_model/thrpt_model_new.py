@@ -528,6 +528,7 @@ def parse_args():
                             help='K of each rank group.')
     parser.add_argument('--algo',
                         choices=['cat_regression',
+                                 'cat_ranking',
                                  'nn'],
                         default='cat_regression',
                         help='The algorithm to use.')
