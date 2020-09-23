@@ -297,7 +297,7 @@ class CatRanker(CatRegressor):
             init_model = None
         params = {
             'loss_function': 'YetiRank',
-            'task_type': 'GPU',
+            'task_type': 'CPU',
             'iterations': niter,
             'verbose': True,
             'train_dir': train_dir,
