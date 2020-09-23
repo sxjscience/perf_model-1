@@ -301,6 +301,10 @@ class CatBoostPoolIndicesGenerator:
 
 
 class CatRanker(CatRegressor):
+    def __init__(self, model=None, normalize_relevance=False):
+        self.model = model
+        self.normalize_relevance = normalize_relevance
+
     def fit(self, train_df, step_sample_num=204800, group_size=40,
             niter=5000, train_dir='.', seed=123):
         if self.model is not None:
@@ -326,6 +330,8 @@ class CatRanker(CatRegressor):
             indices = sampler()
             step_features = np.take(features, indices, axis=0)
             step_thrpt = np.take(thrpt, indices, axis=0)
+            if self.normalize_relevance:
+                step_thrpt = step_thrpt / (np.max(step_thrpt, axis=-1, keepdims=True) + 1E-6)
             step_groups = np.broadcast_to(np.arange(step_thrpt.shape[0]).reshape((-1, 1)),
                                           step_thrpt.shape)
             train_pool = catboost.Pool(data=step_features.reshape((-1, step_features.shape[-1])),
