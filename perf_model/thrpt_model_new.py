@@ -313,7 +313,7 @@ class CatRanker(CatRegressor):
         for i in range(num_fit_calls):
             indices = sampler()
             step_features = np.take(features, indices, axis=0)
-            step_thrpt = np.argsort(np.take(thrpt, indices, axis=0), axis=-1)
+            step_thrpt = np.take(thrpt, indices, axis=0)
             step_groups = np.broadcast_to(np.arange(step_thrpt.shape[0]).reshape((-1, 1)),
                                           step_thrpt.shape)
             train_pool = catboost.Pool(data=step_features.reshape((-1, step_features.shape[-1])),
