@@ -553,6 +553,8 @@ def parse_args():
                         help='Lambda value of the ranking loss.')
     parser.add_argument('--rank_lambda', default=1.0, type=float,
                         help='Lambda value of the ranking loss.')
+    parser.add_argument('--normalize_relevance', action='store_true',
+                        help='Whether to turn on normalized relevance in ranking')
     args = parser.parse_args()
     return args
 
@@ -621,7 +623,7 @@ def main():
             with open(os.path.join(args.out_dir, 'test_scores.json'), 'w') as out_f:
                 json.dump(test_score, out_f)
         elif args.algo == 'cat_ranking':
-            model = CatRanker()
+            model = CatRanker(normalize_relevance=args.normalize_relevance)
             model.fit(train_df, train_dir=args.out_dir, seed=args.seed)
             model.save(args.out_dir)
             test_score = {}
