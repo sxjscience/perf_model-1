@@ -241,7 +241,10 @@ class CatRegressor:
     def predict(self, features):
         features = np.array(features, dtype=np.float32)
         features_shape = features.shape
-        preds = self.model.predict(features.reshape((-1, features_shape[-1])))
+        with multiprocessing.Pool(os.cpu_count()) as pool:
+            preds = pool.map(self.model.predict, features.reshape((-1, features_shape[-1])))
+        preds = np.array(preds)
+        # preds = self.model.predict(features.reshape((-1, features_shape[-1])))
         preds = preds.reshape(features_shape[:-1])
         return preds
 

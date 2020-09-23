@@ -5,6 +5,7 @@ aws s3 cp --recursive s3://hyuz-shared-data/dataset_0726 tuning_dataset
 aws s3 cp --recursive s3://hyuz-shared-data/trained_models trained_models
 
 aws s3 cp --recursive s3://xingjian-public/split_tuning_dataset_20200920 split_tuning_dataset
+aws s3 cp --recursive s3://xingjian-public/lorien/models/cat_regression_20200922/ model_results/cat_regression
 ```
 
 The `split_tuning_dataset` is generated based on the tuning dataset. We can generate the dataset as follows:
