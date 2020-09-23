@@ -12,6 +12,9 @@ MODELS=(
 "SqueezeNet1.0"
 "SqueezeNet1.1"
 "VGG19"
+"VGG19_bn"
+"ResNet50_v1"
+"ResNet18_v1"
 )
 TARGET="cuda -model=t4"
 mkdir -p ${OUT_DIR}
