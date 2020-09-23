@@ -15,7 +15,7 @@ MODELS=(
 )
 TARGET="cuda -model=t4"
 mkdir -p ${OUT_DIR}
-for network in ${MODELS}
+for network in ${MODELS[@]}
 do
   python3 app/main.py --list-net ${MODEL_PATH} \
                     --model_type ${MODEL_TYPE} \
