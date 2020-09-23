@@ -289,7 +289,7 @@ class CatBoostPoolIndicesGenerator:
 
 
 class CatRanker(CatRegressor):
-    def fit(self, train_df, step_sample_num=10240, group_size=20, fit_call_mults=3,
+    def fit(self, train_df, step_sample_num=102400, group_size=40, fit_call_mults=1,
             niter=1000, train_dir='.', seed=123):
         if self.model is not None:
             init_model = self.model
@@ -305,6 +305,7 @@ class CatRanker(CatRegressor):
         }
         num_fit_calls = (len(train_df) + step_sample_num - 1) // step_sample_num * fit_call_mults
         num_fit_calls = 1
+        step_sample_num = min(step_sample_num, len(train_df))
         self.model = catboost.CatBoost(params)
         features, thrpt = get_feature_label(train_df)
         sampler = CatBoostPoolIndicesGenerator(thrpt,
