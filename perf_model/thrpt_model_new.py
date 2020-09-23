@@ -277,7 +277,7 @@ class CatBoostPoolIndicesGenerator:
         self.thrpt = thrpt
         self.total = len(thrpt)
         self.sample_num = sample_num
-        self.group_size = min(group_size, self.total - 1)
+        self.group_size = min(group_size, self.total // 2)
         self.generator = np.random.default_rng()
 
     def __call__(self):
