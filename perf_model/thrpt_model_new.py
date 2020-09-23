@@ -318,7 +318,8 @@ class CatRanker(CatRegressor):
             train_pool = catboost.Pool(data=step_features.reshape((-1, step_features.shape[-1])),
                                        label=step_thrpt.reshape((-1,)),
                                        group_id=step_groups.reshape((-1,)))
-            self.model.fit(train_pool, eval_set=train_pool)
+            self.model.fit(train_pool, eval_set=train_pool, init_model=init_model)
+            init_model = self.model
 
     def save(self, out_dir):
         self.model.save_model(os.path.join(out_dir, 'cat_ranking.cbm'))
