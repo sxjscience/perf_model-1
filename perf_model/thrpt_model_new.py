@@ -297,13 +297,14 @@ class CatRanker(CatRegressor):
             init_model = None
         params = {
             'loss_function': 'YetiRank',
-            'task_type': 'CPU',
+            'task_type': 'GPU',
             'iterations': niter,
             'verbose': True,
             'train_dir': train_dir,
             'random_seed': seed
         }
         num_fit_calls = (len(train_df) + step_sample_num - 1) // step_sample_num * fit_call_mults
+        num_fit_calls = 1
         self.model = catboost.CatBoost(params)
         features, thrpt = get_feature_label(train_df)
         sampler = CatBoostPoolIndicesGenerator(thrpt,
