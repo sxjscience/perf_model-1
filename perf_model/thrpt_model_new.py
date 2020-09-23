@@ -289,8 +289,8 @@ class CatBoostPoolIndicesGenerator:
 
 
 class CatRanker(CatRegressor):
-    def fit(self, train_df, step_sample_num=204800, group_size=40, fit_call_mults=1,
-            niter=1000, train_dir='.', seed=123):
+    def fit(self, train_df, step_sample_num=204800, group_size=40,
+            niter=3000, train_dir='.', seed=123):
         if self.model is not None:
             init_model = self.model
         else:
@@ -303,9 +303,8 @@ class CatRanker(CatRegressor):
             'train_dir': train_dir,
             'random_seed': seed
         }
-        num_fit_calls = (len(train_df) + step_sample_num - 1) // step_sample_num * fit_call_mults
         num_fit_calls = 1
-        step_sample_num = min(step_sample_num, len(train_df))
+        step_sample_num = min(step_sample_num, len(train_df) * 5)
         self.model = catboost.CatBoost(params)
         features, thrpt = get_feature_label(train_df)
         sampler = CatBoostPoolIndicesGenerator(thrpt,
@@ -320,8 +319,7 @@ class CatRanker(CatRegressor):
             train_pool = catboost.Pool(data=step_features.reshape((-1, step_features.shape[-1])),
                                        label=step_thrpt.reshape((-1,)),
                                        group_id=step_groups.reshape((-1,)))
-            self.model.fit(train_pool, eval_set=train_pool, init_model=init_model)
-            init_model = self.model
+            self.model.fit(train_pool, init_model=init_model)
 
     def save(self, out_dir):
         self.model.save_model(os.path.join(out_dir, 'cat_ranking.cbm'))
