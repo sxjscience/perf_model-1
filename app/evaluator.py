@@ -18,7 +18,7 @@ try:
 except Exception:  # pylint: disable=broad-except
     import imp
 from perf_model.data_proc import extract_feature
-from perf_model.thrpt_model_new import NNRanker, CatRegressor
+from perf_model.thrpt_model_new import NNRanker, CatRegressor, CatRanker
 from tvm.autotvm.measure import LocalRunner, MeasureErrorNo, MeasureResult
 from tvm.autotvm.measure.measure import Builder
 from tvm.autotvm.measure.measure_methods import BuildResult
@@ -276,6 +276,19 @@ class NNRankModel(RankModel):
 class CatRegressionModel(RankModel):
     def load_models(self, model_path):
         self.model = CatRegressor.load(model_path)
+
+    def valid_model_forward(self, features):
+        """Valid Model Inference."""
+        return [True] * len(features)
+
+    def rank_model_forward(self, valids, features):
+        scores = self.model.predict(features)
+        return -scores
+
+
+class CatRankingModel(RankModel):
+    def load_models(self, model_path):
+        self.model = CatRanker.load(model_path)
 
     def valid_model_forward(self, features):
         """Valid Model Inference."""
