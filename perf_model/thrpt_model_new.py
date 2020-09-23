@@ -255,32 +255,84 @@ class CatRegressor:
             # We calculate two things, the NDCG score and the MRR score.
             ndcg_val = ndcg_score(y_true=labels, y_score=preds)
             ndcg_K3_val = ndcg_score(y_true=labels, y_score=preds, k=3)
-            absolute_ndcg_score = ndcg_score(y_true=np.argsort(-labels), y_score=preds)
+            abs_ndcg_score = ndcg_score(y_true=np.argsort(labels), y_score=preds)
+            abs_ndcg_k3_score = ndcg_score(y_true=np.argsort(labels),
+                                           y_score=preds,
+                                           k=3)
             ranks = np.argsort(-preds, axis=-1) + 1
             true_max_indices = np.argmax(labels, axis=-1)
             rank_of_max = ranks[np.arange(len(true_max_indices)), true_max_indices]
             mrr = np.mean(1.0 / rank_of_max)
             return {'ndcg': ndcg_val,
                     'ndcg_k3': ndcg_K3_val,
-                    'abs_ndcg': absolute_ndcg_score,
+                    'abs_ndcg': abs_ndcg_score,
+                    'abs_ndcg_k3': abs_ndcg_k3_score,
                     'mrr': mrr, 'rank_of_top': 1 / mrr}
         else:
             raise NotImplementedError
 
 
-class CatRanker:
-    def __init__(self, model=None):
-        self.model = model
+class CatBoostPoolIndicesGenerator:
+    def __init__(self, thrpt, sample_num=10240, group_size=20, method='random'):
+        self.thrpt = thrpt
+        self.total = len(thrpt)
+        self.sample_num = sample_num
+        self.group_size = group_size
+        self.generator = np.random.default_rng()
 
-    def fit(self, train_df):
-        pass
+    def __iter__(self):
+        while True:
+            out = []
+            for i in range(self.sample_num):
+                out.append(self.generator.choice(self.total, self.group_size, False))
+            indices = np.vstack(out)
+            yield indices
 
-    def save(self):
-        pass
+
+class CatRanker(CatRegressor):
+    def fit(self, train_df, step_sample_num=10240, group_size=20, fit_call_mults=3,
+            niter=1000, train_dir='.', seed=123):
+        if self.model is not None:
+            init_model = self.model
+        else:
+            init_model = None
+        params = {
+            'loss_function': 'YetiRank',
+            'task_type': 'GPU',
+            'iterations': niter,
+            'verbose': True,
+            'train_dir': train_dir,
+            'random_seed': seed
+        }
+        num_fit_calls = (len(train_df) + step_sample_num - 1) // step_sample_num * fit_call_mults
+        self.model = catboost.CatBoost(params)
+        features, thrpt = get_feature_label(train_df)
+        sampler = CatBoostPoolIndicesGenerator(thrpt,
+                                               sample_num=step_sample_num,
+                                               group_size=group_size)
+        for i in range(num_fit_calls):
+            indices = next(sampler)
+            step_features = np.take(features, indices, axis=0)
+            step_thrpt = np.take(thrpt, indices, axis=0)
+            step_groups = np.broadcast_to(np.arange(step_thrpt.shape[0]).reshape((-1, 1)),
+                                          step_thrpt.shape)
+            train_pool = catboost.Pool(data=step_features.reshape((-1, step_features.shape[-1])),
+                                       label=step_thrpt.reshape((-1,)),
+                                       group_id=step_groups.reshape((-1,)))
+            self.model.fit(train_pool, init_model=init_model)
+            init_model = self.model
+
+    def save(self, out_dir):
+        self.model.save_model(os.path.join(out_dir, 'cat_ranking.cbm'))
+        self.model.save_model(os.path.join(out_dir, 'cat_ranking'), format='python')
 
     @classmethod
-    def load(self):
-        pass
+    def load(cls, path):
+        try:
+            model = catboost.CatBoost().load_model(os.path.join(path, 'cat_ranking.cbm'))
+            return cls(model=model)
+        except NameError:  # CatBoost is unavailable. Try to load Python model.
+            pass
 
 
 class NNRanker:
@@ -417,15 +469,18 @@ class NNRanker:
             # We calculate two things, the NDCG score and the MRR score.
             ndcg_val = ndcg_score(y_true=labels, y_score=preds)
             ndcg_K3_val = ndcg_score(y_true=labels, y_score=preds, k=3)
-            normalized_ndcg_score = ndcg_score(y_true=labels / self._std_val,
-                                               y_score=preds)
+            abs_ndcg_score = ndcg_score(y_true=np.argsort(labels),
+                                        y_score=preds)
+            abs_ndcg_k3_score = ndcg_score(y_true=np.argsort(labels),
+                                           y_score=preds, k=3)
             ranks = np.argsort(-preds, axis=-1) + 1
             true_max_indices = np.argmax(labels, axis=-1)
             rank_of_max = ranks[np.arange(len(true_max_indices)), true_max_indices]
             mrr = np.mean(1.0 / rank_of_max)
             return {'ndcg': ndcg_val,
                     'ndcg_k3': ndcg_K3_val,
-                    'norm_ndcg': normalized_ndcg_score,
+                    'abs_ndcg': abs_ndcg_score,
+                    'abs_ndcg_k3_score': abs_ndcg_k3_score,
                     'mrr': mrr, 'rank_of_top': 1 / mrr}
         else:
             raise NotImplementedError
@@ -542,6 +597,25 @@ def main():
                                                       rank_test_valid['rank_labels'],
                                                       'ranking')
             test_ranking_score_valid = {k + '_valid': v for k, v in test_ranking_score_valid.items()}
+            test_score.update(test_ranking_score_all)
+            test_score.update(test_ranking_score_valid)
+            logging.info('Test Score={}'.format(test_score))
+            with open(os.path.join(args.out_dir, 'test_scores.json'), 'w') as out_f:
+                json.dump(test_score, out_f)
+        elif args.algo == 'cat_ranking':
+            model = CatRanker()
+            model.fit(train_df, train_dir=args.out_dir, seed=args.seed)
+            model.save(args.out_dir)
+            test_score = {}
+            test_ranking_score_all = model.evaluate(rank_test_all['rank_features'],
+                                                    rank_test_all['rank_labels'],
+                                                    'ranking')
+            test_ranking_score_all = {k + '_all': v for k, v in test_ranking_score_all.items()}
+            test_ranking_score_valid = model.evaluate(rank_test_valid['rank_features'],
+                                                      rank_test_valid['rank_labels'],
+                                                      'ranking')
+            test_ranking_score_valid = {k + '_valid': v for k, v in
+                                        test_ranking_score_valid.items()}
             test_score.update(test_ranking_score_all)
             test_score.update(test_ranking_score_valid)
             logging.info('Test Score={}'.format(test_score))

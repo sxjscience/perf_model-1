@@ -3,15 +3,21 @@ import argparse
 import os
 import json
 import numpy as np
-from perf_model.thrpt_model_new import NNRanker, read_pd, get_feature_label
+from perf_model.thrpt_model_new import NNRanker, read_pd, get_feature_label, CatRegressor
 
 parser = argparse.ArgumentParser(description='Read model results.')
 parser.add_argument('--dir_path', type=str, default='model_results/nn_5.0_200')
+parser.add_argument('--model_type', choices=['nn', 'cat_regression'])
 args = parser.parse_args()
 
 for dir_name in sorted(os.listdir(args.dir_path)):
     for exp_name in sorted(os.listdir(os.path.join(args.dir_path, dir_name))):
-        model = NNRanker.load(os.path.join(args.dir_path, dir_name, exp_name))
+        if args.model_type == 'nn':
+            model = NNRanker.load(os.path.join(args.dir_path, dir_name, exp_name))
+        elif args.model_type == 'cat_regression':
+            model = CatRegressor.load(os.path.join(args.dir_path, dir_name, exp_name))
+        else:
+            raise NotImplementedError
         data_prefix = os.path.join('split_tuning_dataset', dir_name, exp_name)
         test_df = read_pd(data_prefix + '.test.pq')
         with open(data_prefix + '.used_key.json', 'r') as in_f:
