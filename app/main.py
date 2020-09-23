@@ -8,7 +8,7 @@ import re
 import sys
 import time
 import logging
-
+import random
 import numpy as np
 
 import tvm
@@ -49,6 +49,9 @@ def create_config():
                         type=int,
                         default=32,
                         help='Number of top configs to be measured')
+    parser.add_argument('--seed',
+                        type=int,
+                        default=123)
     parser.add_argument('--n-trial',
                         type=int,
                         default=5000,
@@ -293,8 +296,9 @@ def tune_graph(graph, dshape, target, records, opt_sch_file, use_dp=True):
 
 def main():
     """Main entry."""
-
     configs = create_config()
+    np.random.seed(configs.seed)
+    random.seed(configs.seed)
 
     # Check if the target is for x86.
     target = tvm.target.create(configs.target)
