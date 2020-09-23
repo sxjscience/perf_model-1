@@ -87,6 +87,9 @@ Now we can finally auto-tune a DNN model:
 python3 app/main.py --list-net ./model_results/cat_regression/gcv_t4_csv \
                     --model_type cat_regression \
                     --target "cuda -model=t4" --gcv MobileNetV2_1.0
+python3 app/main.py --list-net ./model_results/nn_5.0_200/gcv_t4_csv \
+                    --model_type nn \
+                    --target "cuda -model=t4" --gcv MobileNetV2_1.0
 python3 app/main.py --list-net ./trained_models/listwise_t4 \
                     --target "cuda -model=t4" --gcv MobileNetV2_1.0
 python3 app/main.py --list-net ./skylake_models --target "llvm -mcpu=skylake-avx512" --gcv MobileNetV2_1.0
