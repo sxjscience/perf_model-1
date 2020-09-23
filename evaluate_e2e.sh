@@ -1,8 +1,8 @@
 set -ex
 
-MODEL_NAME=cat_regression
-MODEL_PATH=./model_results/${MODEL_NAME}/gcv_t4_csv
+MODEL_PATH=./model_results/cat_regression/gcv_t4_csv
 MODEL_TYPE=cat_regression
+OUT_DIR=cat_regression_e2e_t4
 MODELS=(
 "InceptionV3"
 "MobileNet1.0"
@@ -14,9 +14,10 @@ MODELS=(
 "VGG19"
 )
 TARGET="cuda -model=t4"
+mkdir -p ${OUT_DIR}
 for network in ${MODELS}
 do
   python3 app/main.py --list-net ${MODEL_PATH} \
                     --model_type ${MODEL_TYPE} \
-                    --target "${TARGET}" --gcv ${network} 2>&1 | tee -a ${MODEL_NAME}.txt
+                    --target "${TARGET}" --gcv ${network} 2>&1 | tee -a ${OUT_DIR}/${network}.txt
 done;
