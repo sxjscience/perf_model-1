@@ -259,6 +259,12 @@ class CatRegressor:
             abs_ndcg_k3_score = ndcg_score(y_true=np.argsort(labels),
                                            y_score=preds,
                                            k=3)
+            rel_ndcg_score = ndcg_score(y_true=labels / (labels.max(axis=-1, keepdims=True) + 1E-6),
+                                        y_score=preds)
+            rel_ndcg_k3_score = ndcg_score(y_true=labels / (labels.max(axis=-1, keepdims=True)
+                                                            + 1E-6),
+                                           y_score=preds,
+                                           k=3)
             ranks = np.argsort(-preds, axis=-1) + 1
             true_max_indices = np.argmax(labels, axis=-1)
             rank_of_max = ranks[np.arange(len(true_max_indices)), true_max_indices]
@@ -267,6 +273,8 @@ class CatRegressor:
                     'ndcg_k3': ndcg_K3_val,
                     'abs_ndcg': abs_ndcg_score,
                     'abs_ndcg_k3': abs_ndcg_k3_score,
+                    'rel_ndcg': rel_ndcg_score,
+                    'rel_ndcg_k3': rel_ndcg_k3_score,
                     'mrr': mrr, 'rank_of_top': 1 / mrr}
         else:
             raise NotImplementedError
