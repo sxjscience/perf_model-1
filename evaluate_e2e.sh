@@ -18,5 +18,5 @@ for network in ${MODELS}
 do
   python3 app/main.py --list-net ${MODEL_PATH} \
                     --model_type ${MODEL_TYPE} \
-                    --target ${TARGET} --gcv ${network} 2>&1 | tee -a ${MODEL_NAME}.txt
+                    --target "${TARGET}" --gcv ${network} 2>&1 | tee -a ${MODEL_NAME}.txt
 done;
