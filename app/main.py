@@ -266,6 +266,7 @@ def tune_and_evaluate(mod, params, input_shape, dtype, measure_top_n, target, tu
     else:
         sys.stderr.write("Compile model with fallback + tophub...\n")
 
+    compile_engine.get().clear()
     with relay.build_config(opt_level=3):
         graph, lib, params = relay.build_module.build(mod, target=target, params=params)
     tvm.autotvm.task.DispatchContext.current = dispatch_ctx
