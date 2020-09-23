@@ -290,7 +290,7 @@ class CatBoostPoolIndicesGenerator:
 
 class CatRanker(CatRegressor):
     def fit(self, train_df, step_sample_num=204800, group_size=40,
-            niter=4000, train_dir='.', seed=123):
+            niter=5000, train_dir='.', seed=123):
         if self.model is not None:
             init_model = self.model
         else:
