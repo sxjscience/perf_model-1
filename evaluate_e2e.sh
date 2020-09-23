@@ -1,3 +1,5 @@
+set -ex
+
 MODEL_NAME=cat_regression
 MODEL_PATH=./model_results/${MODEL_NAME}/gcv_t4_csv
 MODEL_TYPE=cat_regression
