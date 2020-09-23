@@ -268,6 +268,21 @@ class CatRegressor:
             raise NotImplementedError
 
 
+class CatRanker:
+    def __init__(self, model=None):
+        self.model = model
+
+    def fit(self, train_df):
+        pass
+
+    def save(self):
+        pass
+
+    @classmethod
+    def load(self):
+        pass
+
+
 class NNRanker:
     def __init__(self, in_units=None, units=256, num_layers=2,
                  dropout=0.1, act_type='leaky',
@@ -335,9 +350,10 @@ class NNRanker:
             ranking_labels = ranking_labels.reshape((batch_size, group_size))
             ranking_scores = self.net(ranking_features)
             ranking_scores = ranking_scores.reshape((batch_size, group_size))
-            loss_regression = torch.abs(ranking_scores - ranking_labels).mean()
+            loss_regression = torch.square(ranking_scores - ranking_labels).mean()
             loss_ranking = loss_fn(y_pred=ranking_scores,
-                                   y_true=ranking_labels / std_val + mean_val / std_val)
+                                   y_true=ranking_labels / th.max(ranking_labels,
+                                                                  dim=1, keepdim=True))
             loss = loss_regression + rank_lambda * loss_ranking
             loss.backward()
             optimizer.step()
