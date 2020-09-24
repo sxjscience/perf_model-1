@@ -2,8 +2,8 @@ set -ex
 
 MODEL_PATH=./model_results/cat_ranking/gcv_t4_csv
 MODEL_TYPE=cat_ranking
-n_parallel=32
-measure_top_n=8
+n_parallel=8
+measure_top_n=32
 
 OUT_DIR=${MODEL_TYPE}_e2e_t4_npara${n_parallel}_ntop${measure_top_n}
 MODELS=(
