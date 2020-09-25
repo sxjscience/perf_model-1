@@ -412,12 +412,12 @@ class NNRanker:
         log_cnt = 0
         niter = 0
         for ranking_features, ranking_labels in dataloader:
-            original_ranking_labels = ranking_labels.reshape((batch_size, group_size))
-            ranking_labels = (ranking_labels - mean_val) / std_val
             ranking_features = ranking_features.cuda()
             ranking_labels = ranking_labels.cuda()
-            optimizer.zero_grad()
+            original_ranking_labels = ranking_labels.reshape((batch_size, group_size))
+            ranking_labels = (ranking_labels - mean_val) / std_val
             ranking_labels = ranking_labels.reshape((batch_size, group_size))
+            optimizer.zero_grad()
             ranking_scores = self.net(ranking_features)
             ranking_scores = ranking_scores.reshape((batch_size, group_size))
             loss_regression = torch.square(ranking_scores - ranking_labels).mean()
