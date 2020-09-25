@@ -125,12 +125,9 @@ def lambdaLoss(y_pred, y_true, eps=DEFAULT_EPS, k=None, sigma=1.,
     weights = torch.abs(torch.pow(D[:, :, None], -1.) - torch.pow(D[:, None, :], -1.))\
               * torch.abs(G[:, :, None] - G[:, None, :])
     weights = torch.tril(weights)
-    print('G=', G)
-    print('weights=', weights)
     # We are clamping the array entries to maintain correct backprop (log(0) and division by 0)
     scores_diffs = (y_pred_sorted[:, :, None] - y_pred_sorted[:, None, :]).clamp(min=-1e8, max=1e8)
     scores_diffs[torch.isnan(scores_diffs)] = 0.
-    print('score_diffs=', scores_diffs)
     # Calculate the log sigmoid
     if use_hinge_loss is False:
         losses = - torch.nn.LogSigmoid()(sigma * scores_diffs)
