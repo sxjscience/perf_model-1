@@ -480,11 +480,14 @@ class NNRanker:
         return preds
 
     def evaluate(self, features, labels, mode='ranking'):
-        preds = self.predict(features)
+        preds = self.predict(features, use_gpu=True)
         if mode == 'regression':
             rmse = np.sqrt(np.mean(np.square(preds - labels)))
             mae = np.mean(np.abs(preds - labels))
-            return {'rmse': rmse, 'mae': mae}
+            valid_indices = (labels > 0).nonzero()[0]
+            valid_rmse = np.sqrt(np.mean(np.square(preds[valid_indices] - labels[valid_indices])))
+            valid_mae = np.mean(np.abs(preds[valid_indices] - labels[valid_indices]))
+            return {'rmse': rmse, 'mae': mae, 'valid_rmse': valid_rmse, 'valid_mae': valid_mae}
         elif mode == 'ranking':
             # We calculate two things, the NDCG score and the MRR score.
             ndcg_val = ndcg_score(y_true=labels, y_score=preds)
