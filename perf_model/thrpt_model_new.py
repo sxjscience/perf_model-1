@@ -355,7 +355,7 @@ class CatRanker(CatRegressor):
 class NNRanker:
     def __init__(self, in_units=None, units=256, num_layers=2,
                  dropout=0.1, act_type='leaky',
-                 rank_loss_fn='approx_ndcg',
+                 rank_loss_fn='lambda_rank',
                  mean_val=None, std_val=None):
         if in_units is None:
             self.net = None
@@ -405,7 +405,7 @@ class NNRanker:
                                          group_size=group_size)
         dataloader = DataLoader(dataset, batch_sampler=batch_sampler, num_workers=8)
         optimizer = torch.optim.Adam(self.net.parameters(), lr=lr, amsgrad=False)
-        loss_fn = get_ranking_loss(self._rank_loss_fn)
+        rank_loss_fn = get_ranking_loss(self._rank_loss_fn)
         dataloader = iter(dataloader)
         log_regression_loss = 0
         log_ranking_loss = 0
@@ -421,8 +421,8 @@ class NNRanker:
             ranking_scores = self.net(ranking_features)
             ranking_scores = ranking_scores.reshape((batch_size, group_size))
             loss_regression = torch.square(ranking_scores - ranking_labels).mean()
-            loss_ranking = loss_fn(y_pred=ranking_scores,
-                                   y_true=original_ranking_labels / std_val)
+            loss_ranking = rank_loss_fn(y_pred=ranking_scores,
+                                        y_true=original_ranking_labels / std_val)
             loss = loss_regression + rank_lambda * loss_ranking
             loss.backward()
             optimizer.step()
