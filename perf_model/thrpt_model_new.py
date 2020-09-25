@@ -415,7 +415,7 @@ class NNRanker:
             ranking_features = ranking_features.cuda()
             ranking_labels = ranking_labels.cuda()
             ranking_labels = ranking_labels.reshape((batch_size, group_size))
-            original_ranking_labels = ranking_labels.copy()
+            original_ranking_labels = ranking_labels
             ranking_labels = (ranking_labels - mean_val) / std_val
             optimizer.zero_grad()
             ranking_scores = self.net(ranking_features)
