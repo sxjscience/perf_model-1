@@ -404,7 +404,7 @@ class NNRanker:
                                          rank_batch_size=batch_size,
                                          group_size=group_size)
         dataloader = DataLoader(dataset, batch_sampler=batch_sampler, num_workers=8)
-        optimizer = torch.optim.Adam(self.net.parameters(), lr=lr, amsgrad=True)
+        optimizer = torch.optim.Adam(self.net.parameters(), lr=lr, amsgrad=False)
         rank_loss_fn = get_ranking_loss(self._rank_loss_fn)
         dataloader = iter(dataloader)
         log_regression_loss = 0
@@ -420,7 +420,7 @@ class NNRanker:
             optimizer.zero_grad()
             ranking_scores = self.net(ranking_features)
             ranking_scores = ranking_scores.reshape((batch_size, group_size))
-            loss_regression = torch.square(ranking_scores - ranking_labels).mean()
+            loss_regression = torch.abs(ranking_scores - ranking_labels).mean()
             loss_ranking = rank_loss_fn(y_pred=ranking_scores,
                                         y_true=original_ranking_labels / std_val)
             loss = loss_regression + rank_lambda * loss_ranking
@@ -464,10 +464,13 @@ class NNRanker:
         model.net.load_state_dict(torch.load(os.path.join(model_dir, 'model_states.th')))
         return model
 
-    def predict(self, features):
+    def predict(self, features, use_gpu=False):
         features = np.array(features, dtype=np.float32)
         features_shape = features.shape
-        self.net.cpu()
+        if use_gpu is False:
+            self.net.cpu()
+        else:
+            self.net.gpu()
         self.net.eval()
         with torch.no_grad():
             features = torch.tensor(features, dtype=th.float32)
