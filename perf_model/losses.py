@@ -124,7 +124,6 @@ def lambdaLoss(y_pred, y_true, eps=DEFAULT_EPS, k=None, sigma=1.,
 
     weights = torch.abs(torch.pow(D[:, :, None], -1.) - torch.pow(D[:, None, :], -1.))\
               * torch.abs(G[:, :, None] - G[:, None, :])
-    weights = torch.tril(weights)
     # We are clamping the array entries to maintain correct backprop (log(0) and division by 0)
     scores_diffs = (y_pred_sorted[:, :, None] - y_pred_sorted[:, None, :]).clamp(min=-1e8, max=1e8)
     scores_diffs[torch.isnan(scores_diffs)] = 0.
@@ -137,9 +136,12 @@ def lambdaLoss(y_pred, y_true, eps=DEFAULT_EPS, k=None, sigma=1.,
             losses = losses / math.log(2)
         else:
             raise ValueError("Reduction logarithm base can be either natural or binary")
+        weights = torch.tril(weights)
+        losses = losses * weights
     else:
         losses = torch.max(hinge_alpha - scores_diffs, 0)[0]
-    losses = losses * weights
+        weights = torch.tril(weights)
+        losses = losses * weights
     masked_losses = losses[:, ndcg_at_k_mask]
     if reduction == "sum":
         loss = torch.sum(masked_losses)
