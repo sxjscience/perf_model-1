@@ -377,7 +377,7 @@ class NNRanker:
     def fit(self, train_df, batch_size=256, group_size=10, lr=1E-3,
             iter_mult=500, rank_lambda=1.0):
         features, labels = get_feature_label(train_df)
-        log_interval = (len(features) + batch_size - 1) // batch_size * (iter_mult // 20)
+        log_interval = ((len(features) + batch_size - 1) // batch_size * iter_mult) // 20
         num_iters = ((len(features) + batch_size - 1) // batch_size) * iter_mult
         if self.net is None:
             self._in_units = features.shape[1]
@@ -404,7 +404,7 @@ class NNRanker:
                                          rank_batch_size=batch_size,
                                          group_size=group_size)
         dataloader = DataLoader(dataset, batch_sampler=batch_sampler, num_workers=8)
-        optimizer = torch.optim.Adam(self.net.parameters(), lr=lr, amsgrad=False)
+        optimizer = torch.optim.Adam(self.net.parameters(), lr=lr, amsgrad=True)
         rank_loss_fn = get_ranking_loss(self._rank_loss_fn)
         dataloader = iter(dataloader)
         log_regression_loss = 0
