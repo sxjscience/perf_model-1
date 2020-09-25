@@ -114,4 +114,4 @@ class RankGroupSampler:
             rank_batch_indices = np.vstack(rank_batch_indices)
             # batch_indices = np.hstack([regression_indices, rank_batch_indices.reshape((-1,))])
             # yield batch_indices
-            yield rank_batch_indices
+            yield rank_batch_indices.reshape((-1,))
