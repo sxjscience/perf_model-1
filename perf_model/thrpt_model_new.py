@@ -424,7 +424,7 @@ class NNRanker:
             loss_ranking = rank_loss_fn(y_pred=ranking_scores,
                                         y_true=original_ranking_labels
                                                / th.max(original_ranking_labels, dim=-1,
-                                                        keepdim=True))
+                                                        keepdim=True)[0])
             loss = loss_regression + rank_lambda * loss_ranking
             loss.backward()
             optimizer.step()
