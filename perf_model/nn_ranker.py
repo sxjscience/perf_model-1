@@ -3,7 +3,7 @@ import torch.nn as nn
 import numpy as np
 import torch.nn.functional as F
 from torch.distributions.dirichlet import Dirichlet
-from .losses import approxNDCGLoss, listMLE
+from .losses import approxNDCGLoss, listMLE, lambdaLoss
 
 
 def get_activation(act_type):
@@ -20,13 +20,15 @@ def get_ranking_loss(loss_type):
         return approxNDCGLoss
     elif loss_type == 'list_mle':
         return listMLE
+    elif loss_type == 'lambda_rank':
+        return lambdaLoss
     else:
         raise NotImplementedError
 
 
 class RankingModel(nn.Module):
     def __init__(self, in_units, units=128, num_layers=3,
-                 dropout=0.05, act_type='leaky'):
+                 dropout=0.05, use_bn=True, act_type='leaky'):
         super(RankingModel, self).__init__()
         layers = []
         for i in range(num_layers):
@@ -34,7 +36,8 @@ class RankingModel(nn.Module):
                                     out_features=units,
                                     bias=False))
             in_units = units
-            layers.append(nn.BatchNorm1d(in_units))
+            if use_bn:
+                layers.append(nn.BatchNorm1d(in_units))
             layers.append(get_activation(act_type))
             layers.append(nn.Dropout(dropout))
         layers.append(nn.Linear(in_features=in_units,
@@ -59,9 +62,11 @@ class RankingModel(nn.Module):
 
 
 class RankGroupSampler:
-    def __init__(self, thrpt, batch_size=512, group_size=10,
+    def __init__(self, thrpt, regression_batch_size=1024,
+                 rank_batch_size=512, group_size=10,
                  beta_params=(3.0, 1.0)):
-        self._batch_size = batch_size
+        self._rank_batch_size = min(rank_batch_size, len(thrpt))
+        self._regression_batch_size = min(regression_batch_size, len(thrpt))
         self._num_samples = len(thrpt)
         self._thrpt = thrpt
         self._group_size = group_size
@@ -69,6 +74,15 @@ class RankGroupSampler:
         self._invalid_indices = (thrpt == 0).nonzero()[0]
         # The mixture of dirichlet
         self._beta_params = beta_params
+        self._generator = np.random.default_rng()
+
+    @property
+    def regression_batch_size(self):
+        return self._regression_batch_size
+
+    @property
+    def rank_batch_size(self):
+        return self._rank_batch_size
 
     def __iter__(self):
         """
@@ -76,27 +90,28 @@ class RankGroupSampler:
         Returns
         -------
         indices
-            List with shape (batch_size * group_size,)
+            List with shape (regression_batch_size + batch_size * group_size,)
         """
         while True:
-            indices = []
+            # regression_indices = np.random.choice(len(self._thrpt),
+            #                                       self.regression_batch_size,
+            #                                       replace=False)
             taus = np.random.beta(a=self._beta_params[0],
                                   b=self._beta_params[1],
-                                  size=(self._batch_size,))
+                                  size=(self._rank_batch_size,))
             valid_nums = np.ceil(taus * self._group_size).astype(np.int32)
             invalid_nums = self._group_size - valid_nums
             if len(self._invalid_indices) == 0:
                 valid_nums[:] = self._group_size
                 invalid_nums[:] = 0
-            batch_valid_indices = np.random.choice(self._valid_indices, sum(valid_nums),
-                                                   replace=True)
-            batch_invalid_indices = np.random.choice(self._invalid_indices, sum(invalid_nums),
-                                                     replace=True)
-            valid_cnt = 0
-            invalid_cnt = 0
-            for i in range(self._batch_size):
-                indices.extend(batch_valid_indices[valid_cnt:(valid_cnt + valid_nums[i])])
-                indices.extend(batch_invalid_indices[invalid_cnt:(invalid_cnt + invalid_nums[i])])
-                valid_cnt += valid_nums[i]
-                invalid_cnt += invalid_nums[i]
-            yield indices
+            rank_batch_indices = []
+            for i in range(self._rank_batch_size):
+                invalid_indices = self._generator.choice(self._valid_indices, valid_nums[i],
+                                                         replace=False)
+                valid_indices = self._generator.choice(self._invalid_indices, invalid_nums[i],
+                                                       replace=False)
+                rank_batch_indices.append(np.hstack([invalid_indices, valid_indices]))
+            rank_batch_indices = np.vstack(rank_batch_indices)
+            # batch_indices = np.hstack([regression_indices, rank_batch_indices.reshape((-1,))])
+            # yield batch_indices
+            yield rank_batch_indices

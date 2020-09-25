@@ -401,7 +401,7 @@ class NNRanker:
         th_labels = th.tensor(labels, dtype=th.float32)
         dataset = TensorDataset(th_features, th_labels)
         batch_sampler = RankGroupSampler(thrpt=labels,
-                                         batch_size=batch_size,
+                                         rank_batch_size=batch_size,
                                          group_size=group_size)
         dataloader = DataLoader(dataset, batch_sampler=batch_sampler, num_workers=8)
         optimizer = torch.optim.Adam(self.net.parameters(), lr=lr, amsgrad=False)
@@ -412,6 +412,7 @@ class NNRanker:
         log_cnt = 0
         niter = 0
         for ranking_features, ranking_labels in dataloader:
+            original_ranking_labels = ranking_labels.reshape((batch_size, group_size))
             ranking_labels = (ranking_labels - mean_val) / std_val
             ranking_features = ranking_features.cuda()
             ranking_labels = ranking_labels.cuda()
@@ -421,8 +422,7 @@ class NNRanker:
             ranking_scores = ranking_scores.reshape((batch_size, group_size))
             loss_regression = torch.square(ranking_scores - ranking_labels).mean()
             loss_ranking = loss_fn(y_pred=ranking_scores,
-                                   y_true=ranking_labels / th.max(ranking_labels,
-                                                                  dim=1, keepdim=True))
+                                   y_true=original_ranking_labels / std_val)
             loss = loss_regression + rank_lambda * loss_ranking
             loss.backward()
             optimizer.step()
