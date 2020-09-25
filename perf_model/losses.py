@@ -83,7 +83,7 @@ def listMLE(y_pred, y_true, eps=DEFAULT_EPS):
 
 def lambdaLoss(y_pred, y_true, eps=DEFAULT_EPS, k=None, sigma=1.,
                reduction="mean", reduction_log="binary",
-               use_hinge_loss=False, hinge_alpha=-0.01):
+               use_hinge_loss=False, hinge_alpha=1.0):
     """
     LambdaLoss framework for LTR losses implementations, introduced in "The LambdaLoss Framework for Ranking Metric Optimization".
     Contains implementations of different weighing schemes corresponding to e.g. LambdaRank or RankNet.
@@ -136,11 +136,11 @@ def lambdaLoss(y_pred, y_true, eps=DEFAULT_EPS, k=None, sigma=1.,
             losses = losses / math.log(2)
         else:
             raise ValueError("Reduction logarithm base can be either natural or binary")
-        weights = torch.tril(weights)
+        weights = torch.triu(weights)
         losses = losses * weights
     else:
-        losses = torch.max(hinge_alpha - scores_diffs, 0)[0]
-        weights = torch.tril(weights)
+        losses = torch.max(hinge_alpha - scores_diffs, torch.zeros_like(scores_diffs))
+        weights = torch.triu(weights)
         losses = losses * weights
     masked_losses = losses[:, ndcg_at_k_mask]
     if reduction == "sum":
