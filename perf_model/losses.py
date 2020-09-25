@@ -83,7 +83,7 @@ def listMLE(y_pred, y_true, eps=DEFAULT_EPS):
 
 def lambdaLoss(y_pred, y_true, eps=DEFAULT_EPS, k=None, sigma=1.,
                reduction="mean", reduction_log="binary",
-               use_hinge_loss=True, hinge_alpha=0.01):
+               use_hinge_loss=True, hinge_alpha=-0.01):
     """
     LambdaLoss framework for LTR losses implementations, introduced in "The LambdaLoss Framework for Ranking Metric Optimization".
     Contains implementations of different weighing schemes corresponding to e.g. LambdaRank or RankNet.
