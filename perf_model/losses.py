@@ -138,7 +138,7 @@ def lambdaLoss(y_pred, y_true, eps=DEFAULT_EPS, k=None, sigma=1.,
             raise ValueError("Reduction logarithm base can be either natural or binary")
     else:
         print(scores_diffs)
-        losses = torch.max(hinge_alpha - scores_diffs, 0)
+        losses = torch.max(hinge_alpha - scores_diffs, 0)[0]
     print(losses)
     print(weights)
     ch = input()
