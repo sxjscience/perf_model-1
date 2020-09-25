@@ -420,7 +420,7 @@ class NNRanker:
             optimizer.zero_grad()
             ranking_scores = self.net(ranking_features)
             ranking_scores = ranking_scores.reshape((batch_size, group_size))
-            loss_regression = torch.abs(ranking_scores - ranking_labels).mean()
+            loss_regression = torch.square(ranking_scores - ranking_labels).mean()
             loss_ranking = rank_loss_fn(y_pred=ranking_scores,
                                         y_true=original_ranking_labels / std_val)
             loss = loss_regression + rank_lambda * loss_ranking
