@@ -477,8 +477,10 @@ class NNRanker:
             for batch_start in range(0, (features.shape[0] + batch_size - 1) // batch_size):
                 batch_end = min(batch_start + batch_size, features.shape[0])
                 th_features = torch.tensor(features[batch_start:batch_end], dtype=th.float32)
+                if use_gpu:
+                    th_features = th_features.cuda()
                 features_shape = th_features.shape
-                preds = self.net(features.reshape((-1, features_shape[-1])))
+                preds = self.net(th_features.reshape((-1, features_shape[-1])))
                 preds = preds.reshape(features_shape[:-1]) * self._std_val + self._mean_val
                 preds = preds.numpy()
                 all_preds.append(preds)
