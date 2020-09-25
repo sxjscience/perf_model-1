@@ -482,6 +482,8 @@ class NNRanker:
                 features_shape = th_features.shape
                 preds = self.net(th_features.reshape((-1, features_shape[-1])))
                 preds = preds.reshape(features_shape[:-1]) * self._std_val + self._mean_val
+                if use_gpu:
+                    preds = preds.cpu()
                 preds = preds.numpy()
                 all_preds.append(preds)
         return np.concatenate(all_preds, axis=0)
