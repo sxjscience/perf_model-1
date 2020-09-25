@@ -466,18 +466,23 @@ class NNRanker:
 
     def predict(self, features, use_gpu=False):
         features = np.array(features, dtype=np.float32)
-        features_shape = features.shape
         if use_gpu is False:
             self.net.cpu()
         else:
             self.net.gpu()
         self.net.eval()
+        batch_size = 10240
         with torch.no_grad():
-            features = torch.tensor(features, dtype=th.float32)
-            preds = self.net(features.reshape((-1, features_shape[-1])))
-            preds = preds.reshape(features_shape[:-1]) * self._std_val + self._mean_val
-            preds = preds.numpy()
-        return preds
+            all_preds = []
+            for batch_start in range(0, (features.shape[0] + batch_size - 1) // batch_size):
+                batch_end = min(batch_start + batch_size, len(features.shape[0]))
+                th_features = torch.tensor(features[batch_start:batch_end], dtype=th.float32)
+                features_shape = th_features.shape
+                preds = self.net(features.reshape((-1, features_shape[-1])))
+                preds = preds.reshape(features_shape[:-1]) * self._std_val + self._mean_val
+                preds = preds.numpy()
+                all_preds.append(preds)
+        return np.concatenate(all_preds, axis=0)
 
     def evaluate(self, features, labels, mode='ranking'):
         preds = self.predict(features, use_gpu=True)
