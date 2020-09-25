@@ -469,7 +469,7 @@ class NNRanker:
         if use_gpu is False:
             self.net.cpu()
         else:
-            self.net.gpu()
+            self.net.cuda()
         self.net.eval()
         batch_size = 10240
         with torch.no_grad():
