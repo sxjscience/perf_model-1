@@ -140,7 +140,7 @@ def lambdaLoss(y_pred, y_true, eps=DEFAULT_EPS, k=None, sigma=1.,
     else:
         losses = torch.max(hinge_alpha - scores_diffs, 0)
     losses = losses * weights
-    masked_losses = losses[ndcg_at_k_mask]
+    masked_losses = losses[:, ndcg_at_k_mask]
     if reduction == "sum":
         loss = torch.sum(masked_losses)
     elif reduction == "mean":
