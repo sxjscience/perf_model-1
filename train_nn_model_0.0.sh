@@ -1,7 +1,7 @@
 set -ex
 
 rank_lambda=0.0
-iter_mult=200
+iter_mult=20
 
 MODEL_DIR=model_results/nn_${rank_lambda}_${iter_mult}
 mkdir -p ${MODEL_DIR}
