@@ -83,7 +83,7 @@ def listMLE(y_pred, y_true, eps=DEFAULT_EPS):
 
 def lambdaLoss(y_pred, y_true, eps=DEFAULT_EPS, k=None, sigma=1.,
                reduction="mean", reduction_log="binary",
-               use_hinge_loss=False, hinge_alpha=0.1):
+               use_hinge_loss=True, hinge_alpha=0.1):
     """
     LambdaLoss framework for LTR losses implementations, introduced in "The LambdaLoss Framework for Ranking Metric Optimization".
     Contains implementations of different weighing schemes corresponding to e.g. LambdaRank or RankNet.
@@ -124,7 +124,7 @@ def lambdaLoss(y_pred, y_true, eps=DEFAULT_EPS, k=None, sigma=1.,
 
     weights = torch.abs(torch.pow(D[:, :, None], -1.) - torch.pow(D[:, None, :], -1.))\
               * torch.abs(G[:, :, None] - G[:, None, :])
-
+    print(weights)
     # We are clamping the array entries to maintain correct backprop (log(0) and division by 0)
     scores_diffs = (y_pred_sorted[:, :, None] - y_pred_sorted[:, None, :]).clamp(min=-1e8, max=1e8)
     scores_diffs[torch.isnan(scores_diffs)] = 0.
