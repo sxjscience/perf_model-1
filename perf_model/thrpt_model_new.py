@@ -475,7 +475,7 @@ class NNRanker:
         with torch.no_grad():
             all_preds = []
             for batch_start in range(0, (features.shape[0] + batch_size - 1) // batch_size):
-                batch_end = min(batch_start + batch_size, len(features.shape[0]))
+                batch_end = min(batch_start + batch_size, features.shape[0])
                 th_features = torch.tensor(features[batch_start:batch_end], dtype=th.float32)
                 features_shape = th_features.shape
                 preds = self.net(features.reshape((-1, features_shape[-1])))
