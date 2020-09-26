@@ -19,7 +19,7 @@ TASKS=(
 #"gcv_skylake_csv/dense_pack.x86"
 #"gcv_skylake_csv/depthwise_conv2d_NCHWc.x86"
 
-"gcv_t4_csv/conv2d_cudnn.cuda"
+#"gcv_t4_csv/conv2d_cudnn.cuda"
 "gcv_t4_csv/conv2d_nchw.cuda"
 "gcv_t4_csv/conv2d_nchw_winograd.cuda"
 "gcv_t4_csv/conv2d_transpose_nchw.cuda"
