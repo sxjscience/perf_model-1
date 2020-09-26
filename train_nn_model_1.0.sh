@@ -23,9 +23,9 @@ TASKS=(
 "gcv_t4_csv/conv2d_nchw.cuda"
 "gcv_t4_csv/conv2d_nchw_winograd.cuda"
 "gcv_t4_csv/conv2d_transpose_nchw.cuda"
-"gcv_t4_csv/dense_cublas.cuda"
-"gcv_t4_csv/dense_large_batch.cuda"
-"gcv_t4_csv/dense_small_batch.cuda"
+#"gcv_t4_csv/dense_cublas.cuda"
+#"gcv_t4_csv/dense_large_batch.cuda"
+#"gcv_t4_csv/dense_small_batch.cuda"
 "gcv_t4_csv/dense_tensorcore.cuda"
 "gcv_t4_csv/depthwise_conv2d_nchw.cuda"
 )
