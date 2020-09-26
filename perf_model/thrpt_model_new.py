@@ -474,7 +474,7 @@ class NNRanker:
         batch_size = 10240
         with torch.no_grad():
             all_preds = []
-            for batch_start in range(0, (features.shape[0] + batch_size - 1) // batch_size):
+            for batch_start in range(0, features.shape[0], batch_size):
                 batch_end = min(batch_start + batch_size, features.shape[0])
                 th_features = torch.tensor(features[batch_start:batch_end], dtype=th.float32)
                 if use_gpu:
