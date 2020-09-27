@@ -38,6 +38,7 @@ TASKS=(
 
 
 N=8
+i=0
 (
 for iter_mult in 120;
 do
