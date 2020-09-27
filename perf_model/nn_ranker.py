@@ -1,3 +1,4 @@
+import functools
 import torch as th
 import torch.nn as nn
 import numpy as np
@@ -22,6 +23,8 @@ def get_ranking_loss(loss_type):
         return listMLE
     elif loss_type == 'lambda_rank':
         return lambdaLoss
+    elif loss_type == 'lambda_rank_hinge':
+        return functools.partial(lambdaLoss, use_hinge_loss=True)
     else:
         raise NotImplementedError
 
