@@ -6,6 +6,15 @@ aws s3 cp --recursive s3://hyuz-shared-data/trained_models trained_models
 
 aws s3 cp --recursive s3://xingjian-public/split_tuning_dataset_20200920 split_tuning_dataset
 aws s3 cp --recursive s3://xingjian-public/lorien/models/cat_regression_20200922/ model_results/cat_regression
+
+aws s3 cp --recursive s3://xingjian-public/lorien/models/nn_0.0_40_20200926/ model_results/nn_0.0_40
+aws s3 cp --recursive s3://xingjian-public/lorien/models/nn_0.0_80_20200926/ model_results/nn_0.0_80
+aws s3 cp --recursive s3://xingjian-public/lorien/models/nn_1.0_40_20200926/ model_results/nn_1.0_40
+aws s3 cp --recursive s3://xingjian-public/lorien/models/nn_1.0_80_20200926/ model_results/nn_1.0_80
+aws s3 cp --recursive s3://xingjian-public/lorien/models/nn_1.0_40_hinge_20200926/ model_results/nn_1.0_40_hinge
+aws s3 cp --recursive s3://xingjian-public/lorien/models/nn_1.0_80_hinge_20200926/ model_results/nn_1.0_80_hinge
+aws s3 cp --recursive s3://xingjian-public/lorien/models/nn_1.0_40_approx_ndcg_20200926/ model_results/nn_1.0_40_approx_ndcg
+aws s3 cp --recursive s3://xingjian-public/lorien/models/nn_1.0_80_approx_ndcg_20200926/ model_results/nn_1.0_80_approx_ndcg
 ```
 
 The `split_tuning_dataset` is generated based on the tuning dataset. We can generate the dataset as follows:
