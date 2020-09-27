@@ -47,7 +47,7 @@ do
         --algo nn \
         --data_prefix ${data_prefix} \
         --rank_lambda ${rank_lambda} \
-        --rank_loss_type lambda_rank \
+        --rank_loss_type approx_ndcg \
         --iter_mult ${iter_mult} \
         --out_dir ${MODEL_DIR}/$task
   done;
