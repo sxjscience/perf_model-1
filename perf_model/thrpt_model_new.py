@@ -571,7 +571,8 @@ def parse_args():
     parser.add_argument('--rank_loss_type', choices=['lambda_rank',
                                                      'lambda_rank_hinge',
                                                      'approx_ndcg'],
-                        help='Lambda value of the ranking loss.')
+                        default='lambda_rank_hinge',
+                        help='Rank loss type.')
     parser.add_argument('--normalize_relevance', action='store_true',
                         help='Whether to turn on normalized relevance in ranking')
     args = parser.parse_args()
