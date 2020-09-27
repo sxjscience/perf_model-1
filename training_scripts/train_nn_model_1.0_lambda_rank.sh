@@ -2,7 +2,7 @@ set -ex
 
 rank_lambda=1.0
 TASKS=(
-"gcv_graviton2_csv/conv2d_NCHWc.x86.train.pq"
+"gcv_graviton2_csv/conv2d_NCHWc.x86"
 "gcv_graviton2_csv/conv2d_nchw_spatial_pack.arm_cpu"
 "gcv_graviton2_csv/conv2d_nchw_winograd.arm_cpu"
 "gcv_graviton2_csv/dense_nopack.x86"
@@ -42,7 +42,7 @@ do
   data_prefix=split_tuning_dataset/$task
   for iter_mult in 120;
   do
-    MODEL_DIR=model_results/nn_${rank_lambda}_${iter_mult}
+    MODEL_DIR=model_results/nn_${rank_nlambda}_${iter_mult}
     mkdir -p ${MODEL_DIR}
     python3 -m perf_model.thrpt_model_new \
         --algo nn \
