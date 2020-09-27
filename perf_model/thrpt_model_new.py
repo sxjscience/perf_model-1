@@ -461,7 +461,11 @@ class NNRanker:
         with open(os.path.join(model_dir, 'model_config.json'), 'r') as in_f:
             cfg = json.load(in_f)
         model = cls(**cfg)
-        model.net.load_state_dict(torch.load(os.path.join(model_dir, 'model_states.th')))
+        if torch.cuda.is_available() is False:
+            model.net.load_state_dict(torch.load(os.path.join(model_dir, 'model_states.th'),
+                                                 map_location=torch.device('cpu')))
+        else:
+            model.net.load_state_dict(torch.load(os.path.join(model_dir, 'model_states.th')))
         return model
 
     def predict(self, features, use_gpu=False):
