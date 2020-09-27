@@ -40,7 +40,7 @@ TASKS=(
 for task in ${TASKS[@]};
 do
   data_prefix=split_tuning_dataset/$task
-  for iter_mult in 40 80;
+  for iter_mult in 120;
   do
     MODEL_DIR=model_results/nn_${rank_lambda}_${iter_mult}
     mkdir -p ${MODEL_DIR}

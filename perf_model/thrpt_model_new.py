@@ -201,12 +201,12 @@ class CatRegressor:
     def __init__(self, model=None):
         self.model = model
 
-    def fit(self, train_df, valid_df=None, train_dir='.', seed=123):
+    def fit(self, train_df, valid_df=None, train_dir='.', niter=10000, seed=123):
         if self.model is None:
             params = {
                 'loss_function': 'RMSE',
                 'task_type': 'GPU',
-                'iterations': 10000,
+                'iterations': niter,
                 'verbose': True,
                 'train_dir': train_dir,
                 'random_seed': seed
@@ -577,6 +577,8 @@ def parse_args():
                                                      'approx_ndcg'],
                         default='lambda_rank_hinge',
                         help='Rank loss type.')
+    parser.add_argument('--niter', type=int, default=5000,
+                        help='Number of iterations to train the catboost models.')
     parser.add_argument('--normalize_relevance', action='store_true',
                         help='Whether to turn on normalized relevance in ranking')
     args = parser.parse_args()
@@ -629,7 +631,8 @@ def main():
         test_df = test_df[used_key]
         if args.algo == 'cat_regression':
             model = CatRegressor()
-            model.fit(train_df, valid_df=None, train_dir=args.out_dir, seed=args.seed)
+            model.fit(train_df, valid_df=None, train_dir=args.out_dir, seed=args.seed,
+                      niter=args.niter)
             model.save(args.out_dir)
             test_features, test_labels = get_feature_label(test_df)
             test_score = model.evaluate(test_features, test_labels, 'regression')
@@ -648,7 +651,7 @@ def main():
                 json.dump(test_score, out_f)
         elif args.algo == 'cat_ranking':
             model = CatRanker(normalize_relevance=args.normalize_relevance)
-            model.fit(train_df, train_dir=args.out_dir, seed=args.seed)
+            model.fit(train_df, train_dir=args.out_dir, seed=args.seed, niter=args.niter)
             model.save(args.out_dir)
             test_score = {}
             test_ranking_score_all = model.evaluate(rank_test_all['rank_features'],
