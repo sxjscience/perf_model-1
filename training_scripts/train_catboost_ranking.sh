@@ -1,7 +1,7 @@
 set -ex
 
 TASKS=(
-"gcv_graviton2_csv/conv2d_NCHWc.x86.train.pq"
+"gcv_graviton2_csv/conv2d_NCHWc.x86"
 "gcv_graviton2_csv/conv2d_nchw_spatial_pack.arm_cpu"
 "gcv_graviton2_csv/conv2d_nchw_winograd.arm_cpu"
 "gcv_graviton2_csv/dense_nopack.x86"
