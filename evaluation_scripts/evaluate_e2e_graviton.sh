@@ -2,7 +2,6 @@ set -ex
 
 n_parallel=8
 measure_top_n=32
-MODEL_TYPE=nn
 TARGET="llvm -mcpu=skylake-avx512"
 FOLDER="gcv_skylake_csv"
 MODELS=(
@@ -21,13 +20,13 @@ MODELS=(
 
 for MODEL_NAME in nn_0.0_40 nn_0.0_80 nn_1.0_40 nn_1.0_80 nn_1.0_40_hinge nn_1.0_80_hinge;
 do
-  MODEL_PATH=./model_results/${MODEL_NAME}/${FOLDER}
+  MODEL_PATH=../model_results/${MODEL_NAME}/${FOLDER}
 
   OUT_DIR=${MODEL_NAME}_e2e_t4_npara${n_parallel}_ntop${measure_top_n}
   mkdir -p ${OUT_DIR}
   for network in ${MODELS[@]}
   do
-    python3 app/main.py --list-net ${MODEL_PATH} \
+    python3 ../app/main.py --list-net ${MODEL_PATH} \
                       --model_type ${MODEL_TYPE} \
                       --n-parallel ${n_parallel} \
                       --measure-top-n ${measure_top_n} \
