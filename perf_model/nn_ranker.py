@@ -102,7 +102,8 @@ class RankGroupSampler:
             taus = np.random.beta(a=self._beta_params[0],
                                   b=self._beta_params[1],
                                   size=(self._rank_batch_size,))
-            valid_nums = np.ceil(taus * self._group_size).astype(np.int32)
+            valid_nums = min(np.ceil(taus * self._group_size).astype(np.int32),
+                             len(self._valid_indices))
             invalid_nums = self._group_size - valid_nums
             if len(self._invalid_indices) == 0:
                 valid_nums[:] = self._group_size
