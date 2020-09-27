@@ -31,6 +31,7 @@ do
                       --model_type ${MODEL_TYPE} \
                       --n-parallel ${n_parallel} \
                       --measure-top-n ${measure_top_n} \
+                      --graph \
                       --target "${TARGET}" --gcv ${network} 2>&1 | tee -a ${OUT_DIR}/${network}.txt
   done;
 done;
