@@ -36,19 +36,23 @@ TASKS=(
 "gcv_v100_csv/depthwise_conv2d_nchw.cuda"
 )
 
-
-for task in ${TASKS[@]};
+N=8
+(
+for iter_mult in 120;
 do
-  data_prefix=split_tuning_dataset/$task
-  for iter_mult in 120;
+  for task in ${TASKS[@]};
   do
-    MODEL_DIR=model_results/nn_${rank_lambda}_${iter_mult}
-    mkdir -p ${MODEL_DIR}
-    python3 -m perf_model.thrpt_model_new \
-        --algo nn \
-        --data_prefix ${data_prefix} \
-        --rank_lambda ${rank_lambda} \
-        --iter_mult ${iter_mult} \
-        --out_dir ${MODEL_DIR}/$task
+    data_prefix=split_tuning_dataset/$task
+    ((i=i%N)); ((i++==0)) && wait
+    ( MODEL_DIR=model_results/nn_${rank_lambda}_${iter_mult}
+      mkdir -p ${MODEL_DIR}
+      python3 -m perf_model.thrpt_model_new \
+          --algo nn \
+          --data_prefix ${data_prefix} \
+          --rank_lambda ${rank_lambda} \
+          --iter_mult ${iter_mult} \
+          --out_dir ${MODEL_DIR}/$task ) &
   done;
 done;
+)
+
