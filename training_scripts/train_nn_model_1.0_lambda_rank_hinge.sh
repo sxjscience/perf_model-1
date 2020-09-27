@@ -41,7 +41,7 @@ do
   data_prefix=split_tuning_dataset/$task
   for iter_mult in 40 80;
   do
-    MODEL_DIR=model_results/nn_${rank_lambda}_${iter_mult}
+    MODEL_DIR=model_results/nn_${rank_lambda}_${iter_mult}_hinge
     mkdir -p ${MODEL_DIR}
     python3 -m perf_model.thrpt_model_new \
         --algo nn \
