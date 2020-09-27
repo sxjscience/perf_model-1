@@ -35,18 +35,21 @@ TASKS=(
 "gcv_v100_csv/depthwise_conv2d_nchw.cuda"
 )
 
-
-for task in ${TASKS[@]};
+N=4
+(
+for niter in 5000 10000;
 do
-  data_prefix=split_tuning_dataset/$task
-  for niter in 5000 10000;
+  for task in ${TASKS[@]};
   do
-    MODEL_DIR=model_results/cat_regression_${niter}
-    mkdir -p ${MODEL_DIR}
-    python3 -m perf_model.thrpt_model_new \
-        --algo cat_regression \
-        --niter ${niter} \
-        --data_prefix ${data_prefix} \
-        --out_dir ${MODEL_DIR}/$task
+    data_prefix=split_tuning_dataset/$task
+    ((i=i%N)); ((i++==0)) && wait
+    ( MODEL_DIR=model_results/cat_regression_${niter}
+      mkdir -p ${MODEL_DIR}
+      python3 -m perf_model.thrpt_model_new \
+          --algo cat_regression \
+          --niter ${niter} \
+          --data_prefix ${data_prefix} \
+          --out_dir ${MODEL_DIR}/$task ) &
   done;
 done;
+)
