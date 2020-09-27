@@ -44,7 +44,9 @@ for iter_mult in 120;
 do
   for task in ${TASKS[@]};
   do
-    ((i=i%N)); ((i++==0)) && wait
+    ((i=i%N))
+    ((i++==0)) && wait
+    echo $i
     ( data_prefix=split_tuning_dataset/$task
       MODEL_DIR=model_results/nn_${rank_lambda}_${iter_mult}_hinge
       mkdir -p ${MODEL_DIR}
