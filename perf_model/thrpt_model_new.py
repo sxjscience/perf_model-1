@@ -661,7 +661,7 @@ def main():
             with open(os.path.join(args.out_dir, 'test_scores.json'), 'w') as out_f:
                 json.dump(test_score, out_f)
         elif args.algo == 'nn':
-            model = NNRanker()
+            model = NNRanker(rank_loss_fn=args.rank_loss_type)
             model.fit(train_df, rank_lambda=args.rank_lambda, iter_mult=args.iter_mult)
             model.save(args.out_dir)
             test_features, test_labels = get_feature_label(test_df)
