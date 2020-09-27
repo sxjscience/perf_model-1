@@ -4,6 +4,7 @@ n_parallel=8
 measure_top_n=32
 MODEL_TYPE=nn
 TARGET="llvm -mcpu=skylake-avx512"
+FOLDER="gcv_skylake_csv"
 MODELS=(
 "InceptionV3"
 "MobileNet1.0"
@@ -20,7 +21,7 @@ MODELS=(
 
 for MODEL_NAME in nn_0.0_40 nn_0.0_80 nn_1.0_40 nn_1.0_80 nn_1.0_40_hinge nn_1.0_80_hinge;
 do
-  MODEL_PATH=./model_results/${MODEL_NAME}/gcv_t4_csv
+  MODEL_PATH=./model_results/${MODEL_NAME}/${FOLDER}
 
   OUT_DIR=${MODEL_NAME}_e2e_t4_npara${n_parallel}_ntop${measure_top_n}
   mkdir -p ${OUT_DIR}
