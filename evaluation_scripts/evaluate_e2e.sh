@@ -31,7 +31,7 @@ else
   exit
 fi
 
-MODEL_PATH=../model_results/${model_name}
+MODEL_PATH=../model_results/${model_name}/${FOLDER}
 
 OUT_DIR=${model_name}_e2e_${instance_type}_npara${n_parallel}_ntop${measure_top_n}
 mkdir -p ${OUT_DIR}
