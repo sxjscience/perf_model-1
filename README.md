@@ -29,13 +29,10 @@ bash split_data.sh
 ```
 
 ## Train Performance Models with Different Algorithms 
-```
-python3 -m perf_model.thrpt_model_new \
-    --algo cat_regression \
-    --data_prefix split_tuning_dataset/gcv_t4_csv/depthwise_conv2d_nchw.cuda \
-    --out_dir depthwise_conv2d_nchw.cuda/cat_regression
-```
+See more in [training_scripts](./training_scripts).
 
+## Evaluate Performance Models with Different Algorithms 
+See more in [evaluation_scripts](./training_scripts).
 
 ## Train Listwise Rank Model with Catboost
 

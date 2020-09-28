@@ -12,3 +12,4 @@ python3 -m perf_model.thrpt_model_new \
     --data_prefix ${data_prefix} \
     --niter $niter \
     --out_dir ${MODEL_DIR}/$task
+cp ${TUNING_DATASET}/$task.meta ${MODEL_DIR}/$task/feature.meta
