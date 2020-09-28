@@ -43,6 +43,7 @@ do
                       --n-parallel ${n_parallel} \
                       --measure-top-n ${measure_top_n} \
                       --target "${TARGET}" --gcv ${network} 2>&1 | tee -a ${OUT_DIR}/${network}.txt
+    mv tune.log $network.log
   else
     python3 ../app/main.py --list-net ${MODEL_PATH} \
                         --model_type ${model_type} \
@@ -50,7 +51,7 @@ do
                         --measure-top-n ${measure_top_n} \
                         --graph \
                         --target "${TARGET}" --gcv ${network} 2>&1 | tee -a ${OUT_DIR}/${network}.txt
+    mv tune.log $network.log
+    mv graph.log $network_graph.log
   fi
-  mv tune.log $network.log
-  mv graph.log $network_graph.log
 done;
