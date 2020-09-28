@@ -7,6 +7,9 @@ bash evaluate_e2e.sh g4 cat_regression cat_regression
 
 # Evaluate Catboost Ranking on G4
 bash evaluate_e2e.sh g4 cat_ranking cat_ranking
+
+# Evaluate LambdaRank
+bash evaluate_e2e.sh g4 nn_lambda_rank_1.0_120 nn
 ```
 
 ## C5
