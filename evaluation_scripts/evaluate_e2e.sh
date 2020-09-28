@@ -26,7 +26,7 @@ elif [ ${instance_type} -eq "m6" ]; then
   TARGET="llvm -device=arm_cpu -mtriple=aarch64-linux-gnu -mattr=+v8.2a,+fullfp16,+fp-armv8,+dotprod,+crc,+crypto,+neon"
   FOLDER="gcv_graviton_csv"
   USE_GRAPH=0
-else;
+else
   echo "${instance_type} not supported!"
   exit
 fi
@@ -43,7 +43,7 @@ do
                       --n-parallel ${n_parallel} \
                       --measure-top-n ${measure_top_n} \
                       --target "${TARGET}" --gcv ${network} 2>&1 | tee -a ${OUT_DIR}/${network}.txt
- else;
+ else
    python3 ../app/main.py --list-net ${MODEL_PATH} \
                         --model_type ${model_type} \
                         --n-parallel ${n_parallel} \
