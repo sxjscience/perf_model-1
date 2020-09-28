@@ -8,11 +8,11 @@ aws s3 cp --recursive s3://xingjian-public/split_tuning_dataset_20200920 split_t
 # The old model
 aws s3 cp --recursive s3://hyuz-shared-data/trained_models trained_models
 
-# Download the new catboost models
+# Download the catboost models
 aws s3 cp --recursive s3://xingjian-public/lorien/models/cat_regression_20200923/ model_results/cat_regression
 aws s3 cp --recursive s3://xingjian-public/lorien/models/cat_ranking_20200923/ model_results/cat_ranking
 
-# Download the catboost models
+# Download the NN models
 aws s3 cp --recursive s3://xingjian-public/lorien/models/nn_0.0_40_20200926/ model_results/nn_0.0_40
 aws s3 cp --recursive s3://xingjian-public/lorien/models/nn_0.0_80_20200926/ model_results/nn_0.0_80
 aws s3 cp --recursive s3://xingjian-public/lorien/models/nn_1.0_40_20200926/ model_results/nn_1.0_40
