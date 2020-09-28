@@ -6,23 +6,23 @@ instance_type=$1
 model_name=$2
 model_type=$3
 
-if [ "${instance_type}" -eq "g4" ]; then
+if [ "${instance_type}" == "g4" ]; then
   TARGET="cuda -model=t4"
   FOLDER="gcv_t4_csv"
   USE_GRAPH=0
-elif [ "${instance_type}" -eq "c4" ]; then
+elif [ "${instance_type}" == "c4" ]; then
   TARGET="llvm -mcpu=core-avx2"
   FOLDER="gcv_skylake_csv"
   USE_GRAPH=1
-elif [ "${instance_type}" -eq "c5" ]; then
+elif [ "${instance_type}" == "c5" ]; then
   TARGET="llvm -mcpu=skylake-avx512"
   FOLDER="gcv_skylake_csv"
   USE_GRAPH=1
-elif [ "${instance_type}" -eq "p3" ]; then
+elif [ "${instance_type}" == "p3" ]; then
   TARGET="cuda -model=v100"
   FOLDER="gcv_v100_csv"
   USE_GRAPH=0
-elif [ "${instance_type}" -eq "m6" ]; then
+elif [ "${instance_type}" == "m6" ]; then
   TARGET="llvm -device=arm_cpu -mtriple=aarch64-linux-gnu -mattr=+v8.2a,+fullfp16,+fp-armv8,+dotprod,+crc,+crypto,+neon"
   FOLDER="gcv_graviton_csv"
   USE_GRAPH=0
