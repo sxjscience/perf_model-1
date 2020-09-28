@@ -1,12 +1,14 @@
 ## Download the Example Dataset and Pretrained Models
 
 ```bash
+# Download the datasets
 aws s3 cp --recursive s3://hyuz-shared-data/dataset_0726 tuning_dataset
-aws s3 cp --recursive s3://hyuz-shared-data/trained_models trained_models
-
 aws s3 cp --recursive s3://xingjian-public/split_tuning_dataset_20200920 split_tuning_dataset
 
-# Download the catboost models
+# The old model
+aws s3 cp --recursive s3://hyuz-shared-data/trained_models trained_models
+
+# Download the new catboost models
 aws s3 cp --recursive s3://xingjian-public/lorien/models/cat_regression_20200923/ model_results/cat_regression
 aws s3 cp --recursive s3://xingjian-public/lorien/models/cat_ranking_20200923/ model_results/cat_ranking
 
