@@ -1,7 +1,7 @@
 set -ex
 
 n_parallel=8
-measure_top_n=32
+measure_top_n=8
 instance_type=$1
 model_name=$2
 model_type=$3
