@@ -1,3 +1,12 @@
+## Requirements
+
+```
+python3 -m pip install torch torchvision
+
+# For M6 instance, you can install via
+python3 -m pip install https://github.com/Lmy0217/PyTorch-aarch64/raw/master/torch-1.6.0a0%2B8d883f5-cp36-cp36m-linux_aarch64.whl 
+```
+
 ## Download the Example Dataset and Pretrained Models
 
 ```bash
