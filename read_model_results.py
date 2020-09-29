@@ -24,7 +24,7 @@ for dir_name in sorted(os.listdir(args.dir_path)):
                                 dat['ndcg_valid'], dat['ndcg_k3_valid'], dat['mrr_valid']))
             else:
                 results.append((f'{dir_name}/{exp_name}',
-                                dat['rmse'], dat['mae'],
+                                dat['rmse'], dat['mae'], dat['valid_rmse'], dat['valid_mae'],
                                 dat['ndcg_all'], dat['ndcg_k3_all'], dat['mrr_all'],
                                 dat['ndcg_valid'], dat['ndcg_k3_valid'], dat['mrr_valid']))
 df = pd.DataFrame(results, columns=columns)
