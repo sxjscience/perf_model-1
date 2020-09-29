@@ -77,7 +77,7 @@ class RegressionSampler:
     def __iter__(self):
         while True:
             if self._neg_mult > 0:
-                valid_batch_size = np.ceil(self._regression_batch_size / (1 + self._neg_mult))
+                valid_batch_size = int(np.ceil(self._regression_batch_size / (1 + self._neg_mult)))
                 valid_batch_size = min(valid_batch_size, len(self._valid_indices))
                 invalid_batch_size = self._regression_batch_size - valid_batch_size
                 valid_indices = self._generator.choice(len(self._valid_indices),
