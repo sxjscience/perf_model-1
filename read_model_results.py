@@ -12,7 +12,7 @@ ranking_metrics = ['ndcg_all', 'ndcg_k3_all', 'mrr_all', 'ndcg_valid', 'ndcg_k3_
 if args.ranking_only:
     columns = ['name'] + ranking_metrics
 else:
-    columns = ['name', 'rmse', 'mae'] + ranking_metrics
+    columns = ['name', 'rmse', 'mae', 'valid_rmse', 'valid_mae'] + ranking_metrics
 results = []
 for dir_name in sorted(os.listdir(args.dir_path)):
     for exp_name in sorted(os.listdir(os.path.join(args.dir_path, dir_name))):
