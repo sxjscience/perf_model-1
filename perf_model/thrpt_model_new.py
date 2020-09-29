@@ -514,6 +514,7 @@ class NNRanker:
     def evaluate(self, features, labels, mode='ranking'):
         preds = self.predict(features, use_gpu=True)
         if mode == 'regression':
+            preds = preds * (preds > 0)
             rmse = np.sqrt(np.mean(np.square(preds - labels)))
             mae = np.mean(np.abs(preds - labels))
             valid_indices = (labels > 0).nonzero()[0]
