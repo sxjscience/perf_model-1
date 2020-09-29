@@ -14,3 +14,11 @@ cat tasks.txt | parallel -j 1 bash train_catboost.sh cat_regression 5000
 # Run CatBoost Ranking
 cat tasks.txt | parallel -j 1 bash train_catboost.sh cat_ranking 5000
 ```
+
+
+### Run NoRank Ablation
+
+```
+cat tasks.txt | parallel -j 8 bash train_nn_regression_model.sh -1 200 
+
+```
