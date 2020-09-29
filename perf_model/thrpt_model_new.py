@@ -438,12 +438,14 @@ class NNRanker:
             else:
                 ranking_labels = (ranking_labels - mean_val) / std_val
                 ranking_scores = self.net(ranking_features)
-                loss = torch.square(ranking_scores - ranking_labels).mean()
+                loss_regression = torch.square(ranking_scores - ranking_labels).mean()
+                loss = loss_regression
             loss.backward()
             optimizer.step()
             with torch.no_grad():
                 log_regression_loss += loss_regression
-                log_ranking_loss += loss_ranking
+                self._rank_loss_fn != 'no_rank':
+                    log_ranking_loss += loss_ranking
                 log_cnt += 1
                 if log_cnt >= log_interval:
                     logging.info('[{}/{}] Regression Loss = {:.4f}, Ranking Loss = {:.4f}'
