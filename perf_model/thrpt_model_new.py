@@ -404,7 +404,7 @@ class NNRanker:
         th_features = th.tensor(features, dtype=th.float32)
         th_labels = th.tensor(labels, dtype=th.float32)
         dataset = TensorDataset(th_features, th_labels)
-        if self._neg_mult < 0:
+        if self._rank_loss_fn == 'no_rank':
             batch_sampler = RegressionSampler(thrpt=labels,
                                               regression_batch_size=batch_size * group_size)
         else:
@@ -416,25 +416,31 @@ class NNRanker:
         optimizer = torch.optim.Adam(self.net.parameters(), lr=lr, amsgrad=False)
         lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=num_iters,
                                                                   eta_min=1E-4)
-        rank_loss_fn = get_ranking_loss(self._rank_loss_fn)
+        if self._rank_loss_fn != 'no_rank':
+            rank_loss_fn = get_ranking_loss(self._rank_loss_fn)
         dataloader = iter(dataloader)
         log_regression_loss = 0
         log_ranking_loss = 0
         log_cnt = 0
         niter = 0
         for ranking_features, ranking_labels in dataloader:
+            optimizer.zero_grad()
             ranking_features = ranking_features.cuda()
             ranking_labels = ranking_labels.cuda()
-            ranking_labels = ranking_labels.reshape((batch_size, group_size))
-            original_ranking_labels = ranking_labels
-            ranking_labels = (ranking_labels - mean_val) / std_val
-            optimizer.zero_grad()
-            ranking_scores = self.net(ranking_features)
-            ranking_scores = ranking_scores.reshape((batch_size, group_size))
-            loss_regression = torch.square(ranking_scores - ranking_labels).mean()
-            loss_ranking = rank_loss_fn(y_pred=ranking_scores,
-                                        y_true=original_ranking_labels / std_val)
-            loss = loss_regression + rank_lambda * loss_ranking
+            if self._rank_loss_fn != 'no_rank':
+                ranking_labels = ranking_labels.reshape((batch_size, group_size))
+                original_ranking_labels = ranking_labels
+                ranking_labels = (ranking_labels - mean_val) / std_val
+                ranking_scores = self.net(ranking_features)
+                ranking_scores = ranking_scores.reshape((batch_size, group_size))
+                loss_regression = torch.square(ranking_scores - ranking_labels).mean()
+                loss_ranking = rank_loss_fn(y_pred=ranking_scores,
+                                            y_true=original_ranking_labels / std_val)
+                loss = loss_regression + rank_lambda * loss_ranking
+            else:
+                ranking_labels = (ranking_labels - mean_val) / std_val
+                ranking_scores = self.net(ranking_features)
+                loss = torch.square(ranking_scores - ranking_labels).mean()
             loss.backward()
             optimizer.step()
             lr_scheduler.step()
