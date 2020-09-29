@@ -444,7 +444,7 @@ class NNRanker:
             optimizer.step()
             with torch.no_grad():
                 log_regression_loss += loss_regression
-                self._rank_loss_fn != 'no_rank':
+                if self._rank_loss_fn != 'no_rank':
                     log_ranking_loss += loss_ranking
                 log_cnt += 1
                 if log_cnt >= log_interval:
