@@ -64,6 +64,35 @@ class RankingModel(nn.Module):
         return self.net(X)[:, 0]
 
 
+class RegressionSampler:
+    def __init__(self, thrpt, regression_batch_size=2048,
+                 neg_mult=5):
+        self._regression_batch_size = regression_batch_size
+        self._thrpt = thrpt
+        self._neg_mult = neg_mult
+        self._valid_indices = (thrpt > 0).nonzero()[0]
+        self._invalid_indices = (thrpt == 0).nonzero()[0]
+        self._generator = np.random.default_rng()
+
+    def __iter__(self):
+        while True:
+            if self._neg_mult > 0:
+                valid_batch_size = np.ceil(self._regression_batch_size / (1 + self._neg_mult))
+                valid_batch_size = min(valid_batch_size, len(self._valid_indices))
+                invalid_batch_size = self._regression_batch_size - valid_batch_size
+                valid_indices = self._generator.choice(len(self._valid_indices),
+                                                       valid_batch_size,
+                                                       replace=True)
+                invalid_indices = self._generator.choice(len(self._invalid_indices),
+                                                         invalid_batch_size,
+                                                         replace=True)
+                indices = np.hstack([valid_indices, invalid_indices])
+            else:
+                indices = self._generator.choice(len(self._thrpt), self._regression_batch_size,
+                                                 replace=True)
+            yield indices
+
+
 class RankGroupSampler:
     def __init__(self, thrpt, regression_batch_size=1024,
                  rank_batch_size=512, group_size=10,

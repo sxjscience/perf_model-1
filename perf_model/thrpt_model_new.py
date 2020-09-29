@@ -17,7 +17,7 @@ from torch.utils.data import DataLoader
 from torch.utils.data.dataset import TensorDataset
 from sklearn.metrics import ndcg_score
 from .util import analyze_valid_threshold, logging_config, read_pd
-from .nn_ranker import RankGroupSampler, RankingModel, get_ranking_loss
+from .nn_ranker import RankGroupSampler, RankingModel, get_ranking_loss, RegressionSampler
 
 
 def set_seed(seed):
@@ -356,6 +356,8 @@ class NNRanker:
     def __init__(self, in_units=None, units=256, num_layers=2,
                  dropout=0.1, act_type='leaky',
                  rank_loss_fn='lambda_rank',
+                 beta_distribution=(3.0, 1.0),
+                 neg_mult=5,
                  mean_val=None, std_val=None):
         if in_units is None:
             self.net = None
@@ -371,6 +373,8 @@ class NNRanker:
         self._dropout = dropout
         self._act_type = act_type
         self._rank_loss_fn = rank_loss_fn
+        self._beta_distribution = beta_distribution
+        self._neg_mult = neg_mult
         self._mean_val = mean_val
         self._std_val = std_val
 
@@ -400,9 +404,14 @@ class NNRanker:
         th_features = th.tensor(features, dtype=th.float32)
         th_labels = th.tensor(labels, dtype=th.float32)
         dataset = TensorDataset(th_features, th_labels)
-        batch_sampler = RankGroupSampler(thrpt=labels,
-                                         rank_batch_size=batch_size,
-                                         group_size=group_size)
+        if self._neg_mult < 0:
+            batch_sampler = RegressionSampler(thrpt=labels,
+                                              regression_batch_size=batch_size * group_size)
+        else:
+            batch_sampler = RankGroupSampler(thrpt=labels,
+                                             rank_batch_size=batch_size,
+                                             group_size=group_size,
+                                             beta_params=self._beta_distribution)
         dataloader = DataLoader(dataset, batch_sampler=batch_sampler, num_workers=8)
         optimizer = torch.optim.Adam(self.net.parameters(), lr=lr, amsgrad=False)
         rank_loss_fn = get_ranking_loss(self._rank_loss_fn)
@@ -451,6 +460,8 @@ class NNRanker:
                      'dropout': self._dropout,
                      'act_type': self._act_type,
                      'rank_loss_fn': self._rank_loss_fn,
+                     'beta_distribution': self._beta_distribution,
+                     'neg_mult': self._neg_mult,
                      'mean_val': self._mean_val,
                      'std_val': self._std_val}
         with open(os.path.join(out_dir, 'model_config.json'), 'w') as out_f:
@@ -572,11 +583,18 @@ def parse_args():
                         help='Lambda value of the ranking loss.')
     parser.add_argument('--rank_lambda', default=1.0, type=float,
                         help='Lambda value of the ranking loss.')
-    parser.add_argument('--rank_loss_type', choices=['lambda_rank',
+    parser.add_argument('--beta', default='3.0,1.0', type=str,
+                        help='Beta distribution of the pos + neg samples.')
+    parser.add_argument('--neg_mult', default=5, type=int,
+                        help='The multiplier of #negative samples v.s. #positive samples.')
+    parser.add_argument('--rank_loss_type', choices=['no_rank',
+                                                     'lambda_rank',
                                                      'lambda_rank_hinge',
                                                      'approx_ndcg'],
                         default='lambda_rank_hinge',
                         help='Rank loss type.')
+    parser.add_argument('--batch_size', default=2560, type=int,
+                        help='Batch size of the input.')
     parser.add_argument('--niter', type=int, default=5000,
                         help='Number of iterations to train the catboost models.')
     parser.add_argument('--normalize_relevance', action='store_true',
@@ -669,7 +687,10 @@ def main():
             with open(os.path.join(args.out_dir, 'test_scores.json'), 'w') as out_f:
                 json.dump(test_score, out_f)
         elif args.algo == 'nn':
-            model = NNRanker(rank_loss_fn=args.rank_loss_type)
+            beta_distribution = [float(ele) for ele in args.beta.split(',')]
+            model = NNRanker(rank_loss_fn=args.rank_loss_type,
+                             beta_distribution=beta_distribution,
+                             neg_mult=args.neg_mult)
             model.fit(train_df, rank_lambda=args.rank_lambda, iter_mult=args.iter_mult)
             model.save(args.out_dir)
             test_features, test_labels = get_feature_label(test_df)
