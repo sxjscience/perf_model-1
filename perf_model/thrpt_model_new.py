@@ -381,7 +381,7 @@ class CatRanker(CatRegressor):
 
 
 class NNRanker:
-    def __init__(self, in_units=None, units=512, num_layers=2,
+    def __init__(self, in_units=None, units=512, num_layers=3,
                  dropout=0.1, act_type='leaky',
                  rank_loss_fn='lambda_rank',
                  beta_distribution=(3.0, 1.0),
