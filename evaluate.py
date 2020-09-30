@@ -42,5 +42,6 @@ for dir_name in sorted(os.listdir(args.dir_path)):
                                     test_ranking_score_valid.items()}
         test_score.update(test_ranking_score_valid)
         print(test_score)
-        with open(os.path.join(os.path.join(args.dir_path, dir_name, exp_name), 'test_scores.json'), 'w') as out_f:
+        with open(os.path.join(os.path.join(args.dir_path, dir_name, exp_name), 'test_scores.json'),
+                  'w') as out_f:
             json.dump(test_score, out_f)
