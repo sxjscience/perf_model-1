@@ -406,7 +406,7 @@ class NNRanker:
         self._mean_val = mean_val
         self._std_val = std_val
 
-    def fit(self, train_df, batch_size=256, group_size=10, lr=1E-3,
+    def fit(self, train_df, batch_size=256, group_size=10, lr=1E-2,
             iter_mult=500, rank_lambda=1.0):
         features, labels = get_feature_label(train_df)
         log_interval = ((len(features) + batch_size - 1) // batch_size * iter_mult) // 20
@@ -442,6 +442,9 @@ class NNRanker:
                                              beta_params=self._beta_distribution)
         dataloader = DataLoader(dataset, batch_sampler=batch_sampler, num_workers=8)
         optimizer = torch.optim.Adam(self.net.parameters(), lr=lr, amsgrad=False)
+        lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer=optimizer,
+                                                                  T_max=num_iters,
+                                                                  eta_min=1E-4)
         if self._rank_loss_fn != 'no_rank':
             rank_loss_fn = get_ranking_loss(self._rank_loss_fn)
         dataloader = iter(dataloader)
@@ -470,6 +473,7 @@ class NNRanker:
                 loss = loss_regression
             loss.backward()
             optimizer.step()
+            lr_scheduler.step()
             with torch.no_grad():
                 log_regression_loss += loss_regression
                 if self._rank_loss_fn != 'no_rank':
