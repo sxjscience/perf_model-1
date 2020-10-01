@@ -477,6 +477,7 @@ class NNRanker:
                 loss = loss_regression
             loss.backward()
             optimizer.step()
+            lr_scheduler.step()
             with torch.no_grad():
                 log_regression_loss += loss_regression
                 if self._rank_loss_fn != 'no_rank':
@@ -496,7 +497,6 @@ class NNRanker:
             niter += 1
             epoch_iter += 1
             if epoch_iter >= epoch_iters:
-                lr_scheduler.step()
                 epoch_iter = 0
             if niter >= num_iters:
                 break
