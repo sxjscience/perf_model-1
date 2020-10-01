@@ -409,6 +409,12 @@ class NNRanker:
     def fit(self, train_df, batch_size=256, group_size=10, lr=1E-2,
             iter_mult=500, rank_lambda=1.0, valid_df=None):
         features, labels = get_feature_label(train_df)
+        split_ratio = 0.1 * len(features)
+        train_num = int(np.ceil(0.1 * len(features)))
+        valid_num = len(features) - train_num
+        perm = np.random.permutation(len(features))
+        train_features, train_labels = features[perm[:train_num]], labels[perm[:train_num]]
+        valid_features, valid_labels = features[perm[train_num:]], labels[perm[train_num:]]
         if valid_df is not None:
             valid_df_features, valid_df_labels = get_feature_label(valid_df)
         log_interval = ((len(features) + batch_size - 1) // batch_size * iter_mult) // 20
@@ -423,10 +429,10 @@ class NNRanker:
                                     act_type=self._act_type)
         self.net.cuda()
         self.net.train()
-        valid_labels = labels[labels > 0]
+        non_invalid_labels = labels[labels > 0]
         if self._mean_val is None:
-            mean_val = valid_labels.mean()
-            std_val = valid_labels.std()
+            mean_val = non_invalid_labels.mean()
+            std_val = non_invalid_labels.std()
             self._mean_val = mean_val
             self._std_val = std_val
         else:
