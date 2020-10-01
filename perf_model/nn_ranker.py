@@ -40,6 +40,7 @@ class LinearBlock(nn.Module):
                                  out_features=units,
                                  bias=False)
         if use_gate_net:
+            logging.info('Use Gate')
             self.gate_net = nn.Sequential(
                 nn.Linear(in_features=in_units,
                           out_features=units,
