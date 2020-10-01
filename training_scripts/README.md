@@ -16,10 +16,14 @@ cat tasks.txt | parallel -j 1 bash train_catboost.sh cat_ranking 5000
 ```
 
 
-### Run NoRank Ablation
+### Run Neural Network Performance Model Ablation
 
+Use a p3.16x instance.
 ```
-cat tasks.txt | parallel -j 8 bash train_nn_regression_model.sh -1 1000 512 3 0.1 0
-cat tasks.txt | parallel -j 8 bash train_nn_regression_model.sh -1 1000 512 3 0.1 1
-cat tasks.txt | parallel -j 8 bash train_nn_regression_model.sh 2 1000 512 3 0.1 1
+# Baseline
+cat tasks.txt | awk '{print NR,$0}' | parallel -j 12 bash train_nn_regression_model.sh -1 1000 512 3 0.1 0 8
+# Baseline + Gate
+cat tasks.txt | awk '{print NR,$0}' | parallel -j 12 bash train_nn_regression_model.sh -1 1000 512 3 0.1 1 8
+# Baseline + Gate + Balanced
+cat tasks.txt | awk '{print NR,$0}' | parallel -j 12 bash train_nn_regression_model.sh 2 1000 512 3 0.1 1 8
 ```
