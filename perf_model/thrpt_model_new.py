@@ -407,7 +407,7 @@ class NNRanker:
         self._std_val = std_val
 
     def fit(self, train_df, batch_size=256, group_size=10, lr=1E-2,
-            iter_mult=500, rank_lambda=1.0, valid_df=None):
+            iter_mult=500, rank_lambda=1.0, test_df=None):
         features, labels = get_feature_label(train_df)
         split_ratio = 0.1
         train_num = int(np.ceil((1 - split_ratio) * len(features)))
@@ -415,8 +415,8 @@ class NNRanker:
         train_features, train_labels = features[perm[:train_num]], labels[perm[:train_num]]
         valid_features, valid_labels = features[perm[train_num:]], labels[perm[train_num:]]
         features, labels = train_features, train_labels
-        # if valid_df is not None:
-        #     valid_df_features, valid_df_labels = get_feature_label(valid_df)
+        if test_df is not None:
+            test_features, test_labels = get_feature_label(test_df)
         log_interval = ((len(features) + batch_size - 1) // batch_size * iter_mult) // 20
         epoch_iters = (len(features) + batch_size - 1) // batch_size
         num_iters = epoch_iters * iter_mult
@@ -498,7 +498,10 @@ class NNRanker:
                     log_ranking_loss = 0
                     log_cnt = 0
                     valid_score = self.evaluate(valid_features, valid_labels, 'regression')
+                    test_score = self.evaluate(test_features, test_labels, 'regression')
                     logging.info(f'[{niter + 1}/{num_iters}], Valid_score={valid_score}')
+                    if test_df is not None:
+                        logging.info(f'[{niter + 1}/{num_iters}], Test_score={test_score}')
             niter += 1
             epoch_iter += 1
             if epoch_iter >= epoch_iters:
@@ -762,7 +765,7 @@ def main():
             model.fit(train_df,
                       rank_lambda=args.rank_lambda,
                       iter_mult=args.iter_mult,
-                      valid_df=test_df)
+                      test_df=test_df)
             model.save(args.out_dir)
             test_features, test_labels = get_feature_label(test_df)
             test_score = model.evaluate(test_features, test_labels, 'regression')
