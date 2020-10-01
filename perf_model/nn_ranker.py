@@ -34,17 +34,26 @@ def get_ranking_loss(loss_type):
 class LinearBlock(nn.Module):
     def __init__(self, in_units, units, act_type, dropout):
         super(LinearBlock, self).__init__()
-        self.net = nn.Sequential(
+        self.linear1 = nn.Linear(in_features=in_units,
+                                 out_features=units,
+                                 bias=False)
+        self.gate_net = nn.Sequential(
             nn.Linear(in_features=in_units,
                       out_features=units,
                       bias=False),
-            nn.BatchNorm1d(units),
-            get_activation(act_type),
-            nn.Dropout(dropout)
-        )
+            nn.Sigmoid())
+        self.bn = nn.BatchNorm1d(units)
+        self.act = get_activation(act_type)
+        self.dropout = nn.Dropout(dropout)
 
     def forward(self, x):
-        return self.net(x)
+        out = self.linear1(x)
+        out = self.bn(out)
+        out = self.act(out)
+        gate = self.gate_net(x)
+        out = out * gate
+        out = self.dropout(out)
+        return out
 
 
 class RankingModel(nn.Module):
