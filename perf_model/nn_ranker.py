@@ -74,6 +74,7 @@ class RankingModel(nn.Module):
                                       units=units,
                                       act_type=act_type,
                                       dropout=dropout))
+            in_units = units
         self.out_layer = nn.Sequential(
             nn.Linear(in_features=units,
                       out_features=1,
