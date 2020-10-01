@@ -489,9 +489,9 @@ class NNRanker:
                     log_regression_loss = 0
                     log_ranking_loss = 0
                     log_cnt = 0
-                if valid_df is not None:
-                    valid_score = self.evaluate(valid_df_features, valid_df_labels, 'regression')
-                    logging.info(f'[{niter + 1}/{num_iters}], Valid_score={valid_score}')
+                    if valid_df is not None:
+                        valid_score = self.evaluate(valid_df_features, valid_df_labels, 'regression')
+                        logging.info(f'[{niter + 1}/{num_iters}], Valid_score={valid_score}')
             niter += 1
             epoch_iter += 1
             if epoch_iter >= epoch_iters:
