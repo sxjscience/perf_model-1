@@ -411,7 +411,6 @@ class NNRanker:
         features, labels = get_feature_label(train_df)
         split_ratio = 0.1
         train_num = int(np.ceil((1 - split_ratio) * len(features)))
-        valid_num = len(features) - train_num
         perm = np.random.permutation(len(features))
         train_features, train_labels = features[perm[:train_num]], labels[perm[:train_num]]
         valid_features, valid_labels = features[perm[train_num:]], labels[perm[train_num:]]
