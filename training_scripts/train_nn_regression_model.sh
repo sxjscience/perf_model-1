@@ -3,8 +3,8 @@ set -ex
 neg_mult=$1
 iter_mult=$2
 task=$3
-units=${4:-256}
-num_layers=${5:-2}
+units=${4:-512}
+num_layers=${5:-3}
 dropout=${6:-0.1}
 use_gate=${7:-1}
 
