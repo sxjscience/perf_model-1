@@ -9,6 +9,8 @@ cuda_device=${cuda_device_task[0]}
 task=${cuda_device_task[1]}
 
 
+export CUDA_VISIBLE_DEVICES=$((${cuda_device} % ${num_gpus}))
+
 TUNING_DATASET=../tuning_dataset
 data_prefix=../split_tuning_dataset/$task
 MODEL_DIR=../model_results/${model_type}_${niter}_split${split_postfix}
