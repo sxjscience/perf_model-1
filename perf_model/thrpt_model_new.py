@@ -734,6 +734,16 @@ def main():
         if args.save_used_keys:
             with open(args.used_key_path, 'w') as of:
                 json.dump(used_keys, of)
+    elif args.subsample:
+        os.makedirs(args.out_dir, exist_ok=True)
+        for folder in os.listdir(args.dataset):
+            os.makedirs(os.path.join(args.out_dir, folder), exist_ok=True)
+            for subfolder in os.listdir(os.path.join(args.dataset, folder)):
+                os.makedirs(os.path.join(args.out_dir, folder, subfolder), exist_ok=True)
+                data_path = os.path.join(args.dataset, folder, subfolder + '.train.pq')
+                df = get_data(data_path)
+                sub_df = down_sample_df(df, seed=args.seed, ratio=args.subsample_ratio)
+                sub_df.to_parquet(args.path.join(args.out_dir, folder, subfolder + '.train.pq'))
     else:
         logging_config(args.out_dir, 'train')
         train_df = read_pd(args.data_prefix + '.train.pq')
