@@ -410,7 +410,7 @@ class NNRanker:
         self._mean_val = mean_val
         self._std_val = std_val
 
-    def fit(self, train_df, batch_size=256, group_size=10, lr=1E-2,
+    def fit(self, train_df, batch_size=256, group_size=10, lr=1E-3,
             iter_mult=500, rank_lambda=1.0, test_df=None, train_dir='.'):
         features, labels = get_feature_label(train_df)
         split_ratio = 0.1
