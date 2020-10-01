@@ -33,23 +33,26 @@ class RankingModel(nn.Module):
     def __init__(self, in_units, units=128, num_layers=3,
                  dropout=0.05, use_bn=True, act_type='leaky'):
         super(RankingModel, self).__init__()
-        layers = []
+        blocks = []
+        self.num_layers = num_layers
         for i in range(num_layers):
-            layers.append(nn.Linear(in_features=in_units,
-                                    out_features=units,
-                                    bias=False))
+            block = []
+            block.append(nn.Linear(in_features=in_units,
+                                   out_features=units,
+                                   bias=False))
             in_units = units
             if use_bn:
-                layers.append(nn.BatchNorm1d(in_units))
-            layers.append(get_activation(act_type))
-            layers.append(nn.Dropout(dropout))
-        layers.append(nn.Linear(in_features=in_units,
-                                out_features=1,
-                                bias=True))
-        self.net = nn.Sequential(*layers)
+                block.append(nn.BatchNorm1d(in_units))
+            block.append(get_activation(act_type))
+            block.append(nn.Dropout(dropout))
+            blocks.append(nn.Sequential(*block))
+        self.out_layer = nn.Linear(in_features=in_units,
+                                   out_features=1,
+                                   bias=True)
+        self.blocks = nn.ModuleList(blocks)
 
     def forward(self, X):
-        """
+        """MLP with residual connection
 
         Parameters
         ----------
@@ -61,7 +64,12 @@ class RankingModel(nn.Module):
         scores
             Shape (batch_size,)
         """
-        return self.net(X)[:, 0]
+        data_in = self.blocks[0](X)
+        for i in range(1, self.num_layers):
+            out = self.blocks[i](data_in)
+            out = out + data_in
+        out = self.out_layer(out)
+        return out[:, 0]
 
 
 class RegressionSampler:

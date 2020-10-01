@@ -441,7 +441,7 @@ class NNRanker:
                                              group_size=group_size,
                                              beta_params=self._beta_distribution)
         dataloader = DataLoader(dataset, batch_sampler=batch_sampler, num_workers=8)
-        optimizer = torch.optim.Adam(self.net.parameters(), lr=lr, amsgrad=False)
+        optimizer = torch.optim.Adam(self.net.parameters(), lr=lr, amsgrad=True)
         lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer=optimizer,
                                                                   T_max=num_iters,
                                                                   eta_min=1E-4)
@@ -639,6 +639,10 @@ def parse_args():
                         help='Batch size of the input.')
     parser.add_argument('--num_layers', default=3, type=int,
                         help='Number of layers.')
+    parser.add_argument('--dropout', default=0.1, type=float,
+                        help='Dropout ratio.')
+    parser.add_argument('--act_type', default='leaky', type=str,
+                        help='Activation type.')
     parser.add_argument('--niter', type=int, default=5000,
                         help='Number of iterations to train the catboost models.')
     parser.add_argument('--normalize_relevance', action='store_true',
@@ -734,6 +738,8 @@ def main():
             beta_distribution = [float(ele) for ele in args.beta.split(',')]
             model = NNRanker(units=args.hidden_size,
                              num_layers=args.num_layers,
+                             dropout=args.dropout,
+                             act_type=args.act_type,
                              rank_loss_fn=args.rank_loss_type,
                              beta_distribution=beta_distribution,
                              neg_mult=args.neg_mult)
