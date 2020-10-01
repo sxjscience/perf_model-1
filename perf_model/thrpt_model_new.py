@@ -751,7 +751,7 @@ def main():
                 test_df = pd.read_parquet(test_path)
                 sample_counts.append((os.path.join(folder, subfolder), len(df), len(test_df)))
                 sub_df = down_sample_df(df, seed=args.seed, ratio=args.subsample_ratio)
-                sub_df.to_parquet(args.path.join(args.out_dir, folder, subfolder + '.train.pq'))
+                sub_df.to_parquet(os.path.join(args.out_dir, folder, subfolder + '.train.pq'))
         df = pd.DataFrame(sample_counts)
         df.to_csv(os.path.join(args.out_dir, 'status.csv'))
     else:
