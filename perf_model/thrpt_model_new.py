@@ -577,7 +577,9 @@ class NNRanker:
             valid_indices = (labels > 0).nonzero()[0]
             valid_rmse = np.sqrt(np.mean(np.square(preds[valid_indices] - labels[valid_indices])))
             valid_mae = np.mean(np.abs(preds[valid_indices] - labels[valid_indices]))
-            return {'rmse': rmse, 'mae': mae, 'valid_rmse': valid_rmse, 'valid_mae': valid_mae}
+            return {'rmse': rmse, 'mae': mae,
+                    'valid_rmse': valid_rmse, 'valid_mae': valid_mae,
+                    'invalid_acc': np.sum((preds <= 0) * labels) / len(preds)}
         elif mode == 'ranking':
             # We calculate two things, the NDCG score and the MRR score.
             ndcg_val = ndcg_score(y_true=labels, y_score=preds)
