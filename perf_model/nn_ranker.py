@@ -41,7 +41,7 @@ class RankingModel(nn.Module):
             block = []
             block.append(nn.Linear(in_features=in_units,
                                    out_features=units,
-                                   bias=False))
+                                   bias=not use_bn))
             in_units = units
             if use_bn:
                 block.append(nn.BatchNorm1d(in_units))
