@@ -820,6 +820,7 @@ def main():
                              num_layers=args.num_layers,
                              dropout=args.dropout,
                              act_type=args.act_type,
+                             use_gate=args.use_gate,
                              rank_loss_fn=args.rank_loss_type,
                              beta_distribution=beta_distribution,
                              neg_mult=args.neg_mult)
