@@ -732,7 +732,9 @@ def main():
                 json.dump(test_score, out_f)
         elif args.algo == 'nn':
             beta_distribution = [float(ele) for ele in args.beta.split(',')]
-            model = NNRanker(rank_loss_fn=args.rank_loss_type,
+            model = NNRanker(units=args.hidden_size,
+                             num_layers=args.num_layers,
+                             rank_loss_fn=args.rank_loss_type,
                              beta_distribution=beta_distribution,
                              neg_mult=args.neg_mult)
             model.fit(train_df, rank_lambda=args.rank_lambda, iter_mult=args.iter_mult)
