@@ -389,7 +389,7 @@ class NNRanker:
                  dropout=0.1, act_type='leaky',
                  rank_loss_fn='lambda_rank',
                  beta_distribution=(3.0, 1.0),
-                 neg_mult=5,
+                 neg_mult=5, use_gate=True,
                  mean_val=None, std_val=None):
         if in_units is None:
             self.net = None
@@ -398,9 +398,11 @@ class NNRanker:
                                     units=units,
                                     num_layers=num_layers,
                                     dropout=dropout,
+                                    use_gate=use_gate,
                                     act_type=act_type)
         self._in_units = in_units
         self._units = units
+        self._use_gate = use_gate
         self._num_layers = num_layers
         self._dropout = dropout
         self._act_type = act_type
@@ -528,6 +530,7 @@ class NNRanker:
                      'num_layers': self._num_layers,
                      'dropout': self._dropout,
                      'act_type': self._act_type,
+                     'use_gate': self._use_gate,
                      'rank_loss_fn': self._rank_loss_fn,
                      'beta_distribution': self._beta_distribution,
                      'neg_mult': self._neg_mult,
