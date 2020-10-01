@@ -5,7 +5,7 @@ iter_mult=$2
 task=$3
 units=${4:-256}
 num_layers=${5:-2}
-dropout=${6:-0.2}
+dropout=${6:-0.1}
 
 
 TUNING_DATASET=../tuning_dataset
