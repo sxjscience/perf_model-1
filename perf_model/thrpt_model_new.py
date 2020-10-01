@@ -410,7 +410,7 @@ class NNRanker:
             iter_mult=500, rank_lambda=1.0, valid_df=None):
         features, labels = get_feature_label(train_df)
         if valid_df is not None:
-            valid_features, valid_labels = get_feature_label(valid_df)
+            valid_df_features, valid_df_labels = get_feature_label(valid_df)
         log_interval = ((len(features) + batch_size - 1) // batch_size * iter_mult) // 20
         num_iters = ((len(features) + batch_size - 1) // batch_size) * iter_mult
         if self.net is None:
@@ -490,7 +490,7 @@ class NNRanker:
                     log_ranking_loss = 0
                     log_cnt = 0
                 if valid_df is not None:
-                    valid_score = self.evaluate(valid_features, valid_labels, 'regression')
+                    valid_score = self.evaluate(valid_df_features, valid_df_labels, 'regression')
                     logging.info(f'[{niter + 1}/{num_iters}], Valid_score={valid_score}')
             niter += 1
             if niter >= num_iters:
