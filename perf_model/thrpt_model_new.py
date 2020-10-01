@@ -407,7 +407,7 @@ class NNRanker:
         self._std_val = std_val
 
     def fit(self, train_df, batch_size=256, group_size=10, lr=1E-2,
-            iter_mult=500, rank_lambda=1.0, test_df=None):
+            iter_mult=500, rank_lambda=1.0, test_df=None, train_dir='.'):
         features, labels = get_feature_label(train_df)
         split_ratio = 0.1
         train_num = int(np.ceil((1 - split_ratio) * len(features)))
@@ -462,6 +462,7 @@ class NNRanker:
         log_cnt = 0
         niter = 0
         epoch_iter = 0
+        best_valid_rmse = np.inf
         for ranking_features, ranking_labels in dataloader:
             optimizer.zero_grad()
             ranking_features = ranking_features.cuda()
@@ -498,16 +499,22 @@ class NNRanker:
                     log_ranking_loss = 0
                     log_cnt = 0
                     valid_score = self.evaluate(valid_features, valid_labels, 'regression')
-                    test_score = self.evaluate(test_features, test_labels, 'regression')
                     logging.info(f'[{niter + 1}/{num_iters}], Valid_score={valid_score}')
+                    if valid_score['rmse'] < best_valid_rmse:
+                        best_valid_rmse = valid_score['rmse']
+                        torch.save(self.net.state_dict(), os.path.join(train_dir,
+                                                                       'best_model_states.th'))
                     if test_df is not None:
+                        test_score = self.evaluate(test_features, test_labels, 'regression')
                         logging.info(f'[{niter + 1}/{num_iters}], Test_score={test_score}')
+
             niter += 1
             epoch_iter += 1
             if epoch_iter >= epoch_iters:
                 epoch_iter = 0
             if niter >= num_iters:
                 break
+        self.net.load_state_dict(torch.load(os.path.join(train_dir, 'model_states.th')))
 
     def save(self, out_dir):
         os.makedirs(out_dir, exist_ok=True)
@@ -765,7 +772,8 @@ def main():
             model.fit(train_df,
                       rank_lambda=args.rank_lambda,
                       iter_mult=args.iter_mult,
-                      test_df=test_df)
+                      test_df=test_df,
+                      train_dir=args.out_dir)
             model.save(args.out_dir)
             test_features, test_labels = get_feature_label(test_df)
             test_score = model.evaluate(test_features, test_labels, 'regression')
