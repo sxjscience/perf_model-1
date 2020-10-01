@@ -2,6 +2,7 @@ import functools
 import torch as th
 import torch.nn as nn
 import numpy as np
+import logging
 import torch.nn.functional as F
 from torch.distributions.dirichlet import Dirichlet
 from .losses import approxNDCGLoss, listMLE, lambdaLoss
@@ -69,6 +70,7 @@ class RankingModel(nn.Module):
         self.num_layers = num_layers
         self.use_residual = use_residual
         self.feature_importance = feature_importance
+        logging.info('Use Gate=', use_gate)
         if self.feature_importance:
             self.feature_importance_net = \
                 nn.Sequential(

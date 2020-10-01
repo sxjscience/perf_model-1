@@ -7,6 +7,8 @@ cat tasks.txt | awk '{print NR,$0}' | parallel -j 8 bash train_catboost.sh cat_r
 cat tasks.txt | awk '{print NR,$0}' | parallel -j 8 bash train_catboost.sh cat_regression 5000 0.7 8
 # Run CatBoost Regression + 50% Training Data
 cat tasks.txt | awk '{print NR,$0}' | parallel -j 8 bash train_catboost.sh cat_regression 5000 0.5 8
+# Run CatBoost Regression + 30% Training Data
+cat tasks.txt | awk '{print NR,$0}' | parallel -j 8 bash train_catboost.sh cat_regression 5000 0.3 8
 
 
 # Run CatBoost Ranking
