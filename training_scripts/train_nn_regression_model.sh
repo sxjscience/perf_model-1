@@ -6,6 +6,7 @@ task=$3
 units=${4:-256}
 num_layers=${5:-2}
 dropout=${6:-0.1}
+use_gate=${7:-1}
 
 
 TUNING_DATASET=../tuning_dataset
@@ -19,5 +20,6 @@ python3 -m perf_model.thrpt_model_new \
     --iter_mult ${iter_mult} \
     --neg_mult ${neg_mult} \
     --dropout ${dropout} \
+    --use_gate ${use_gate} \
     --out_dir ${MODEL_DIR}/$task
 cp ${TUNING_DATASET}/$task.meta ${MODEL_DIR}/$task/feature.meta
