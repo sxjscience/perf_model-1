@@ -684,6 +684,8 @@ def parse_args():
                                                      'approx_ndcg'],
                         default='lambda_rank_hinge',
                         help='Rank loss type.')
+    parser.add_argument('--split_postfix', defualt=None, type=str,
+                        help='split postfix')
     parser.add_argument('--batch_size', default=2560, type=int,
                         help='Batch size of the input.')
     parser.add_argument('--hidden_size', default=512, type=int,
@@ -762,7 +764,10 @@ def main():
         df.to_csv(os.path.join(args.out_dir, 'status.csv'))
     else:
         logging_config(args.out_dir, 'train')
-        train_df = read_pd(args.data_prefix + '.train.pq')
+        if args.split_postfix is not None:
+            train_df = read_pd(args.data_prefix + f'_{args.split_postfix}.train.pq')
+        else:
+            train_df = read_pd(args.data_prefix + '.train.pq')
         test_df = read_pd(args.data_prefix + '.test.pq')
         rank_test_all = np.load(args.data_prefix + '.rank_test.all.npz')
         rank_test_valid = np.load(args.data_prefix + '.rank_test.valid.npz')
