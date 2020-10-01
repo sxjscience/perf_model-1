@@ -13,9 +13,8 @@ python3 -m pip install -U -e . --user
 ## Split Performance Dataset for Ablation
 
 ```
-python3 -m perf_model.thrpt_model_new \ 
-        --subsample \ 
-        --dataset split_tuning_dataset \
+python3 -m perf_model.thrpt_model_new --dataset split_tuning_dataset \
+        --subsample \
         --subsample_ratio 0.7 \
         --out_dir split_tuning_dataset_0.7
 ```

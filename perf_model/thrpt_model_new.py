@@ -635,7 +635,7 @@ def parse_args():
                              'and testing.')
     parser.add_argument('--subsample', action='store_true',
                         help='When set, it will subsample the input training df.')
-    parser.add_argument('--subsample-ratio', default=0.7, type=float,
+    parser.add_argument('--subsample_ratio', default=0.7, type=float,
                         help='The ratio of the subsample')
     split_args = parser.add_argument_group('data split arguments')
     split_args.add_argument('--dataset',
