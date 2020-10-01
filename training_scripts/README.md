@@ -23,9 +23,17 @@ cat tasks.txt | awk '{print NR,$0}' | parallel -j 8 bash train_catboost.sh cat_r
 Use a p3.16x instance.
 ```
 # Baseline
-cat tasks.txt | awk '{print NR,$0}' | parallel -j 12 bash train_nn_regression_model.sh -1 1000 512 3 0.1 0 8
+cat tasks.txt | awk '{print NR,$0}' | parallel -j 12 bash train_nn_regression_model.sh -1 1000 512 3 0.1 0 1 8
 # Baseline + Gate
-cat tasks.txt | awk '{print NR,$0}' | parallel -j 12 bash train_nn_regression_model.sh -1 1000 512 3 0.1 1 8
+cat tasks.txt | awk '{print NR,$0}' | parallel -j 12 bash train_nn_regression_model.sh -1 1000 512 3 0.1 1 1 8
 # Baseline + Gate + Balanced
-cat tasks.txt | awk '{print NR,$0}' | parallel -j 12 bash train_nn_regression_model.sh 2 1000 512 3 0.1 1 8
+cat tasks.txt | awk '{print NR,$0}' | parallel -j 12 bash train_nn_regression_model.sh 2 1000 512 3 0.1 1 1 8
+
+
+# Baseline + Gate + Balanced 70%
+cat tasks.txt | awk '{print NR,$0}' | parallel -j 12 bash train_nn_regression_model.sh 2 1000 512 3 0.1 1 0.7 8
+
+# Baseline + Gate + Balanced 50%
+cat tasks.txt | awk '{print NR,$0}' | parallel -j 12 bash train_nn_regression_model.sh 2 1000 512 3 0.1 1 0.5 8
+
 ```
