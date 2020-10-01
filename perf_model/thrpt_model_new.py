@@ -738,8 +738,12 @@ def main():
         sample_counts = []
         os.makedirs(args.out_dir, exist_ok=True)
         for folder in os.listdir(args.dataset):
+            if not os.path.isdir(os.path.join(args.dataset, folder)):
+                continue
             os.makedirs(os.path.join(args.out_dir, folder), exist_ok=True)
             for subfolder in os.listdir(os.path.join(args.dataset, folder)):
+                if not os.path.isdir(os.path.join(args.dataset, folder, subfolder)):
+                    continue
                 os.makedirs(os.path.join(args.out_dir, folder, subfolder), exist_ok=True)
                 data_path = os.path.join(args.dataset, folder, subfolder + '.train.pq')
                 test_path = os.path.join(args.dataset, folder, subfolder + '.test.pq')
