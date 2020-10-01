@@ -31,6 +31,17 @@ def get_ranking_loss(loss_type):
         raise NotImplementedError
 
 
+def dense_bn_act_dropout(in_units, units, act_type, dropout):
+    return nn.Sequential(
+        nn.Linear(in_features=in_units,
+                  out_features=units,
+                  bias=False),
+        nn.BatchNorm1d(units),
+        get_activation(act_type),
+        nn.Dropout(dropout)
+    )
+
+
 class RankingModel(nn.Module):
     def __init__(self, in_units, units=128, num_layers=3,
                  dropout=0.05, use_bn=True, use_residual=True,
@@ -39,17 +50,25 @@ class RankingModel(nn.Module):
         blocks = []
         self.num_layers = num_layers
         self.use_residual = use_residual
+        self.feature_importance_net = \
+            nn.Sequential(
+                dense_bn_act_dropout(in_units=in_units,
+                                     units=units,
+                                     act_type=act_type,
+                                     dropout=dropout),
+                dense_bn_act_dropout(in_units=in_units,
+                                     units=units,
+                                     act_type=act_type,
+                                     dropout=dropout),
+                nn.Linear(in_features=units,
+                          out_features=in_units),
+                nn.Sigmoid()
+            )
         for i in range(num_layers):
-            block = []
-            block.append(nn.Linear(in_features=in_units,
-                                   out_features=units,
-                                   bias=not use_bn))
-            in_units = units
-            if use_bn:
-                block.append(nn.BatchNorm1d(in_units))
-            block.append(get_activation(act_type))
-            block.append(nn.Dropout(dropout))
-            blocks.append(nn.Sequential(*block))
+            blocks.append(dense_bn_act_dropout(in_units=in_units,
+                                               units=units,
+                                               act_type=act_type,
+                                               dropout=dropout))
         self.out_layer = nn.Sequential(
             nn.Linear(in_features=in_units,
                       out_features=1,
@@ -62,13 +81,15 @@ class RankingModel(nn.Module):
         Parameters
         ----------
         X
-            Shape (batch_size, units)
+            Shape (batch_size, in_units)
 
         Returns
         -------
         scores
             Shape (batch_size,)
         """
+        feature_importance = self.feature_importance_net(X)
+        X = feature_importance * X
         data_in = self.blocks[0](X)
         for i in range(1, self.num_layers):
             out = self.blocks[i](data_in)
