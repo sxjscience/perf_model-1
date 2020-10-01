@@ -31,7 +31,7 @@ def get_ranking_loss(loss_type):
 
 class RankingModel(nn.Module):
     def __init__(self, in_units, units=128, num_layers=3,
-                 dropout=0.05, use_bn=True, use_residual=True,
+                 dropout=0.05, use_bn=False, use_residual=True,
                  act_type='leaky'):
         super(RankingModel, self).__init__()
         blocks = []
