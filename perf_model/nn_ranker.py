@@ -32,16 +32,20 @@ def get_ranking_loss(loss_type):
 
 
 class LinearBlock(nn.Module):
-    def __init__(self, in_units, units, act_type, dropout):
+    def __init__(self, in_units, units, act_type, dropout, use_gate_net=False):
         super(LinearBlock, self).__init__()
+        if use_gate_net:
+            units = units // 2
+        self.use_gate_net = use_gate_net
         self.linear1 = nn.Linear(in_features=in_units,
                                  out_features=units,
                                  bias=False)
-        self.gate_net = nn.Sequential(
-            nn.Linear(in_features=in_units,
-                      out_features=units,
-                      bias=False),
-            nn.Sigmoid())
+        if use_gate_net:
+            self.gate_net = nn.Sequential(
+                nn.Linear(in_features=in_units,
+                          out_features=units,
+                          bias=False),
+                nn.Sigmoid())
         self.bn = nn.BatchNorm1d(units)
         self.act = get_activation(act_type)
         self.dropout = nn.Dropout(dropout)
@@ -50,34 +54,38 @@ class LinearBlock(nn.Module):
         out = self.linear1(x)
         out = self.bn(out)
         out = self.act(out)
-        gate = self.gate_net(x)
-        out = out * gate
+        if self.use_gate_net:
+            gate = self.gate_net(x)
+            out = out * gate
         out = self.dropout(out)
         return out
 
 
 class RankingModel(nn.Module):
     def __init__(self, in_units, units=128, num_layers=3,
-                 dropout=0.05, use_bn=True, use_residual=False,
+                 dropout=0.05, use_bn=True,
+                 use_residual=False, feature_importance=False,
                  act_type='leaky'):
         super(RankingModel, self).__init__()
         blocks = []
         self.num_layers = num_layers
         self.use_residual = use_residual
-        self.feature_importance_net = \
-            nn.Sequential(
-                LinearBlock(in_units=in_units,
-                            units=units,
-                            act_type=act_type,
-                            dropout=dropout),
-                LinearBlock(in_units=units,
-                            units=units,
-                            act_type=act_type,
-                            dropout=dropout),
-                nn.Linear(in_features=units,
-                          out_features=in_units),
-                nn.Sigmoid()
-            )
+        if self.feature_importance:
+            self.feature_importance_net = \
+                nn.Sequential(
+                    LinearBlock(in_units=in_units,
+                                units=units,
+                                act_type=act_type,
+                                dropout=dropout),
+                    LinearBlock(in_units=units,
+                                units=units,
+                                act_type=act_type,
+                                dropout=dropout),
+                    nn.Linear(in_features=units,
+                              out_features=in_units),
+                    nn.Sigmoid()
+                )
+        self.feature_importance = feature_importance
         for i in range(num_layers):
             blocks.append(LinearBlock(in_units=in_units,
                                       units=units,
@@ -103,8 +111,9 @@ class RankingModel(nn.Module):
         scores
             Shape (batch_size,)
         """
-        feature_importance = self.feature_importance_net(X)
-        X = feature_importance * X
+        if self.feature_importance:
+            feature_importance = self.feature_importance_net(X)
+            X = feature_importance * X
         data_in = self.blocks[0](X)
         for i in range(1, self.num_layers):
             out = self.blocks[i](data_in)
