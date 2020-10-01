@@ -684,7 +684,7 @@ def parse_args():
                                                      'approx_ndcg'],
                         default='lambda_rank_hinge',
                         help='Rank loss type.')
-    parser.add_argument('--split_postfix', defualt=None, type=str,
+    parser.add_argument('--split_postfix', default=None, type=str,
                         help='split postfix')
     parser.add_argument('--batch_size', default=2560, type=int,
                         help='Batch size of the input.')
