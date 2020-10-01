@@ -2,7 +2,8 @@ set -ex
 
 model_type=$1
 niter=$2
-task=$3
+split_postfix=$3
+task=$4
 
 TUNING_DATASET=../tuning_dataset
 data_prefix=../split_tuning_dataset/$task
@@ -12,5 +13,6 @@ python3 -m perf_model.thrpt_model_new \
     --algo ${model_type} \
     --data_prefix ${data_prefix} \
     --niter $niter \
+    --split_postfix ${split_postfix} \
     --out_dir ${MODEL_DIR}/$task
 cp ${TUNING_DATASET}/$task.meta ${MODEL_DIR}/$task/feature.meta

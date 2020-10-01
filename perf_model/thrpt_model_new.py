@@ -764,7 +764,7 @@ def main():
         df.to_csv(os.path.join(args.out_dir, 'status.csv'))
     else:
         logging_config(args.out_dir, 'train')
-        if args.split_postfix is not None:
+        if args.split_postfix is not None and args.split_postfix != '1':
             train_df = read_pd(args.data_prefix + f'_{args.split_postfix}.train.pq')
         else:
             train_df = read_pd(args.data_prefix + '.train.pq')
