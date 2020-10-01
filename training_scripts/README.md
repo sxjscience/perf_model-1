@@ -3,16 +3,14 @@
 ```
 # Run CatBoost Regression
 cat tasks.txt | awk '{print NR,$0}' | parallel -j 8 bash train_catboost.sh cat_regression 5000 1 8
-
-# Run CatBoost Ranking
-cat tasks.txt | awk '{print NR,$0}' | parallel -j 8 bash train_catboost.sh cat_ranking 5000 1 8
-
 # Run CatBoost Regression + 70% Training Data
 cat tasks.txt | awk '{print NR,$0}' | parallel -j 8 bash train_catboost.sh cat_regression 5000 0.7 8
 # Run CatBoost Regression + 50% Training Data
 cat tasks.txt | awk '{print NR,$0}' | parallel -j 8 bash train_catboost.sh cat_regression 5000 0.5 8
 
 
+# Run CatBoost Ranking
+cat tasks.txt | awk '{print NR,$0}' | parallel -j 8 bash train_catboost.sh cat_ranking 5000 1 8
 # Run CatBoost Ranking + 70% Training Data
 cat tasks.txt | awk '{print NR,$0}' | parallel -j 8 bash train_catboost.sh cat_ranking 5000 0.7 8
 # Run CatBoost Ranking + 50% Training Data
