@@ -46,8 +46,10 @@ def down_sample_df(df, seed, ratio):
     rng = np.random.RandomState(seed)
 
     op_keys = [k for k in df.columns.to_list() if k.find('in_') != -1 or k.find('attr_') != -1]
-    print(op_keys)
-    group_dfs = [x for _, x in df.groupby(op_keys)]
+    if len(op_keys) > 0:
+        group_dfs = [x for _, x in df.groupby(op_keys)]
+    else:
+        group_dfs = [df]
     sampled_dfs = [d.sample(int(len(d) * ratio), random_state=rng) for d in group_dfs]
     return pd.concat(sampled_dfs)
 
