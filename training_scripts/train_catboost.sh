@@ -11,7 +11,7 @@ task=${cuda_device_task[1]}
 
 TUNING_DATASET=../tuning_dataset
 data_prefix=../split_tuning_dataset/$task
-MODEL_DIR=../model_results/${model_type}_${niter}
+MODEL_DIR=../model_results/${model_type}_${niter}_split${split_postfix}
 mkdir -p ${MODEL_DIR}
 python3 -m perf_model.thrpt_model_new \
     --algo ${model_type} \
