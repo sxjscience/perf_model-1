@@ -415,8 +415,9 @@ class NNRanker:
         perm = np.random.permutation(len(features))
         train_features, train_labels = features[perm[:train_num]], labels[perm[:train_num]]
         valid_features, valid_labels = features[perm[train_num:]], labels[perm[train_num:]]
-        if valid_df is not None:
-            valid_df_features, valid_df_labels = get_feature_label(valid_df)
+        features, labels = train_features, train_labels
+        # if valid_df is not None:
+        #     valid_df_features, valid_df_labels = get_feature_label(valid_df)
         log_interval = ((len(features) + batch_size - 1) // batch_size * iter_mult) // 20
         epoch_iters = (len(features) + batch_size - 1) // batch_size
         num_iters = epoch_iters * iter_mult
@@ -497,9 +498,8 @@ class NNRanker:
                     log_regression_loss = 0
                     log_ranking_loss = 0
                     log_cnt = 0
-                    if valid_df is not None:
-                        valid_score = self.evaluate(valid_df_features, valid_df_labels, 'regression')
-                        logging.info(f'[{niter + 1}/{num_iters}], Valid_score={valid_score}')
+                    valid_score = self.evaluate(valid_features, valid_labels, 'regression')
+                    logging.info(f'[{niter + 1}/{num_iters}], Valid_score={valid_score}')
             niter += 1
             epoch_iter += 1
             if epoch_iter >= epoch_iters:
