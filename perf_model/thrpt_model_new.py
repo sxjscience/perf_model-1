@@ -748,7 +748,10 @@ def main():
                              rank_loss_fn=args.rank_loss_type,
                              beta_distribution=beta_distribution,
                              neg_mult=args.neg_mult)
-            model.fit(train_df, rank_lambda=args.rank_lambda, iter_mult=args.iter_mult)
+            model.fit(train_df,
+                      rank_lambda=args.rank_lambda,
+                      iter_mult=args.iter_mult,
+                      valid_df=test_df)
             model.save(args.out_dir)
             test_features, test_labels = get_feature_label(test_df)
             test_score = model.evaluate(test_features, test_labels, 'regression')
