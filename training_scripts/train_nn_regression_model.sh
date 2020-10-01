@@ -7,8 +7,7 @@ num_layers=${4:-3}
 dropout=${5:-0.1}
 use_gate=${6:-1}
 num_gpus=${7:-1}
-cuda_device_task=${8}
-
+cuda_device_task=(${8})
 cuda_device=${cuda_device_task[0]}
 task=${cuda_device_task[1]}
 
