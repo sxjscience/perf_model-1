@@ -4,6 +4,7 @@ model_type=$1
 niter=$2
 task=$3
 
+TUNING_DATASET=../tuning_dataset
 data_prefix=../split_tuning_dataset/$task
 MODEL_DIR=../model_results/${model_type}_${niter}
 mkdir -p ${MODEL_DIR}
