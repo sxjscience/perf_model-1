@@ -409,8 +409,8 @@ class NNRanker:
     def fit(self, train_df, batch_size=256, group_size=10, lr=1E-2,
             iter_mult=500, rank_lambda=1.0, valid_df=None):
         features, labels = get_feature_label(train_df)
-        split_ratio = 0.1 * len(features)
-        train_num = int(np.ceil(0.1 * len(features)))
+        split_ratio = 0.1
+        train_num = int(np.ceil((1 - split_ratio) * len(features)))
         valid_num = len(features) - train_num
         perm = np.random.permutation(len(features))
         train_features, train_labels = features[perm[:train_num]], labels[perm[:train_num]]
