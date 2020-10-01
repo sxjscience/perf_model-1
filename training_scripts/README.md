@@ -21,5 +21,5 @@ cat tasks.txt | parallel -j 1 bash train_catboost.sh cat_ranking 5000
 ```
 cat tasks.txt | parallel -j 8 bash train_nn_regression_model.sh -1 1000 512 3 0.1 0
 cat tasks.txt | parallel -j 8 bash train_nn_regression_model.sh -1 1000 512 3 0.1 1
-cat tasks.txt | parallel -j 8 bash train_nn_regression_model.sh 1 1000 512 3 0.1 1
+cat tasks.txt | parallel -j 8 bash train_nn_regression_model.sh 2 1000 512 3 0.1 1
 ```
