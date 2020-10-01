@@ -421,7 +421,7 @@ class NNRanker:
         features, labels = train_features, train_labels
         if test_df is not None:
             test_features, test_labels = get_feature_label(test_df)
-        epoch_iters = (len(features) + batch_size - 1) // batch_size
+        epoch_iters = (len(features) + batch_size - 1) // batch_size * iter_mult // 25
         log_interval = epoch_iters
         num_iters = epoch_iters * iter_mult
         if self.net is None:
@@ -455,9 +455,9 @@ class NNRanker:
                                              beta_params=self._beta_distribution)
         dataloader = DataLoader(dataset, batch_sampler=batch_sampler, num_workers=8)
         optimizer = torch.optim.Adam(self.net.parameters(), lr=lr, amsgrad=True)
-        lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer=optimizer,
-                                                                  patience=20,
-                                                                  factor=0.5)
+        lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer=optimizer,
+                                                                  T_max=num_iters,
+                                                                  eta_min=1E-5)
         if self._rank_loss_fn != 'no_rank':
             rank_loss_fn = get_ranking_loss(self._rank_loss_fn)
         dataloader = iter(dataloader)
@@ -488,6 +488,7 @@ class NNRanker:
                 loss = loss_regression
             loss.backward()
             optimizer.step()
+            lr_scheduler.step()
             with torch.no_grad():
                 log_regression_loss += loss_regression
                 if self._rank_loss_fn != 'no_rank':
@@ -502,7 +503,6 @@ class NNRanker:
                     log_ranking_loss = 0
                     log_cnt = 0
                     valid_score = self.evaluate(valid_features, valid_labels, 'regression')
-                    lr_scheduler.step(valid_score['rmse'])
                     logging.info(f'[{niter + 1}/{num_iters}], Valid_score={valid_score}')
                     if valid_score['rmse'] < best_valid_rmse:
                         best_valid_rmse = valid_score['rmse']
