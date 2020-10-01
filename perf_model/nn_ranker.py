@@ -55,7 +55,7 @@ class RankingModel(nn.Module):
                       out_features=in_units // 4,
                       bias=True),
             get_activation(act_type),
-            nn.Linear(in_features=in_units,
+            nn.Linear(in_features=in_units // 4,
                       out_features=1,
                       bias=True))
         self.blocks = nn.ModuleList(blocks)
