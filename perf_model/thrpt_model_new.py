@@ -741,11 +741,11 @@ def main():
     elif args.subsample:
         sample_counts = []
         os.makedirs(args.out_dir, exist_ok=True)
-        for folder in os.listdir(args.dataset):
+        for folder in sorted(os.listdir(args.dataset)):
             if not os.path.isdir(os.path.join(args.dataset, folder)):
                 continue
             os.makedirs(os.path.join(args.out_dir, folder), exist_ok=True)
-            for data_path in glob.glob(os.path.join(args.dataset, folder, '*.train.pq')):
+            for data_path in sorted(glob.glob(os.path.join(args.dataset, folder, '*.train.pq'))):
                 base_name = os.path.basename(data_path)[:-len('.train.pq')]
                 if base_name in ['dense_small_batch.cuda',
                                  'conv2d_cudnn.cuda',
