@@ -71,7 +71,7 @@ class RankingModel(nn.Module):
         self.num_layers = num_layers
         self.use_residual = use_residual
         self.feature_importance = feature_importance
-        logging.info('Use Gate=', use_gate)
+        logging.info('Use Gate={}'.format(use_gate))
         if self.feature_importance:
             self.feature_importance_net = \
                 nn.Sequential(

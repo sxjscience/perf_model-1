@@ -436,6 +436,7 @@ class NNRanker:
                                     units=self._units,
                                     num_layers=self._num_layers,
                                     dropout=self._dropout,
+                                    use_gate=self._use_gate,
                                     act_type=self._act_type)
         self.net.cuda()
         self.net.train()
