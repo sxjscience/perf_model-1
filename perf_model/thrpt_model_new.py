@@ -514,7 +514,7 @@ class NNRanker:
                 epoch_iter = 0
             if niter >= num_iters:
                 break
-        self.net.load_state_dict(torch.load(os.path.join(train_dir, 'model_states.th')))
+        self.net.load_state_dict(torch.load(os.path.join(train_dir, 'best_model_states.th')))
 
     def save(self, out_dir):
         os.makedirs(out_dir, exist_ok=True)
