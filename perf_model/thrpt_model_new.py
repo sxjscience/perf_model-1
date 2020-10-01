@@ -496,6 +496,7 @@ class NNRanker:
             epoch_iter += 1
             if epoch_iter >= epoch_iters:
                 lr_scheduler.step()
+                epoch_iter = 0
             if niter >= num_iters:
                 break
 
