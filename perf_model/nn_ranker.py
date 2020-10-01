@@ -62,7 +62,7 @@ class LinearBlock(nn.Module):
 class RankingModel(nn.Module):
     def __init__(self, in_units, units=128, num_layers=3,
                  dropout=0.05, use_gate=True,
-                 use_residual=False, feature_importance=True,
+                 use_residual=False, feature_importance=False,
                  act_type='leaky'):
         super(RankingModel, self).__init__()
         blocks = []
