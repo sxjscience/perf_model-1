@@ -6,8 +6,12 @@ units=${3:-512}
 num_layers=${4:-3}
 dropout=${5:-0.1}
 use_gate=${6:-1}
-task=$7
+num_gpus=${7:-1}
+cuda_device=${8:-0}
+task=$9
 
+
+export CUDA_VISIBLE_DEVICES=$((${cuda_device} % ${num_gpus}))
 
 TUNING_DATASET=../tuning_dataset
 data_prefix=../split_tuning_dataset/$task
