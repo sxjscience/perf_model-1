@@ -735,15 +735,21 @@ def main():
             with open(args.used_key_path, 'w') as of:
                 json.dump(used_keys, of)
     elif args.subsample:
+        sample_counts = []
         os.makedirs(args.out_dir, exist_ok=True)
         for folder in os.listdir(args.dataset):
             os.makedirs(os.path.join(args.out_dir, folder), exist_ok=True)
             for subfolder in os.listdir(os.path.join(args.dataset, folder)):
                 os.makedirs(os.path.join(args.out_dir, folder, subfolder), exist_ok=True)
                 data_path = os.path.join(args.dataset, folder, subfolder + '.train.pq')
+                test_path = os.path.join(args.dataset, folder, subfolder + '.test.pq')
                 df = get_data(data_path)
+                test_df = get_data(test_path)
+                sample_counts.append((os.path.join(folder, subfolder), len(df), len(test_df)))
                 sub_df = down_sample_df(df, seed=args.seed, ratio=args.subsample_ratio)
                 sub_df.to_parquet(args.path.join(args.out_dir, folder, subfolder + '.train.pq'))
+        df = pd.DataFrame(sample_counts)
+        df.to_csv(os.path.join(args.out_dir, 'status.csv'))
     else:
         logging_config(args.out_dir, 'train')
         train_df = read_pd(args.data_prefix + '.train.pq')

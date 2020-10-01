@@ -4,7 +4,20 @@
 python3 -m pip install torch torchvision
 
 # For M6 instance, you can install via
-python3 -m pip install https://github.com/Lmy0217/PyTorch-aarch64/raw/master/torch-1.6.0a0%2B8d883f5-cp36-cp36m-linux_aarch64.whl 
+python3 -m pip install https://github.com/Lmy0217/PyTorch-aarch64/raw/master/torch-1.6.0a0%2B8d883f5-cp36-cp36m-linux_aarch64.whl
+
+# Install the current package
+python3 -m pip install -U -e . --user 
+```
+
+## Split Performance Dataset for Ablation
+
+```
+python3 -m perf_model.thrpt_model_new \ 
+        --subsample \ 
+        --dataset split_tuning_dataset \
+        --subsample_ratio 0.7 \
+        --out_dir split_tuning_dataset_0.7
 ```
 
 ## Download the Example Dataset and Pretrained Models
