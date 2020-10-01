@@ -474,7 +474,7 @@ class NNRanker:
         epoch_iter = 0
         best_valid_rmse = np.inf
         no_better = 0
-        stop_patience = 15
+        stop_patience = 50
         for ranking_features, ranking_labels in dataloader:
             optimizer.zero_grad()
             ranking_features = ranking_features.cuda()
