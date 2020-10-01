@@ -676,6 +676,8 @@ def parse_args():
                         help='Dropout ratio.')
     parser.add_argument('--act_type', default='leaky', type=str,
                         help='Activation type.')
+    parser.add_argument('--use_gate', default=1, type=int,
+                        help='Whether to use gated network.')
     parser.add_argument('--niter', type=int, default=5000,
                         help='Number of iterations to train the catboost models.')
     parser.add_argument('--normalize_relevance', action='store_true',
