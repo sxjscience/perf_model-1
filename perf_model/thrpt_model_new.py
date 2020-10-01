@@ -445,8 +445,9 @@ class NNRanker:
                                              beta_params=self._beta_distribution)
         dataloader = DataLoader(dataset, batch_sampler=batch_sampler, num_workers=8)
         optimizer = torch.optim.Adam(self.net.parameters(), lr=lr, amsgrad=True)
-        lr_scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer=optimizer,
-                                                              gamma=0.8)
+        lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer=optimizer,
+                                                                  T_max=num_iters,
+                                                                  eta_min=1E-4)
         if self._rank_loss_fn != 'no_rank':
             rank_loss_fn = get_ranking_loss(self._rank_loss_fn)
         dataloader = iter(dataloader)
