@@ -3,6 +3,8 @@ set -ex
 neg_mult=$1
 iter_mult=$2
 task=$3
+units=${4:-256}
+num_layers=${5:-2}
 
 TUNING_DATASET=../tuning_dataset
 data_prefix=../split_tuning_dataset/$task
