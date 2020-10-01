@@ -469,7 +469,7 @@ class NNRanker:
             else:
                 ranking_labels = (ranking_labels - mean_val) / std_val
                 ranking_scores = self.net(ranking_features)
-                loss_regression = torch.square(ranking_scores - ranking_labels).mean()
+                loss_regression = torch.abs(ranking_scores - ranking_labels).mean()
                 loss = loss_regression
             loss.backward()
             optimizer.step()
