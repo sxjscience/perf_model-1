@@ -34,8 +34,6 @@ def get_ranking_loss(loss_type):
 class LinearBlock(nn.Module):
     def __init__(self, in_units, units, act_type, dropout, use_gate_net=False):
         super(LinearBlock, self).__init__()
-        if use_gate_net:
-            units = units // 2
         self.use_gate_net = use_gate_net
         self.linear1 = nn.Linear(in_features=in_units,
                                  out_features=units,
