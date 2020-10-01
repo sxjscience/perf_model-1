@@ -412,7 +412,8 @@ class NNRanker:
         if valid_df is not None:
             valid_df_features, valid_df_labels = get_feature_label(valid_df)
         log_interval = ((len(features) + batch_size - 1) // batch_size * iter_mult) // 20
-        num_iters = ((len(features) + batch_size - 1) // batch_size) * iter_mult
+        epoch_iters = (len(features) + batch_size - 1) // batch_size
+        num_iters = epoch_iters * iter_mult
         if self.net is None:
             self._in_units = features.shape[1]
             self.net = RankingModel(in_units=features.shape[1],
@@ -444,9 +445,8 @@ class NNRanker:
                                              beta_params=self._beta_distribution)
         dataloader = DataLoader(dataset, batch_sampler=batch_sampler, num_workers=8)
         optimizer = torch.optim.Adam(self.net.parameters(), lr=lr, amsgrad=True)
-        lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer=optimizer,
-                                                                  T_max=num_iters,
-                                                                  eta_min=1E-4)
+        lr_scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer=optimizer,
+                                                              gamma=0.8)
         if self._rank_loss_fn != 'no_rank':
             rank_loss_fn = get_ranking_loss(self._rank_loss_fn)
         dataloader = iter(dataloader)
@@ -454,6 +454,7 @@ class NNRanker:
         log_ranking_loss = 0
         log_cnt = 0
         niter = 0
+        epoch_iter = 0
         for ranking_features, ranking_labels in dataloader:
             optimizer.zero_grad()
             ranking_features = ranking_features.cuda()
@@ -475,7 +476,6 @@ class NNRanker:
                 loss = loss_regression
             loss.backward()
             optimizer.step()
-            lr_scheduler.step()
             with torch.no_grad():
                 log_regression_loss += loss_regression
                 if self._rank_loss_fn != 'no_rank':
@@ -493,6 +493,9 @@ class NNRanker:
                     valid_score = self.evaluate(valid_df_features, valid_df_labels, 'regression')
                     logging.info(f'[{niter + 1}/{num_iters}], Valid_score={valid_score}')
             niter += 1
+            epoch_iter += 1
+            if epoch_iter >= epoch_iters:
+                lr_scheduler.step()
             if niter >= num_iters:
                 break
 
