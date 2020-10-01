@@ -31,10 +31,12 @@ def get_ranking_loss(loss_type):
 
 class RankingModel(nn.Module):
     def __init__(self, in_units, units=128, num_layers=3,
-                 dropout=0.05, use_bn=True, act_type='leaky'):
+                 dropout=0.05, use_bn=True, use_residual=False,
+                 act_type='leaky'):
         super(RankingModel, self).__init__()
         blocks = []
         self.num_layers = num_layers
+        self.use_residual = use_residual
         for i in range(num_layers):
             block = []
             block.append(nn.Linear(in_features=in_units,
@@ -67,7 +69,8 @@ class RankingModel(nn.Module):
         data_in = self.blocks[0](X)
         for i in range(1, self.num_layers):
             out = self.blocks[i](data_in)
-            out = out + data_in
+            if self.use_residual:
+                out = out + data_in
         out = self.out_layer(out)
         return out[:, 0]
 
