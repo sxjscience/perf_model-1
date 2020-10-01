@@ -2,11 +2,11 @@ set -ex
 
 neg_mult=$1
 iter_mult=$2
-task=$3
-units=${4:-512}
-num_layers=${5:-3}
-dropout=${6:-0.1}
-use_gate=${7:-1}
+units=${3:-512}
+num_layers=${4:-3}
+dropout=${5:-0.1}
+use_gate=${6:-1}
+task=$7
 
 
 TUNING_DATASET=../tuning_dataset
