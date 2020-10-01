@@ -747,6 +747,10 @@ def main():
             for subfolder in os.listdir(os.path.join(args.dataset, folder)):
                 if not os.path.isdir(os.path.join(args.dataset, folder, subfolder)):
                     continue
+                if subfolder in ['dense_small_batch.cuda', 'conv2d_cudnn.cuda',
+                                  'dense_cublas.cuda', 'dense_large_batch.cuda']:
+                    # Skip malformed dataset
+                    continue
                 os.makedirs(os.path.join(args.out_dir, folder, subfolder), exist_ok=True)
                 data_path = os.path.join(args.dataset, folder, subfolder + '.train.pq')
                 test_path = os.path.join(args.dataset, folder, subfolder + '.test.pq')
