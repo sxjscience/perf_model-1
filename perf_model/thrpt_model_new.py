@@ -443,7 +443,7 @@ class NNRanker:
                                              group_size=group_size,
                                              beta_params=self._beta_distribution)
         dataloader = DataLoader(dataset, batch_sampler=batch_sampler, num_workers=8)
-        optimizer = torch.optim.Adam(self.net.parameters(), lr=lr, amsgrad=False)
+        optimizer = torch.optim.SGD(self.net.parameters(), lr=lr)
         lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer=optimizer,
                                                                   T_max=num_iters,
                                                                   eta_min=1E-4)
