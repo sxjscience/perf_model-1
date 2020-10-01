@@ -3,7 +3,11 @@ set -ex
 model_type=$1
 niter=$2
 split_postfix=$3
-task=$4
+num_gpus=$4
+cuda_device_task=($5)
+cuda_device=${cuda_device_task[0]}
+task=${cuda_device_task[1]}
+
 
 TUNING_DATASET=../tuning_dataset
 data_prefix=../split_tuning_dataset/$task
