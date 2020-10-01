@@ -63,7 +63,7 @@ class LinearBlock(nn.Module):
 
 class RankingModel(nn.Module):
     def __init__(self, in_units, units=128, num_layers=3,
-                 dropout=0.05, use_bn=True,
+                 dropout=0.05, use_gate=True,
                  use_residual=False, feature_importance=False,
                  act_type='leaky'):
         super(RankingModel, self).__init__()
@@ -76,11 +76,13 @@ class RankingModel(nn.Module):
                     LinearBlock(in_units=in_units,
                                 units=units,
                                 act_type=act_type,
-                                dropout=dropout),
+                                dropout=dropout,
+                                use_gate_net=use_gate),
                     LinearBlock(in_units=units,
                                 units=units,
                                 act_type=act_type,
-                                dropout=dropout),
+                                dropout=dropout,
+                                use_gate_net=use_gate),
                     nn.Linear(in_features=units,
                               out_features=in_units),
                     nn.Sigmoid()
@@ -90,7 +92,8 @@ class RankingModel(nn.Module):
             blocks.append(LinearBlock(in_units=in_units,
                                       units=units,
                                       act_type=act_type,
-                                      dropout=dropout))
+                                      dropout=dropout,
+                                      use_gate_net=use_gate))
             in_units = units
         self.out_layer = nn.Sequential(
             nn.Linear(in_features=units,
