@@ -469,6 +469,8 @@ class NNRanker:
         niter = 0
         epoch_iter = 0
         best_valid_rmse = np.inf
+        no_better = 0
+        stop_patience = 15
         for ranking_features, ranking_labels in dataloader:
             optimizer.zero_grad()
             ranking_features = ranking_features.cuda()
@@ -510,15 +512,20 @@ class NNRanker:
                         best_valid_rmse = valid_score['rmse']
                         torch.save(self.net.state_dict(), os.path.join(train_dir,
                                                                        'best_model_states.th'))
+                        no_better = 0
+                    else:
+                        no_better += 1
                     if test_df is not None:
                         test_score = self.evaluate(test_features, test_labels, 'regression')
                         logging.info(f'[{niter + 1}/{num_iters}], Test_score={test_score}')
-
             niter += 1
             epoch_iter += 1
             if epoch_iter >= epoch_iters:
                 epoch_iter = 0
             if niter >= num_iters:
+                break
+            if no_better >= stop_patience:
+                logging.info('Early stop')
                 break
         self.net.load_state_dict(torch.load(os.path.join(train_dir, 'best_model_states.th')))
 
