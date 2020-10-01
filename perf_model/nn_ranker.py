@@ -70,6 +70,7 @@ class RankingModel(nn.Module):
         blocks = []
         self.num_layers = num_layers
         self.use_residual = use_residual
+        self.feature_importance = feature_importance
         if self.feature_importance:
             self.feature_importance_net = \
                 nn.Sequential(
@@ -87,7 +88,6 @@ class RankingModel(nn.Module):
                               out_features=in_units),
                     nn.Sigmoid()
                 )
-        self.feature_importance = feature_importance
         for i in range(num_layers):
             blocks.append(LinearBlock(in_units=in_units,
                                       units=units,
