@@ -635,6 +635,10 @@ def parse_args():
                         help='Rank loss type.')
     parser.add_argument('--batch_size', default=2560, type=int,
                         help='Batch size of the input.')
+    parser.add_argument('--hidden_size', default=512, type=int,
+                        help='Batch size of the input.')
+    parser.add_argument('--num_layers', default=3, type=int,
+                        help='Number of layers.')
     parser.add_argument('--niter', type=int, default=5000,
                         help='Number of iterations to train the catboost models.')
     parser.add_argument('--normalize_relevance', action='store_true',
