@@ -3,6 +3,7 @@
 import argparse
 import logging
 import os
+import glob
 import multiprocessing
 import json
 import torch
@@ -744,21 +745,19 @@ def main():
             if not os.path.isdir(os.path.join(args.dataset, folder)):
                 continue
             os.makedirs(os.path.join(args.out_dir, folder), exist_ok=True)
-            for subfolder in os.listdir(os.path.join(args.dataset, folder)):
-                if not os.path.isdir(os.path.join(args.dataset, folder, subfolder)):
+            for data_path in glob.glob(os.path.join(args.dataset, folder, '*.train.pq')):
+                base_name = os.path.basename(data_path)[:-len('.train.pq')]
+                if base_name in ['dense_small_batch.cuda',
+                                 'conv2d_cudnn.cuda',
+                                 'dense_cublas.cuda',
+                                 'dense_large_batch.cuda']:
                     continue
-                if subfolder in ['dense_small_batch.cuda', 'conv2d_cudnn.cuda',
-                                  'dense_cublas.cuda', 'dense_large_batch.cuda']:
-                    # Skip malformed dataset
-                    continue
-                os.makedirs(os.path.join(args.out_dir, folder, subfolder), exist_ok=True)
-                data_path = os.path.join(args.dataset, folder, subfolder + '.train.pq')
-                test_path = os.path.join(args.dataset, folder, subfolder + '.test.pq')
+                test_path = os.path.join(args.dataset, folder, base_name + '.test.pq')
                 df = pd.read_parquet(data_path)
                 test_df = pd.read_parquet(test_path)
-                sample_counts.append((os.path.join(folder, subfolder), len(df), len(test_df)))
+                sample_counts.append((os.path.join(folder, base_name), len(df), len(test_df)))
                 sub_df = down_sample_df(df, seed=args.seed, ratio=args.subsample_ratio)
-                sub_df.to_parquet(os.path.join(args.out_dir, folder, subfolder + '.train.pq'))
+                sub_df.to_parquet(os.path.join(args.out_dir, folder, base_name + '.train.pq'))
         df = pd.DataFrame(sample_counts)
         df.to_csv(os.path.join(args.out_dir, 'status.csv'))
     else:
