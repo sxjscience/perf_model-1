@@ -31,20 +31,25 @@ def get_ranking_loss(loss_type):
         raise NotImplementedError
 
 
-def dense_bn_act_dropout(in_units, units, act_type, dropout):
-    return nn.Sequential(
-        nn.Linear(in_features=in_units,
-                  out_features=units,
-                  bias=False),
-        nn.BatchNorm1d(units),
-        get_activation(act_type),
-        nn.Dropout(dropout)
-    )
+class LinearBlock(nn.Module):
+    def __init__(self, in_units, units, act_type, dropout):
+        super(LinearBlock, self).__init__()
+        self.net = nn.Sequential(
+            nn.Linear(in_features=in_units,
+                      out_features=units,
+                      bias=False),
+            nn.BatchNorm1d(units),
+            get_activation(act_type),
+            nn.Dropout(dropout)
+        )
+
+    def forward(self, x):
+        return self.net(x)
 
 
 class RankingModel(nn.Module):
     def __init__(self, in_units, units=128, num_layers=3,
-                 dropout=0.05, use_bn=True, use_residual=True,
+                 dropout=0.05, use_bn=True, use_residual=False,
                  act_type='leaky'):
         super(RankingModel, self).__init__()
         blocks = []
@@ -52,23 +57,23 @@ class RankingModel(nn.Module):
         self.use_residual = use_residual
         self.feature_importance_net = \
             nn.Sequential(
-                dense_bn_act_dropout(in_units=in_units,
-                                     units=units,
-                                     act_type=act_type,
-                                     dropout=dropout),
-                dense_bn_act_dropout(in_units=in_units,
-                                     units=units,
-                                     act_type=act_type,
-                                     dropout=dropout),
+                LinearBlock(in_units=in_units,
+                            units=units,
+                            act_type=act_type,
+                            dropout=dropout),
+                LinearBlock(in_units=units,
+                            units=units,
+                            act_type=act_type,
+                            dropout=dropout),
                 nn.Linear(in_features=units,
                           out_features=in_units),
                 nn.Sigmoid()
             )
         for i in range(num_layers):
-            blocks.append(dense_bn_act_dropout(in_units=in_units,
-                                               units=units,
-                                               act_type=act_type,
-                                               dropout=dropout))
+            blocks.append(LinearBlock(in_units=in_units,
+                                      units=units,
+                                      act_type=act_type,
+                                      dropout=dropout))
         self.out_layer = nn.Sequential(
             nn.Linear(in_features=in_units,
                       out_features=1,
