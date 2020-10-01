@@ -421,8 +421,8 @@ class NNRanker:
         features, labels = train_features, train_labels
         if test_df is not None:
             test_features, test_labels = get_feature_label(test_df)
-        epoch_iters = (len(features) + batch_size - 1) // batch_size * iter_mult // 25
-        log_interval = epoch_iters
+        epoch_iters = (len(features) + batch_size - 1) // batch_size
+        log_interval = epoch_iters * iter_mult // 25
         num_iters = epoch_iters * iter_mult
         if self.net is None:
             self._in_units = features.shape[1]

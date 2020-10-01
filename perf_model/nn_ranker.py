@@ -29,6 +29,17 @@ def get_ranking_loss(loss_type):
         raise NotImplementedError
 
 
+class SelfAttentionLayer(nn.Module):
+    def __init__(self, in_units, units, act_type='leaky'):
+        self.in_units = in_units
+        self.units = units
+        self.activation = get_activation(act_type)
+        self.qk_dense = nn.Linear()
+
+    def forward(self, X):
+
+
+
 class RankingModel(nn.Module):
     def __init__(self, in_units, units=128, num_layers=3,
                  dropout=0.05, use_bn=True, use_residual=False,
