@@ -36,9 +36,9 @@ for dir_name in sorted(os.listdir(args.dir_path)):
             test_scores = model.predict(test_features)
             pearson_score = pearsonr(test_scores, test_labels)
             spearman_score = spearmanr(test_scores, test_labels)
-            correlation_dat.append({'name': f'{dir_name}/{exp_name}',
-                                    'spearman': spearman_score,
-                                    'pearson': pearson_score})
+            correlation_dat.append([f'{dir_name}/{exp_name}',
+                                    spearman_score,
+                                    pearson_score])
         else:
             rank_test_all = np.load(data_prefix + '.rank_test.all.npz')
             rank_test_valid = np.load(data_prefix + '.rank_test.valid.npz')
