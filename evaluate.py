@@ -69,5 +69,5 @@ for dir_name in sorted(os.listdir(args.dir_path)):
 if args.eval_correlation:
     out_df = pd.DataFrame(correlation_dat, columns=['name',
                                                     'spearman', 'pearson',
-                                                    'spearman_v'])
+                                                    'spearman_v', 'pearson_v'])
     out_df.to_csv(args.correlation_out_name + '.csv')
