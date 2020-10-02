@@ -45,6 +45,14 @@ aws s3 cp --recursive s3://xingjian-public/lorien/models/cat_regression_5000_spl
 # Download the NN models
 aws s3 cp --recursive s3://xingjian-public/lorien/models/nn_regression_-1_1000_512_3_0.1_1_earlystop_20201001/ model_results/nn_regression_-1_1000_512_3_0.1_1_earlystop
 aws s3 cp --recursive s3://xingjian-public/lorien/models/nn_regression_2_1000_512_3_0.1_1_earlystop_20201001/ model_results/nn_regression_2_1000_512_3_0.1_1_earlystop
+aws s3 cp --recursive s3://xingjian-public/lorien/models/nn_regression_split0.3_-1_1000_512_3_0.1_0_20201002/ model_results/nn_regression_split0.3_-1_1000_512_3_0.1_0
+aws s3 cp --recursive s3://xingjian-public/lorien/models/nn_regression_split0.3_-1_1000_512_3_0.1_1_20201002/ model_results/nn_regression_split0.3_-1_1000_512_3_0.1_1
+aws s3 cp --recursive s3://xingjian-public/lorien/models/nn_regression_split0.5_-1_1000_512_3_0.1_0_20201002/ model_results/nn_regression_split0.5_-1_1000_512_3_0.1_0
+aws s3 cp --recursive s3://xingjian-public/lorien/models/nn_regression_split0.5_-1_1000_512_3_0.1_1_20201002/ model_results/nn_regression_split0.5_-1_1000_512_3_0.1_1
+aws s3 cp --recursive s3://xingjian-public/lorien/models/nn_regression_split0.7_-1_1000_512_3_0.1_0_20201002/ model_results/nn_regression_split0.7_-1_1000_512_3_0.1_0
+aws s3 cp --recursive s3://xingjian-public/lorien/models/nn_regression_split0.7_-1_1000_512_3_0.1_1_20201002/ model_results/nn_regression_split0.7_-1_1000_512_3_0.1_1
+aws s3 cp --recursive s3://xingjian-public/lorien/models/nn_regression_split1_-1_1000_512_3_0.1_0_20201002/ model_results/nn_regression_split1_-1_1000_512_3_0.1_0
+aws s3 cp --recursive s3://xingjian-public/lorien/models/nn_regression_split1_-1_1000_512_3_0.1_1_20201002/ model_results/nn_regression_split1_-1_1000_512_3_0.1_1
 ```
 
 The `split_tuning_dataset` is generated based on the tuning dataset. We can generate the dataset as follows:
