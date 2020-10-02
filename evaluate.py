@@ -35,7 +35,7 @@ for dir_name in sorted(os.listdir(args.dir_path)):
             test_features, test_labels = get_feature_label(test_df)
             test_scores = model.predict(test_features)
             pearson_score, _ = pearsonr(test_scores, test_labels)
-            spearman_score, _ = spearmanr(test_scores, test_labels)[0]
+            spearman_score, _ = spearmanr(test_scores, test_labels)
             correlation_dat.append([f'{dir_name}/{exp_name}',
                                     spearman_score,
                                     pearson_score])
