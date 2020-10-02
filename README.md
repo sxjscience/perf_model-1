@@ -25,15 +25,22 @@ python3 -m perf_model.thrpt_model_new --dataset split_tuning_dataset \
 # Download the datasets
 aws s3 cp --recursive s3://hyuz-shared-data/dataset_0726 tuning_dataset
 aws s3 cp --recursive s3://xingjian-public/split_tuning_dataset_20200920 split_tuning_dataset
+aws s3 cp --recursive s3://xingjian-public/lorien/split_tuning_dataset_0.3_20201001 split_tuning_dataset_0.3
 aws s3 cp --recursive s3://xingjian-public/lorien/split_tuning_dataset_0.5_20201001 split_tuning_dataset_0.5
 aws s3 cp --recursive s3://xingjian-public/lorien/split_tuning_dataset_0.7_20201001 split_tuning_dataset_0.7
 
 # The old model
 aws s3 cp --recursive s3://hyuz-shared-data/trained_models trained_models
-
-# Download the catboost models
 aws s3 cp --recursive s3://xingjian-public/lorien/models/cat_regression_20200923/ model_results/cat_regression
 aws s3 cp --recursive s3://xingjian-public/lorien/models/cat_ranking_20200923/ model_results/cat_ranking
+
+
+# Download the catboost models
+aws s3 cp --recursive s3://xingjian-public/lorien/models/cat_regression_5000_split0.5_20201001/ model_results/cat_regression_split0.3
+aws s3 cp --recursive s3://xingjian-public/lorien/models/cat_regression_5000_split0.5_20201001/ model_results/cat_regression_split0.5
+aws s3 cp --recursive s3://xingjian-public/lorien/models/cat_regression_5000_split0.7_20201001/ model_results/cat_regression_split0.7
+aws s3 cp --recursive s3://xingjian-public/lorien/models/cat_regression_5000_split1_20201001/ model_results/cat_regression_split1
+
 
 # Download the NN models
 aws s3 cp --recursive s3://xingjian-public/lorien/models/nn_regression_-1_1000_512_3_0.1_1_earlystop_20201001/ model_results/nn_regression_-1_1000_512_3_0.1_1_earlystop
