@@ -33,12 +33,19 @@ for dir_name in sorted(os.listdir(args.dir_path)):
         test_df = test_df[used_key]
         if args.eval_correlation:
             test_features, test_labels = get_feature_label(test_df)
+            valid_indices = (test_labels > 0).nonzero()[0]
             test_scores = model.predict(test_features)
             pearson_score, _ = pearsonr(test_scores, test_labels)
             spearman_score, _ = spearmanr(test_scores, test_labels)
+            noninvalid_pearson_score, _ = pearsonr(test_scores[valid_indices],
+                                                   test_labels[valid_indices])
+            noninvalid_spearman_score, _ = spearmanr(test_scores[valid_indices],
+                                                     test_labels[valid_indices])
             correlation_dat.append([f'{dir_name}/{exp_name}',
                                     spearman_score,
-                                    pearson_score])
+                                    pearson_score,
+                                    noninvalid_spearman_score,
+                                    noninvalid_pearson_score])
         else:
             rank_test_all = np.load(data_prefix + '.rank_test.all.npz')
             rank_test_valid = np.load(data_prefix + '.rank_test.valid.npz')
@@ -60,5 +67,7 @@ for dir_name in sorted(os.listdir(args.dir_path)):
                       'w') as out_f:
                 json.dump(test_score, out_f)
 if args.eval_correlation:
-    out_df = pd.DataFrame(correlation_dat, columns=['name', 'spearman', 'pearson'])
+    out_df = pd.DataFrame(correlation_dat, columns=['name',
+                                                    'spearman', 'pearson',
+                                                    'spearman_v'])
     out_df.to_csv(args.correlation_out_name + '.csv')
