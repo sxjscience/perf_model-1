@@ -3,7 +3,9 @@
 ## G4
 ```bash
 # Evaluate Catboost Regression on G4
-bash evaluate_e2e.sh g4 cat_regression cat_regression
+bash evaluate_e2e.sh g4 cat_regression_split1 cat_regression
+bash evaluate_e2e.sh g4 cat_regression_split0.7 cat_regression
+bash evaluate_e2e.sh g4 cat_regression_split0.5 cat_regression
 
 # Evaluate Catboost Ranking on G4
 bash evaluate_e2e.sh g4 cat_ranking cat_ranking
@@ -18,7 +20,9 @@ bash evaluate_e2e.sh g4 nn_lambda_rank_0.0_120 nn
 ## C5
 ```bash
 # Evaluate Catboost Regression
-bash evaluate_e2e.sh c5 cat_regression cat_regression
+bash evaluate_e2e.sh c5 cat_regression_split1 cat_regression
+bash evaluate_e2e.sh c5 cat_regression_split0.7 cat_regression
+bash evaluate_e2e.sh c5 cat_regression_split0.5 cat_regression
 
 # Evaluate Catboost Ranking
 bash evaluate_e2e.sh c5 cat_ranking cat_ranking
