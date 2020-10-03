@@ -39,6 +39,7 @@ for dir_name in sorted(os.listdir(args.dir_path)):
             test_features, test_labels = get_feature_label(test_df)
             valid_indices = (test_labels > 0).nonzero()[0]
             test_scores = model.predict(test_features)
+            print(test_scores)
             pearson_score, _ = pearsonr(test_scores, test_labels)
             spearman_score, _ = spearmanr(test_scores, test_labels)
             noninvalid_pearson_score, _ = pearsonr(test_scores[valid_indices],
