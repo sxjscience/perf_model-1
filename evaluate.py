@@ -48,8 +48,8 @@ for dir_name in sorted(os.listdir(args.dir_path)):
             test_scores = model.predict(test_features)
             ndcg_top_2 = ndcg_score(np.expand_dims(test_labels, axis=0),
                                     np.expand_dims(test_scores, axis=0), k=2)
-            ndcg_top_4 = ndcg_score(np.expand_dims(test_labels, axis=0),
-                                    np.expand_dims(test_scores, axis=0), k=4)
+            ndcg_top_5 = ndcg_score(np.expand_dims(test_labels, axis=0),
+                                    np.expand_dims(test_scores, axis=0), k=5)
             ndcg_top_8 = ndcg_score(np.expand_dims(test_labels, axis=0),
                                     np.expand_dims(test_scores, axis=0), k=8)
             ndcg_top_10 = ndcg_score(np.expand_dims(test_labels, axis=0),
@@ -69,7 +69,7 @@ for dir_name in sorted(os.listdir(args.dir_path)):
                                     noninvalid_spearman_score,
                                     noninvalid_pearson_score,
                                     ndcg_top_2,
-                                    ndcg_top_4,
+                                    ndcg_top_5,
                                     ndcg_top_8,
                                     ndcg_top_10]
             if not args.ranking_only:
@@ -99,7 +99,7 @@ for dir_name in sorted(os.listdir(args.dir_path)):
                 json.dump(test_score, out_f)
 if args.eval_correlation:
     columns = ['name', 'spearman', 'pearson', 'spearman_v', 'pearson_v',
-               'ndcg-2', 'ndcg-4', 'ndcg-8', 'ndcg-10']
+               'ndcg-2', 'ndcg-5', 'ndcg-8', 'ndcg-10']
     if not args.ranking_only:
         columns += ['rmse', 'mae']
     out_df = pd.DataFrame(correlation_dat, columns=columns)
