@@ -20,6 +20,11 @@ for dir_name in sorted(os.listdir(args.dir_path)):
     if not os.path.isdir(os.path.join(args.dir_path, dir_name)):
         continue
     for exp_name in sorted(os.listdir(os.path.join(args.dir_path, dir_name))):
+        if exp_name in ['dense_small_batch.cuda', 'conv2d_cudnn.cuda',
+                         'dense_cublas.cuda', 'dense_large_batch.cuda',
+                         'conv2d_transpose_nchw.cuda',
+                         'dense_tensorcore.cuda']:
+            continue
         if not os.path.isdir(os.path.join(args.dir_path, dir_name, exp_name)):
             continue
         if args.model_type == 'nn':
