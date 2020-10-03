@@ -46,6 +46,9 @@ bash evaluate_e2e.sh c4 cat_regression cat_regression
 
 # Evaluate Catboost Ranking
 bash evaluate_e2e.sh c4 cat_ranking cat_ranking
+
+bash evaluate_e2e.sh c4 nn_regression_split1_-1_1000_512_3_0.1_0 nn 8
+bash evaluate_e2e.sh c4 nn_regression_split1_-1_1000_512_3_0.1_1 nn 8
 ```
 
 ## P3
