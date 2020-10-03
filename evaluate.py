@@ -13,6 +13,7 @@ parser = argparse.ArgumentParser(description='Read model results.')
 parser.add_argument('--dir_path', type=str, default='model_results/nn_5.0_200')
 parser.add_argument('--model_type', choices=['nn', 'cat_regression', 'cat_ranking'])
 parser.add_argument('--eval_correlation', action='store_true')
+parser.add_argument('--ranking_only', action='store_true')
 parser.add_argument('--correlation_out_name', default=None, type=str)
 args = parser.parse_args()
 
@@ -52,12 +53,19 @@ for dir_name in sorted(os.listdir(args.dir_path)):
                                                    test_labels[valid_indices])
             noninvalid_spearman_score, _ = spearmanr(test_scores[valid_indices],
                                                      test_labels[valid_indices])
-            correlation_dat.append([f'{dir_name}/{exp_name}',
+            if not args.ranking_only:
+                rmse = np.sqrt(np.square(test_labels - test_scores).mean())
+                mae = np.abs(test_labels - test_scores).mean()
+            ele_results = [f'{dir_name}/{exp_name}',
                                     spearman_score,
                                     pearson_score,
                                     noninvalid_spearman_score,
                                     noninvalid_pearson_score,
-                                    ndcg_top_4])
+                                    ndcg_top_4]
+            if not args.ranking_only:
+                ele_results.append(rmse)
+                ele_results.append(mae)
+            correlation_dat.append(ele_results)
         else:
             rank_test_all = np.load(data_prefix + '.rank_test.all.npz')
             rank_test_valid = np.load(data_prefix + '.rank_test.valid.npz')
@@ -75,11 +83,13 @@ for dir_name in sorted(os.listdir(args.dir_path)):
                                         test_ranking_score_valid.items()}
             test_score.update(test_ranking_score_valid)
             print(test_score)
-            with open(os.path.join(os.path.join(args.dir_path, dir_name, exp_name), 'test_scores.json'),
+            with open(os.path.join(os.path.join(args.dir_path, dir_name, exp_name),
+                                   'test_scores.json'),
                       'w') as out_f:
                 json.dump(test_score, out_f)
 if args.eval_correlation:
-    out_df = pd.DataFrame(correlation_dat, columns=['name',
-                                                    'spearman', 'pearson',
-                                                    'spearman_v', 'pearson_v', 'ndcg-4'])
+    columns = ['name', 'spearman', 'pearson', 'spearman_v', 'pearson_v', 'ndcg-4']
+    if not args.ranking_only:
+        columns += ['rmse', 'mae']
+    out_df = pd.DataFrame(correlation_dat, columns=columns)
     out_df.to_csv(args.correlation_out_name + '.csv')
