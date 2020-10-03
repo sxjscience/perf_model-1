@@ -101,6 +101,17 @@ bash evaluate_e2e.sh p3 cat_ranking cat_ranking
 # NN
 bash evaluate_e2e.sh p3 nn_regression_split1_-1_1000_512_3_0.1_0 nn 2
 bash evaluate_e2e.sh p3 nn_regression_split1_-1_1000_512_3_0.1_1 nn 2
+
+for seed in 123 1234 12345
+do
+    for model in nn_regression_split1_-1_1000_512_3_0.1_1
+    do
+        for K in 2 8
+        do
+            bash evaluate_e2e.sh c5 ${model} nn $K $seed
+        done;
+    done;
+done;
 ```
 
 ## M6
