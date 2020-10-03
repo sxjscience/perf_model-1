@@ -35,7 +35,7 @@ fi
 
 MODEL_PATH=../model_results/${model_name}/${FOLDER}
 
-OUT_DIR=${model_name}_e2e_${instance_type}_npara${n_parallel}_ntop${measure_top_n}
+OUT_DIR=${model_name}_e2e_${instance_type}_npara${n_parallel}_ntop${measure_top_n}_seed${seed}
 mkdir -p ${OUT_DIR}
 for network in `cat models.txt`
 do

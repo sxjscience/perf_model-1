@@ -26,7 +26,22 @@ for model in ${networks[@]}
 do
     bash evaluate_e2e.sh g4 ${model} nn
 done;
+
+# Evaluate NN + Gate
+
+for model in nn_regression_split1_-1_1000_512_3_0.1_1
+do
+    for K in 2 8
+    do
+        for seed in 123
+        do
+            bash evaluate_e2e.sh g4 ${model} nn $K $seed
+        done;
+    done;
+done;
 ```
+
+
 
 ## C5
 ```bash
