@@ -748,6 +748,8 @@ def main():
         if args.save_used_keys:
             with open(args.used_key_path, 'w') as of:
                 json.dump(used_keys, of)
+    elif args.split_test_op_level:
+        pass
     elif args.subsample:
         sample_counts = []
         os.makedirs(args.out_dir, exist_ok=True)
@@ -843,17 +845,17 @@ def main():
             model.save(args.out_dir)
             test_features, test_labels = get_feature_label(test_df)
             test_score = model.evaluate(test_features, test_labels, 'regression')
-            test_ranking_score_all = model.evaluate(rank_test_all['rank_features'],
-                                                    rank_test_all['rank_labels'],
-                                                    'ranking')
-            test_ranking_score_all = {k + '_all': v for k, v in test_ranking_score_all.items()}
-            test_score.update(test_ranking_score_all)
-            test_ranking_score_valid = model.evaluate(rank_test_valid['rank_features'],
-                                                      rank_test_valid['rank_labels'],
-                                                      'ranking')
-            test_ranking_score_valid = {k + '_valid': v for k, v in
-                                        test_ranking_score_valid.items()}
-            test_score.update(test_ranking_score_valid)
+            # test_ranking_score_all = model.evaluate(rank_test_all['rank_features'],
+            #                                         rank_test_all['rank_labels'],
+            #                                         'ranking')
+            # test_ranking_score_all = {k + '_all': v for k, v in test_ranking_score_all.items()}
+            # test_score.update(test_ranking_score_all)
+            # test_ranking_score_valid = model.evaluate(rank_test_valid['rank_features'],
+            #                                           rank_test_valid['rank_labels'],
+            #                                           'ranking')
+            # test_ranking_score_valid = {k + '_valid': v for k, v in
+            #                             test_ranking_score_valid.items()}
+            # test_score.update(test_ranking_score_valid)
             logging.info('Test Score={}'.format(test_score))
             with open(os.path.join(args.out_dir, 'test_scores.json'), 'w') as out_f:
                 json.dump(test_score, out_f)
