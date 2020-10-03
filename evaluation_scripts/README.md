@@ -60,8 +60,8 @@ bash evaluate_e2e.sh p3 cat_regression cat_regression
 bash evaluate_e2e.sh p3 cat_ranking cat_ranking
 
 # NN
-bash evaluate_e2e.sh p3 nn_regression_split1_-1_1000_512_3_0.1_0 nn 8
-bash evaluate_e2e.sh p3 nn_regression_split1_-1_1000_512_3_0.1_1 nn 8
+bash evaluate_e2e.sh p3 nn_regression_split1_-1_1000_512_3_0.1_0 nn 2
+bash evaluate_e2e.sh p3 nn_regression_split1_-1_1000_512_3_0.1_1 nn 2
 ```
 
 ## M6
