@@ -46,8 +46,8 @@ for dir_name in sorted(os.listdir(args.dir_path)):
             test_features, test_labels = get_feature_label(test_df)
             valid_indices = (test_labels > 0).nonzero()[0]
             test_scores = model.predict(test_features)
-            ndcg_top_4 = ndcg_score(test_labels.expand_dims(axis=0),
-                                    test_scores.expand_dims(axis=0), k=4)
+            ndcg_top_4 = ndcg_score(np.expand_dims(test_labels,axis=0),
+                                    np.expand_dims(test_scores, axis=0), k=10)
             pearson_score, _ = pearsonr(test_scores, test_labels)
             spearman_score, _ = spearmanr(test_scores, test_labels)
             noninvalid_pearson_score, _ = pearsonr(test_scores[valid_indices],
