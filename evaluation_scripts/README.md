@@ -11,14 +11,18 @@ bash evaluate_e2e.sh g4 cat_regression_split0.5 cat_regression
 bash evaluate_e2e.sh g4 cat_ranking cat_ranking
 
 # Evaluate neural network
-for model in nn_regression_split1_-1_1000_512_3_0.1_0 \
-             nn_regression_split1_-1_1000_512_3_0.1_1 \
-             nn_regression_split0.7_-1_1000_512_3_0.1_0 \
-             nn_regression_split0.7_-1_1000_512_3_0.1_1 \
-             nn_regression_split0.5_-1_1000_512_3_0.1_0 \
-             nn_regression_split0.5_-1_1000_512_3_0.1_1 \ 
-             nn_regression_split0.3_-1_1000_512_3_0.1_0 \
-             nn_regression_split0.3_-1_1000_512_3_0.1_1 \
+networks=(
+nn_regression_split1_-1_1000_512_3_0.1_0
+nn_regression_split1_-1_1000_512_3_0.1_1
+nn_regression_split0.7_-1_1000_512_3_0.1_0
+nn_regression_split0.7_-1_1000_512_3_0.1_1
+nn_regression_split0.5_-1_1000_512_3_0.1_0
+nn_regression_split0.5_-1_1000_512_3_0.1_1 
+nn_regression_split0.3_-1_1000_512_3_0.1_0
+nn_regression_split0.3_-1_1000_512_3_0.1_1
+)
+
+for model in ${networks[@]} 
 do
     bash evaluate_e2e.sh g4 ${model} nn
 done;

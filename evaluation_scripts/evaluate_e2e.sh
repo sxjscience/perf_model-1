@@ -1,10 +1,11 @@
 set -ex
 
 n_parallel=8
-measure_top_n=8
 instance_type=$1
 model_name=$2
 model_type=$3
+measure_top_n=${4:-8}
+
 
 if [ "${instance_type}" == "g4" ]; then
   TARGET="cuda -model=t4"
