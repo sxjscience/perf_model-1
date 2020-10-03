@@ -1,3 +1,5 @@
+set -ex
+
 SAVE_DIR=evaluation_results
 MODEL_BASE_DIR=../model_results
 
