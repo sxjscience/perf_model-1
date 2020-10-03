@@ -46,7 +46,7 @@ for dir_name in sorted(os.listdir(args.dir_path)):
             test_features, test_labels = get_feature_label(test_df)
             valid_indices = (test_labels > 0).nonzero()[0]
             test_scores = model.predict(test_features)
-            ndcg_top_4 = ndcg_score(np.expand_dims(test_labels,axis=0),
+            ndcg_top_10 = ndcg_score(np.expand_dims(test_labels, axis=0),
                                     np.expand_dims(test_scores, axis=0), k=10)
             pearson_score, _ = pearsonr(test_scores, test_labels)
             spearman_score, _ = spearmanr(test_scores, test_labels)
@@ -89,7 +89,7 @@ for dir_name in sorted(os.listdir(args.dir_path)):
                       'w') as out_f:
                 json.dump(test_score, out_f)
 if args.eval_correlation:
-    columns = ['name', 'spearman', 'pearson', 'spearman_v', 'pearson_v', 'ndcg-4']
+    columns = ['name', 'spearman', 'pearson', 'spearman_v', 'pearson_v', 'ndcg-10']
     if not args.ranking_only:
         columns += ['rmse', 'mae']
     out_df = pd.DataFrame(correlation_dat, columns=columns)
