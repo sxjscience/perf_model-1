@@ -6,6 +6,7 @@ import numpy as np
 from perf_model.thrpt_model_new import NNRanker, read_pd, get_feature_label, CatRegressor,\
     CatRanker
 from scipy.stats import pearsonr, spearmanr
+from sklearn.metrics import ndcg_score
 
 
 parser = argparse.ArgumentParser(description='Read model results.')
@@ -44,7 +45,7 @@ for dir_name in sorted(os.listdir(args.dir_path)):
             test_features, test_labels = get_feature_label(test_df)
             valid_indices = (test_labels > 0).nonzero()[0]
             test_scores = model.predict(test_features)
-            print(test_scores, test_labels)
+            ndcg_top_4 = ndcg_score(test_labels, test_scores, k=4)
             pearson_score, _ = pearsonr(test_scores, test_labels)
             spearman_score, _ = spearmanr(test_scores, test_labels)
             noninvalid_pearson_score, _ = pearsonr(test_scores[valid_indices],
@@ -55,7 +56,8 @@ for dir_name in sorted(os.listdir(args.dir_path)):
                                     spearman_score,
                                     pearson_score,
                                     noninvalid_spearman_score,
-                                    noninvalid_pearson_score])
+                                    noninvalid_pearson_score,
+                                    ndcg_top_4])
         else:
             rank_test_all = np.load(data_prefix + '.rank_test.all.npz')
             rank_test_valid = np.load(data_prefix + '.rank_test.valid.npz')
@@ -79,5 +81,5 @@ for dir_name in sorted(os.listdir(args.dir_path)):
 if args.eval_correlation:
     out_df = pd.DataFrame(correlation_dat, columns=['name',
                                                     'spearman', 'pearson',
-                                                    'spearman_v', 'pearson_v'])
+                                                    'spearman_v', 'pearson_v', 'ndcg-4'])
     out_df.to_csv(args.correlation_out_name + '.csv')
