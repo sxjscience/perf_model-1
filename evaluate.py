@@ -17,7 +17,11 @@ args = parser.parse_args()
 
 correlation_dat = []
 for dir_name in sorted(os.listdir(args.dir_path)):
+    if not os.path.isdir(os.path.join(args.dir_path, dir_name)):
+        continue
     for exp_name in sorted(os.listdir(os.path.join(args.dir_path, dir_name))):
+        if not os.path.isdir(os.path.join(args.dir_path, dir_name, exp_name)):
+            continue
         if args.model_type == 'nn':
             model = NNRanker.load(os.path.join(args.dir_path, dir_name, exp_name))
         elif args.model_type == 'cat_regression':
