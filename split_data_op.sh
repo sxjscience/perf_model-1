@@ -10,7 +10,7 @@ do
     split_test_name=${OUT_DIR}/$fold.test.pq
     python3 -m perf_model.thrpt_model_new  \
               --split_test_op_level \
-              --dataset ${datasets} \
+              --dataset ${dataset} \
               --split_train_name ${split_train_name} \
               --split_test_name ${split_test_name} \
               --split_test_ratio 0.1 \
