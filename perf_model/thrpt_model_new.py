@@ -82,7 +82,9 @@ def split_df_by_op(df, seed, ratio):
     else:
         group_dfs = [df]
 
-    num = int(ratio * len(group_dfs))
+    if len(group_dfs) == 1:
+        return None, None
+    num = int(np.ceil(ratio * len(group_dfs)))
     perm = rng.permutation(len(group_dfs))
     train_num = len(group_dfs) - num
     train_dfs = [group_dfs[i] for i in perm[:train_num]]
@@ -754,6 +756,8 @@ def main():
     elif args.split_test_op_level:
         df, used_keys = get_data(args.dataset)
         train_df, test_df = split_df_by_op(df, seed=args.seed, ratio=args.split_test_ratio)
+        if train_df is None:
+            logging.info(f'Cannot split {args.dataset}.')
         train_df.reset_index(drop=True, inplace=True)
         test_df.reset_index(drop=True, inplace=True)
         train_df.to_parquet(args.split_train_name)
