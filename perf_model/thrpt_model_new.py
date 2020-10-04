@@ -84,6 +84,7 @@ def split_df_by_op(df, seed, ratio):
 
     if len(group_dfs) == 1:
         return None, None
+    print(ratio * len(group_dfs))
     num = int(np.ceil(ratio * len(group_dfs)))
     perm = rng.permutation(len(group_dfs))
     train_num = len(group_dfs) - num
