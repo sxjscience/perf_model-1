@@ -434,7 +434,7 @@ class NNRanker:
         features, labels = get_feature_label(train_df)
         logging.info(f'#Train = {len(train_df)},'
                      f' #Non-invalid Throughputs in Train = {len((labels >0).nonzero()[0])}')
-        split_ratio = 0.1
+        split_ratio = 0.05
         train_num = int(np.ceil((1 - split_ratio) * len(features)))
         perm = np.random.permutation(len(features))
         train_features, train_labels = features[perm[:train_num]], labels[perm[:train_num]]
