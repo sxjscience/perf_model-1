@@ -84,6 +84,7 @@ def split_df_by_op(df, seed, ratio):
 
     if len(group_dfs) == 1:
         return None, None
+    print('ratio=', ratio)
     print(ratio * len(group_dfs))
     num = int(np.ceil(ratio * len(group_dfs)))
     perm = rng.permutation(len(group_dfs))
@@ -670,7 +671,7 @@ def parse_args():
                             help='Name of the testing split.')
     split_args.add_argument('--split_rank_test_prefix', default=None,
                             help='Prefix of the rank test datasets.')
-    split_args.add_argument('--split_test_ratio', default=0.1,
+    split_args.add_argument('--split_test_ratio', default=0.1, type=float,
                             help='Ratio of the test set in the split.')
     split_args.add_argument('--split_top_ratio', default=0.0,
                             help='Ratio of the top samples that will be split to the test set.')
