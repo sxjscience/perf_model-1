@@ -25,6 +25,7 @@ python3 -m perf_model.thrpt_model_new --dataset split_tuning_dataset \
 # Download the datasets
 aws s3 cp --recursive s3://hyuz-shared-data/dataset_0726 tuning_dataset
 aws s3 cp --recursive s3://xingjian-public/split_tuning_dataset_20200920 split_tuning_dataset
+aws s3 cp --recursive s3://xingjian-public/lorien/split_tuning_dataset_op_20201004 split_tuning_dataset_op
 aws s3 cp --recursive s3://xingjian-public/lorien/split_tuning_dataset_0.3_20201001 split_tuning_dataset_0.3
 aws s3 cp --recursive s3://xingjian-public/lorien/split_tuning_dataset_0.5_20201001 split_tuning_dataset_0.5
 aws s3 cp --recursive s3://xingjian-public/lorien/split_tuning_dataset_0.7_20201001 split_tuning_dataset_0.7
