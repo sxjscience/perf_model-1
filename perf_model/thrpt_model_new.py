@@ -752,7 +752,13 @@ def main():
             with open(args.used_key_path, 'w') as of:
                 json.dump(used_keys, of)
     elif args.split_test_op_level:
-        pass
+        df, used_keys = get_data(args.dataset)
+        train_df, test_df = split_df_by_op(df, seed=args.seed, ratio=args.split_test_ratio)
+        train_df.reset_index(drop=True, inplace=True)
+        test_df.reset_index(drop=True, inplace=True)
+        train_df.to_parquet(args.split_train_name)
+        test_df.to_parquet(args.split_test_name)
+        logging.info('  #Train = {}, #Test = {}'.format(len(train_df), len(test_df)))
     elif args.subsample:
         sample_counts = []
         os.makedirs(args.out_dir, exist_ok=True)
