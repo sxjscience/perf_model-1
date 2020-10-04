@@ -612,9 +612,15 @@ class NNRanker:
             valid_indices = (labels > 0).nonzero()[0]
             valid_rmse = np.sqrt(np.mean(np.square(preds[valid_indices] - labels[valid_indices])))
             valid_mae = np.mean(np.abs(preds[valid_indices] - labels[valid_indices]))
+            ndcg_top_2 = ndcg_score(np.expand_dims(labels, axis=0),
+                                    np.expand_dims(original_preds, axis=0), k=2)
+            ndcg_top_8 = ndcg_score(np.expand_dims(labels, axis=0),
+                                    np.expand_dims(original_preds, axis=0), k=8)
             return {'rmse': rmse, 'mae': mae,
                     'valid_rmse': valid_rmse, 'valid_mae': valid_mae,
-                    'invalid_acc': np.sum((original_preds <= 0) * (labels <= 0)) / len(preds)}
+                    'invalid_acc': np.sum((original_preds <= 0) * (labels <= 0)) / len(preds),
+                    'ndcg_top_2': ndcg_top_2,
+                    'ndcg_top_8': ndcg_top_8}
         elif mode == 'ranking':
             # We calculate two things, the NDCG score and the MRR score.
             ndcg_val = ndcg_score(y_true=labels, y_score=preds)
