@@ -73,6 +73,7 @@ def split_df_by_op(df, seed, ratio):
         The training dataframe
     test_df
         The testing dataframe
+    op_keys
     """
     rng = np.random.RandomState(seed)
 
@@ -92,7 +93,7 @@ def split_df_by_op(df, seed, ratio):
     print(f'Training Num: {train_num}, Test Num: {num}')
     train_dfs = [group_dfs[i] for i in perm[:train_num]]
     test_dfs = [group_dfs[i] for i in perm[train_num:]]
-    return pd.concat(train_dfs), pd.concat(test_dfs)
+    return pd.concat(train_dfs), pd.concat(test_dfs), op_keys
 
 
 def split_train_test_df(df, seed, ratio, top_sample_ratio=0.2, group_size=10, K=4):
@@ -758,7 +759,8 @@ def main():
                 json.dump(used_keys, of)
     elif args.split_test_op_level:
         df, used_keys = get_data(args.dataset)
-        train_df, test_df = split_df_by_op(df, seed=args.seed, ratio=args.split_test_ratio)
+        train_df, test_df, op_keys = split_df_by_op(df, seed=args.seed, ratio=args.split_test_ratio)
+        used_keys = [key for key in used_keys if key not in op_keys]
         if train_df is None:
             logging.info(f'Cannot split {args.dataset}.')
         train_df.reset_index(drop=True, inplace=True)
