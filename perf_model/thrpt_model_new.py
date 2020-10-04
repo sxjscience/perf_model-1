@@ -89,6 +89,7 @@ def split_df_by_op(df, seed, ratio):
     num = int(np.ceil(ratio * len(group_dfs)))
     perm = rng.permutation(len(group_dfs))
     train_num = len(group_dfs) - num
+    print(f'Training Num: {train_num}, Test Num: {num}')
     train_dfs = [group_dfs[i] for i in perm[:train_num]]
     test_dfs = [group_dfs[i] for i in perm[train_num:]]
     return pd.concat(train_dfs), pd.concat(test_dfs)
