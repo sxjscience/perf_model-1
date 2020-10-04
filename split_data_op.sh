@@ -11,6 +11,8 @@ do
     python3 -m perf_model.thrpt_model_new  \
               --split_test_op_level \
               --dataset ${dataset} \
+              --save_used_keys \
+              --used_key_path ${OUT_DIR}/$fold.used_key.json \
               --split_train_name ${split_train_name} \
               --split_test_name ${split_test_name} \
               --split_test_ratio 0.1 \

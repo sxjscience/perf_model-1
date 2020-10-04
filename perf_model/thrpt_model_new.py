@@ -765,6 +765,9 @@ def main():
         train_df.to_parquet(args.split_train_name)
         test_df.to_parquet(args.split_test_name)
         logging.info('  #Train = {}, #Test = {}'.format(len(train_df), len(test_df)))
+        if args.save_used_keys:
+            with open(args.used_key_path, 'w') as of:
+                json.dump(used_keys, of)
     elif args.subsample:
         sample_counts = []
         os.makedirs(args.out_dir, exist_ok=True)
