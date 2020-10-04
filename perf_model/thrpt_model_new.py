@@ -426,7 +426,8 @@ class NNRanker:
     def fit(self, train_df, batch_size=256, group_size=10, lr=1E-2,
             iter_mult=500, rank_lambda=1.0, test_df=None, train_dir='.'):
         features, labels = get_feature_label(train_df)
-        logging.info(f'#Train = {len(train_df)}')
+        logging.info(f'#Train = {len(train_df)},'
+                     f' #Non-invalid Throughputs in Train = f{len((labels >0).nonzero()[0])}')
         split_ratio = 0.1
         train_num = int(np.ceil((1 - split_ratio) * len(features)))
         perm = np.random.permutation(len(features))
