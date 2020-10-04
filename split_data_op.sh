@@ -5,7 +5,7 @@ mkdir -p ${OUT_DIR}
 for fold in `cat tasks.txt`;
 do
     mkdir -p ${OUT_DIR}/${fold}
-    dataset=tuning_dataset/${fold}
+    dataset=tuning_dataset/${fold}.csv
     split_train_name=${OUT_DIR}/$fold.train.pq
     split_test_name=${OUT_DIR}/$fold.test.pq
     python3 -m perf_model.thrpt_model_new  \
