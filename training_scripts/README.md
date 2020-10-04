@@ -53,3 +53,17 @@ cat rasp_tasks.txt | awk '{print NR,$0}' | parallel -j 4 bash train_catboost.sh 
 # CatBoost Ranking
 cat rasp_tasks.txt | awk '{print NR,$0}' | parallel -j 4 bash train_catboost.sh cat_ranking 5000 1 8
 ```
+
+Op-level split
+```bash
+# Baseline
+cat rasp_tasks.txt | awk '{print NR,$0}' | parallel -j 8 bash train_nn_regression_model_op.sh -1 1000 512 3 0.1 0 1 8
+# Baseline + Gate
+cat rasp_tasks.txt | awk '{print NR,$0}' | parallel -j 8 bash train_nn_regression_model_op.sh -1 1000 512 3 0.1 1 1 8
+
+# CatBoost Regression
+cat rasp_tasks.txt | awk '{print NR,$0}' | parallel -j 8 bash train_catboost.sh cat_regression 5000 1 8
+
+# CatBoost Ranking
+cat rasp_tasks.txt | awk '{print NR,$0}' | parallel -j 8 bash train_catboost.sh cat_ranking 5000 1 8
+```
