@@ -13,7 +13,7 @@ score_columns = ['spearman', 'ndcg-2', 'ndcg-5', 'ndcg-8']
 
 out = []
 index_l = []
-for file_path in glob.glob(os.path.join(args.dir_path, '*.csv')):
+for file_path in sorted(glob.glob(os.path.join(args.dir_path, '*.csv'))):
     model_name = file_path[:-len('.csv')]
     df = pd.read_csv(file_path)
     file_results = []
