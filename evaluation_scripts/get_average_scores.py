@@ -12,6 +12,7 @@ args = parser.parse_args()
 score_columns = ['spearman', 'ndcg-2', 'ndcg-5', 'ndcg-8']
 
 out = []
+index_l = []
 for file_path in glob.glob(os.path.join(args.dir_path, '*.csv')):
     model_name = file_path[:-len('.csv')]
     df = pd.read_csv(file_path)
@@ -20,5 +21,6 @@ for file_path in glob.glob(os.path.join(args.dir_path, '*.csv')):
         avg_score = df[col].mean()
         file_results.append(avg_score)
     out.append(file_results)
-out_df = pd.DataFrame(out, columns=score_columns)
+    index_l.append(model_name)
+out_df = pd.DataFrame(out, index=index_l, columns=score_columns)
 out_df.to_csv(args.out_path)
