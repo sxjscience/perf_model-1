@@ -14,6 +14,7 @@ parser.add_argument('--dir_path', type=str, default='model_results/nn_5.0_200')
 parser.add_argument('--model_type', choices=['nn', 'cat_regression', 'cat_ranking'])
 parser.add_argument('--eval_correlation', action='store_true')
 parser.add_argument('--ranking_only', action='store_true')
+parser.add_argument('--use_op_split', action='store_true')
 parser.add_argument('--correlation_out_name', default=None, type=str)
 args = parser.parse_args()
 
@@ -37,7 +38,10 @@ for dir_name in sorted(os.listdir(args.dir_path)):
             model = CatRanker.load(os.path.join(args.dir_path, dir_name, exp_name))
         else:
             raise NotImplementedError
-        data_prefix = os.path.join('split_tuning_dataset', dir_name, exp_name)
+        if args.use_op_split:
+            data_prefix = os.path.join('split_tuning_dataset_op', dir_name, exp_name)
+        else:
+            data_prefix = os.path.join('split_tuning_dataset', dir_name, exp_name)
         test_df = read_pd(data_prefix + '.test.pq')
         with open(data_prefix + '.used_key.json', 'r') as in_f:
             used_key = json.load(in_f)
