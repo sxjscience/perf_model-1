@@ -21,5 +21,6 @@ for model in nn_regression_split0.3_-1_1000_512_3_0.1_0 \
              nn_regression_split0.7_-1_1000_512_3_0.1_1 \
              nn_regression_split1_-1_1000_512_3_0.1_0 \
              nn_regression_split1_-1_1000_512_3_0.1_1
+do
   python3 evaluate.py --eval_correlation --dir_path ${MODEL_BASE_DIR}/${model} --model_type nn --correlation_out_name ${SAVE_DIR}/${model}
 done
