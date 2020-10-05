@@ -37,7 +37,7 @@ aws s3 cp --recursive s3://xingjian-public/lorien/models/cat_ranking_20200923/ m
 
 
 # Download the catboost models
-aws s3 cp --recursive s3://xingjian-public/lorien/models/cat_regression_5000_split0.5_20201001/ model_results/cat_regression_split0.3
+aws s3 cp --recursive s3://xingjian-public/lorien/models/cat_regression_5000_split0.3_20201001/ model_results/cat_regression_split0.3
 aws s3 cp --recursive s3://xingjian-public/lorien/models/cat_regression_5000_split0.5_20201001/ model_results/cat_regression_split0.5
 aws s3 cp --recursive s3://xingjian-public/lorien/models/cat_regression_5000_split0.7_20201001/ model_results/cat_regression_split0.7
 aws s3 cp --recursive s3://xingjian-public/lorien/models/cat_regression_5000_split1_20201001/ model_results/cat_regression_split1

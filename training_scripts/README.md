@@ -36,6 +36,8 @@ cat tasks.txt | awk '{print NR,$0}' | parallel -j 12 bash train_nn_regression_mo
 cat tasks.txt | awk '{print NR,$0}' | parallel -j 12 bash train_nn_regression_model.sh 2 1000 512 3 0.1 1 0.7 8
 # Baseline + Gate + Balanced 50%
 cat tasks.txt | awk '{print NR,$0}' | parallel -j 12 bash train_nn_regression_model.sh 2 1000 512 3 0.1 1 0.5 8
+# Baseline + Gate + Balanced 30%
+cat tasks.txt | awk '{print NR,$0}' | parallel -j 12 bash train_nn_regression_model.sh 2 1000 512 3 0.1 1 0.3 8
 
 ```
 
