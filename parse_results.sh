@@ -1,5 +1,3 @@
-set -ex
-
 BASE_DIR_PATH=$1
 FILES=(
 InceptionV3.txt
