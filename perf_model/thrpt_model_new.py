@@ -766,7 +766,6 @@ def main():
     elif args.split_test_op_level:
         df, used_keys = get_data(args.dataset)
         train_df, test_df, op_keys = split_df_by_op(df, seed=args.seed, ratio=args.split_test_ratio)
-        used_keys = [key for key in used_keys if key not in op_keys]
         if train_df is None:
             logging.info(f'Cannot split {args.dataset}.')
         train_df.reset_index(drop=True, inplace=True)
