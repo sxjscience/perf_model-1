@@ -9,7 +9,7 @@ parser.add_argument('--dir_path', type=str)
 parser.add_argument('--out_path', type=str)
 args = parser.parse_args()
 
-score_columns = ['spearman', 'ndcg2', 'ndcg5', 'ndcg8']
+score_columns = ['spearman', 'ndcg-2', 'ndcg-5', 'ndcg-8']
 
 out = []
 for file_path in glob.glob(os.path.join(args.dir_path, '*.csv')):
