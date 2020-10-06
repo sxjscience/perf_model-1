@@ -267,4 +267,17 @@ bash evaluate_e2e.sh m6 cat_regression cat_regression
 
 # Evaluate Catboost Ranking
 bash evaluate_e2e.sh m6 cat_ranking cat_ranking
+
+# NN Multiple Seeds
+for seed in 123 1234 12345
+do
+    for model in nn_regression_split1_-1_1000_512_3_0.1_1
+    do
+        for K in 2 8
+        do
+            bash evaluate_e2e.sh m6 ${model} nn $K $seed
+        done;
+    done;
+done;
+
 ```
