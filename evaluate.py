@@ -80,6 +80,7 @@ for dir_name in sorted(os.listdir(args.dir_path)):
             test_features, test_labels = get_feature_label(test_df)
             valid_indices = (test_labels > 0).nonzero()[0]
             test_scores = model.predict(test_features)
+            test_scores = test_scores * (test_scores > 0)
             ndcg_top_2 = ndcg_score(np.expand_dims(test_labels, axis=0),
                                     np.expand_dims(test_scores, axis=0), k=2)
             ndcg_top_5 = ndcg_score(np.expand_dims(test_labels, axis=0),
