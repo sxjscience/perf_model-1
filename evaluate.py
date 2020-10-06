@@ -19,7 +19,6 @@ parser.add_argument('--correlation_out_name', default=None, type=str)
 args = parser.parse_args()
 
 
-
 def group_ndcg_score(truth, prediction, k=None, group_indices=None):
     if group_indices is None:
         return ndcg_score(truth, prediction, k=k)
@@ -62,6 +61,7 @@ for dir_name in sorted(os.listdir(args.dir_path)):
         with open(data_prefix + '.used_key.json', 'r') as in_f:
             used_key = json.load(in_f)
         test_df = test_df[used_key]
+        group_indices = get_group_indices(test_df)
         if args.eval_correlation:
             test_features, test_labels = get_feature_label(test_df)
             valid_indices = (test_labels > 0).nonzero()[0]
