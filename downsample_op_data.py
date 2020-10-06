@@ -29,6 +29,7 @@ for folder in sorted(os.listdir(args.dir_path)):
             num_sampled_group = int(np.ceil(args.ratio * len(train_group_dfs)))
             perm = np.random.permutation(len(train_group_dfs))
             subsampled_train_df = pd.concat(train_group_dfs)
+            print(folder, name, len(train_group_dfs), len(test_group_dfs))
             info_l.append((os.path.join(folder),
                            len(train_df), len(test_df),
                            len(train_group_dfs),
