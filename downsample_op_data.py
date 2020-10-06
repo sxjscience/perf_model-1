@@ -18,24 +18,22 @@ np.random.seed(args.seed)
 
 for folder in sorted(os.listdir(args.dir_path)):
     os.makedirs(os.path.join(args.out_path, folder))
-    for subfolder in sorted(os.listdir(os.path.join(args.dir_path, folder))):
-        os.makedirs(os.path.join(args.out_path, folder, subfolder))
-        for name in os.listdir(os.path.join(args.dir_path, folder, subfolder)):
-            if name.endswith('.train.pq'):
-                # Try to split
-                train_df = pd.read_parquet(os.path.join(args.dir_path, folder, subfolder, name))
-                test_df = pd.read_parquet(os.path.join(args.dir_path, folder, subfolder,
-                                                       name[:-len('.train.pq')] + '.test.pq'))
-                train_group_dfs = get_group_df(train_df)
-                test_group_dfs = get_group_df(test_df)
-                num_sampled_group = int(np.ceil(args.ratio * len(train_group_dfs)))
-                perm = np.random.permutation(len(train_group_dfs))
-                subsampled_train_df = pd.concat(train_group_dfs)
-                info_l.append((os.path.join(folder, subfolder),
-                               len(train_df), len(test_df),
-                               len(train_group_dfs),
-                               len(test_group_dfs)))
-                subsampled_train_df.to_csv(os.path.join(args.out_path, folder, subfolder, name))
+    for name in sorted(os.listdir(os.path.join(args.dir_path, folder))):
+        if name.endswith('.train.pq'):
+            # Try to split
+            train_df = pd.read_parquet(os.path.join(args.dir_path, folder, name))
+            test_df = pd.read_parquet(os.path.join(args.dir_path, folder,
+                                                   name[:-len('.train.pq')] + '.test.pq'))
+            train_group_dfs = get_group_df(train_df)
+            test_group_dfs = get_group_df(test_df)
+            num_sampled_group = int(np.ceil(args.ratio * len(train_group_dfs)))
+            perm = np.random.permutation(len(train_group_dfs))
+            subsampled_train_df = pd.concat(train_group_dfs)
+            info_l.append((os.path.join(folder),
+                           len(train_df), len(test_df),
+                           len(train_group_dfs),
+                           len(test_group_dfs)))
+            subsampled_train_df.to_csv(os.path.join(args.out_path, folder, name))
 
 
 stat_df = pd.DataFrame(info_l, columns=['name', 'train_num', 'test_num',
