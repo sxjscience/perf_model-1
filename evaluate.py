@@ -27,7 +27,8 @@ def group_ndcg_score(truth, prediction, k=None, group_indices=None):
         for sel in group_indices:
             sel_truth = truth[sel]
             sel_prediction = prediction[sel]
-            group_ndcg = ndcg_score(sel_truth, sel_prediction, k=k)
+            group_ndcg = ndcg_score(np.expand_dims(sel_truth, axis=0),
+                                    np.expand_dims(sel_prediction, axis=0), k=k)
             avg_ndcg += group_ndcg
         avg_ndcg /= len(group_indices)
         return avg_ndcg
@@ -75,20 +76,16 @@ for dir_name in sorted(os.listdir(args.dir_path)):
             ndcg_top_10 = ndcg_score(np.expand_dims(test_labels, axis=0),
                                      np.expand_dims(test_scores, axis=0), k=10)
 
-            ndcg_group_avg_2 = group_ndcg_score(np.expand_dims(test_labels, axis=0),
-                                                np.expand_dims(test_scores, axis=0),
+            ndcg_group_avg_2 = group_ndcg_score(test_labels, test_scores,
                                                 k=2,
                                                 group_indices=group_indices)
-            ndcg_group_avg_5 = group_ndcg_score(np.expand_dims(test_labels, axis=0),
-                                                np.expand_dims(test_scores, axis=0),
+            ndcg_group_avg_5 = group_ndcg_score(test_labels, test_scores,
                                                 k=5,
                                                 group_indices=group_indices)
-            ndcg_group_avg_8 = group_ndcg_score(np.expand_dims(test_labels, axis=0),
-                                                np.expand_dims(test_scores, axis=0),
+            ndcg_group_avg_8 = group_ndcg_score(test_labels, test_scores,
                                                 k=8,
                                                 group_indices=group_indices)
-            ndcg_group_avg_10 = group_ndcg_score(np.expand_dims(test_labels, axis=0),
-                                                 np.expand_dims(test_scores, axis=0),
+            ndcg_group_avg_10 = group_ndcg_score(test_labels, test_scores,
                                                  k=10,
                                                  group_indices=group_indices)
             pearson_score, _ = pearsonr(test_scores, test_labels)
