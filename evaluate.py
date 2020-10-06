@@ -28,7 +28,7 @@ def group_ndcg_score(truth, prediction, k=None, group_indices=None):
         for sel in group_indices:
             sel_truth = truth[sel]
             sel_prediction = prediction[sel]
-            if len(sel) == 0:
+            if len(sel) == 1:
                 pass
             try:
                 group_ndcg = ndcg_score(np.expand_dims(sel_truth, axis=0),
