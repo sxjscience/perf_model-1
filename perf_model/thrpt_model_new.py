@@ -801,9 +801,14 @@ def main():
     else:
         logging_config(args.out_dir, 'train')
         if args.split_postfix is not None and args.split_postfix != '1':
-            assert 'split_tuning_dataset' in args.data_prefix
-            real_prefix = args.data_prefix.replace('split_tuning_dataset',
-                                                   f'split_tuning_dataset_{args.split_postfix}')
+            if 'split_tuning_dataset_op' in args.data_prefix:
+                real_prefix = args.data_prefix.replace('split_tuning_dataset_op',
+                                                       f'split_tuning_dataset_op{args.split_postfix}')
+            elif 'split_tuning_dataset' in args.data_prefix:
+                real_prefix = args.data_prefix.replace('split_tuning_dataset',
+                                                       f'split_tuning_dataset_{args.split_postfix}')
+            else:
+                raise NotImplementedError
             train_df = read_pd(real_prefix + '.train.pq')
         else:
             train_df = read_pd(args.data_prefix + '.train.pq')
