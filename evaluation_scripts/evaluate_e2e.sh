@@ -26,7 +26,7 @@ elif [ "${instance_type}" == "p3" ]; then
   USE_GRAPH=0
 elif [ "${instance_type}" == "m6" ]; then
   TARGET="llvm -device=arm_cpu -mtriple=aarch64-linux-gnu -mattr=+v8.2a,+fullfp16,+fp-armv8,+dotprod,+crc,+crypto,+neon"
-  FOLDER="gcv_graviton_csv"
+  FOLDER="gcv_graviton2_csv"
   USE_GRAPH=0
 else
   echo "${instance_type} not supported!"
