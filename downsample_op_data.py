@@ -3,7 +3,7 @@ import os
 import pandas as pd
 import numpy as np
 import glob
-from perf_model.thrpt_model_new import get_group_df
+from perf_model.thrpt_model_new import get_group_df, get_group_indices
 
 parser = argparse.ArgumentParser(description='downsample the op training dataset.')
 parser.add_argument('--dir_path', type=str)
@@ -24,15 +24,16 @@ for folder in sorted(os.listdir(args.dir_path)):
             train_df = pd.read_parquet(os.path.join(args.dir_path, folder, name))
             test_df = pd.read_parquet(os.path.join(args.dir_path, folder,
                                                    name[:-len('.train.pq')] + '.test.pq'))
-            train_group_dfs = get_group_df(train_df)
-            test_group_dfs = get_group_df(test_df)
-            num_sampled_group = int(np.ceil(args.ratio * len(train_group_dfs)))
-            perm = np.random.permutation(len(train_group_dfs))
-            subsampled_train_df = pd.concat(train_group_dfs)
-            print(folder, name, len(train_group_dfs), len(test_group_dfs))
+            train_group_indices = get_group_indices(train_df)
+            test_group_indices = get_group_indices(test_df)
+            num_sampled_group = int(np.ceil(args.ratio * len(train_group_indices)))
+            perm = np.random.permutation(len(train_group_indices))
+            indices = np.concatenate(train_group_indices[perm[:num_sampled_group]])
+            subsampled_train_df = train_df.iloc[indices]
+            print(folder, name, len(train_group_indices), len(test_group_dfs), num_sampled_group)
             info_l.append((os.path.join(folder),
                            len(train_df), len(test_df),
-                           len(train_group_dfs),
+                           len(train_group_indices),
                            len(test_group_dfs)))
             subsampled_train_df.to_csv(os.path.join(args.out_path, folder, name))
 
