@@ -69,3 +69,12 @@ cat tasks_op.txt | awk '{print NR,$0}' | parallel -j 8 bash train_catboost_op.sh
 # CatBoost Ranking
 cat tasks_op.txt | awk '{print NR,$0}' | parallel -j 8 bash train_catboost_op.sh cat_ranking 5000 1 8
 ```
+Op-level split different ratio
+```bash
+# Train with 0.3 ratio
+cat tasks_op.txt | awk '{print NR,$0}' | parallel -j 8 bash train_nn_regression_model_op.sh -1 1000 512 3 0.1 1 0.3 8
+# Train with 0.5 ratio
+cat tasks_op.txt | awk '{print NR,$0}' | parallel -j 8 bash train_nn_regression_model_op.sh -1 1000 512 3 0.1 1 0.5 8
+# Train with 0.7 ratio
+cat tasks_op.txt | awk '{print NR,$0}' | parallel -j 8 bash train_nn_regression_model_op.sh -1 1000 512 3 0.1 1 0.7 8
+```
