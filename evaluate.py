@@ -18,6 +18,31 @@ parser.add_argument('--use_op_split', action='store_true')
 parser.add_argument('--correlation_out_name', default=None, type=str)
 args = parser.parse_args()
 
+
+def get_group_indices(df):
+    op_keys = [k for k in df.columns.to_list() if k.find('in_') != -1
+               or k.find('attr_') != -1]
+    if len(op_keys) > 0:
+        group_indices = [idx for _, idx in df.groupby(op_keys).groups]
+    else:
+        group_indices = None
+    return group_indices
+
+
+def group_ndcg_score(truth, prediction, k=None, group_indices=None):
+    if group_indices is None:
+        return ndcg_score(truth, prediction, k=k)
+    else:
+        avg_ndcg = 0
+        for sel in group_indices:
+            sel_truth = truth[sel]
+            sel_prediction = prediction[sel]
+            group_ndcg = ndcg_score(sel_truth, sel_prediction, k=k)
+            avg_ndcg += group_ndcg
+        avg_ndcg /= len(group_indices)
+        return avg_ndcg
+
+
 correlation_dat = []
 for dir_name in sorted(os.listdir(args.dir_path)):
     if not os.path.isdir(os.path.join(args.dir_path, dir_name)):
