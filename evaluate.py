@@ -45,6 +45,23 @@ def group_ndcg_score(truth, prediction, k=None, group_indices=None):
         return avg_ndcg
 
 
+def group_spearman_score(truth, prediction, group_indices=None):
+    if group_indices is None:
+        spearman_score, _ = spearmanr(truth, prediction)
+        return spearman_score
+    else:
+        avg_spearman_score = 0
+        cnt = 0
+        for sel in group_indices:
+            sel_truth = truth[sel]
+            sel_prediction = prediction[sel]
+            sel_spearman, _ = spearmanr(sel_truth, sel_prediction)
+            avg_spearman_score += sel_spearman
+            cnt += 1
+        avg_spearman_score /= cnt
+        return avg_spearman_score
+
+
 correlation_dat = []
 for dir_name in sorted(os.listdir(args.dir_path)):
     if not os.path.isdir(os.path.join(args.dir_path, dir_name)):
