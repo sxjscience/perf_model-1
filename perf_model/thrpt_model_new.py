@@ -11,7 +11,10 @@ import matplotlib.pyplot as plt
 import torch as th
 import numpy as np
 import random
-import catboost
+try:
+    import catboost
+except Exception:
+    import imp
 import pandas as pd
 import tqdm
 from torch.utils.data import DataLoader
