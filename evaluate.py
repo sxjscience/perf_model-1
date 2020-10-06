@@ -54,6 +54,9 @@ for dir_name in sorted(os.listdir(args.dir_path)):
                          'conv2d_transpose_nchw.cuda',
                          'dense_tensorcore.cuda']:
             continue
+        if args.use_op_split:
+            if exp_name in ['dense_pack.x86']:
+                continue
         if not os.path.isdir(os.path.join(args.dir_path, dir_name, exp_name)):
             continue
         if args.model_type == 'nn':
