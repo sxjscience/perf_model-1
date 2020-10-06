@@ -822,7 +822,7 @@ def main():
         if args.split_postfix is not None and args.split_postfix != '1':
             if 'split_tuning_dataset_op' in args.data_prefix:
                 real_prefix = args.data_prefix.replace('split_tuning_dataset_op',
-                                                       f'split_tuning_dataset_op{args.split_postfix}')
+                                                       f'split_tuning_dataset_op_{args.split_postfix}')
             elif 'split_tuning_dataset' in args.data_prefix:
                 real_prefix = args.data_prefix.replace('split_tuning_dataset',
                                                        f'split_tuning_dataset_{args.split_postfix}')
