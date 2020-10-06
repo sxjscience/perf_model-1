@@ -239,6 +239,25 @@ def get_feature_label(df):
     return features, labels
 
 
+def get_group_indices(df):
+    op_keys = [k for k in df.columns.to_list() if k.find('in_') != -1
+               or k.find('attr_') != -1]
+    if len(op_keys) > 0:
+        group_indices = [idx for _, idx in df.groupby(op_keys).groups]
+    else:
+        group_indices = None
+    return group_indices
+
+
+def get_group_df(df):
+    op_keys = [k for k in df.columns.to_list() if k.find('in_') != -1 or k.find('attr_') != -1]
+    if len(op_keys) > 0:
+        group_dfs = [x for _, x in df.groupby(op_keys)]
+    else:
+        group_dfs = [df]
+    return group_dfs
+
+
 class CatRegressor:
     def __init__(self, model=None):
         self.model = model
