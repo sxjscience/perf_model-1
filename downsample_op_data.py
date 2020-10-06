@@ -15,9 +15,9 @@ args = parser.parse_args()
 info_l = []
 
 np.random.seed(args.seed)
-
+os.makedirs(args.out_path, exist_ok=True)
 for folder in sorted(os.listdir(args.dir_path)):
-    os.makedirs(os.path.join(args.out_path, folder))
+    os.makedirs(os.path.join(args.out_path, folder), exist_ok=True)
     for name in sorted(os.listdir(os.path.join(args.dir_path, folder))):
         if name.endswith('.train.pq'):
             # Try to split
