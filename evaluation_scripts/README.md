@@ -123,6 +123,18 @@ do
         done;
     done;
 done;
+
+# Split Ratio 0.7
+for seed in 123 1234 12345
+do
+    for model in nn_regression_split0.7_-1_1000_512_3_0.1_1
+    do
+        for K in 2 8
+        do
+            bash evaluate_e2e.sh c5 ${model} nn $K $seed
+        done;
+    done;
+done;
 ```
 
 ## C4
