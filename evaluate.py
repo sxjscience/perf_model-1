@@ -27,6 +27,9 @@ def group_ndcg_score(truth, prediction, k=None, group_indices=None):
         for sel in group_indices:
             sel_truth = truth[sel]
             sel_prediction = prediction[sel]
+            print(np.expand_dims(sel_truth, axis=0))
+            print(np.expand_dims(sel_prediction, axis=0))
+            ch = input()
             group_ndcg = ndcg_score(np.expand_dims(sel_truth, axis=0),
                                     np.expand_dims(sel_prediction, axis=0), k=k)
             avg_ndcg += group_ndcg
