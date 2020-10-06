@@ -1,6 +1,6 @@
 set -ex
 
-SAVE_DIR=evaluation_results
+SAVE_DIR=${1:-evaluation_results_op_split}
 MODEL_BASE_DIR=model_results
 
 mkdir -p ${SAVE_DIR}
