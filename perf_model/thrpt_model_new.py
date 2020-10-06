@@ -247,7 +247,7 @@ def get_group_indices(df):
                or k.find('attr_') != -1]
     if len(op_keys) > 0:
         print(df.groupby(op_keys).groups)
-        group_indices = [idx for _, idx in df.groupby(op_keys).groups]
+        group_indices = [idx for _, idx in df.groupby(op_keys).groups.items()]
     else:
         group_indices = np.arange(len(df))
     return group_indices
