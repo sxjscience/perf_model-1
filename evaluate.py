@@ -30,15 +30,16 @@ def group_ndcg_score(truth, prediction, k=None, group_indices=None):
             sel_prediction = prediction[sel]
             if len(sel) == 1:
                 pass
-            try:
-                group_ndcg = ndcg_score(np.expand_dims(sel_truth, axis=0),
-                                        np.expand_dims(sel_prediction, axis=0), k=k)
-                avg_ndcg += group_ndcg
-                cnt += 1
-            except Exception:
-                print(sel_truth)
-                print(sel_prediction)
-                raise Exception
+            else:
+                try:
+                    group_ndcg = ndcg_score(np.expand_dims(sel_truth, axis=0),
+                                            np.expand_dims(sel_prediction, axis=0), k=k)
+                    avg_ndcg += group_ndcg
+                    cnt += 1
+                except Exception:
+                    print(sel_truth)
+                    print(sel_prediction)
+                    raise Exception
         avg_ndcg /= cnt
         return avg_ndcg
 
