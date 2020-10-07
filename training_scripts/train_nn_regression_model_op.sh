@@ -1,7 +1,7 @@
 set -ex
 
 neg_mult=$1
-f=$2
+iter_mult=$2
 units=${3:-512}
 num_layers=${4:-3}
 dropout=${5:-0.1}
