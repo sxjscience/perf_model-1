@@ -53,11 +53,14 @@ def group_spearman_score(truth, prediction, group_indices=None):
         avg_spearman_score = 0
         cnt = 0
         for sel in group_indices:
-            sel_truth = truth[sel]
-            sel_prediction = prediction[sel]
-            sel_spearman, _ = spearmanr(sel_truth, sel_prediction)
-            avg_spearman_score += sel_spearman
-            cnt += 1
+            if len(sel) == 1:
+                pass
+            else:
+                sel_truth = truth[sel]
+                sel_prediction = prediction[sel]
+                sel_spearman, _ = spearmanr(sel_truth, sel_prediction)
+                avg_spearman_score += sel_spearman
+                cnt += 1
         avg_spearman_score /= cnt
         return avg_spearman_score
 
