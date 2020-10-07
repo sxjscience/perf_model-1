@@ -453,7 +453,7 @@ class NNRanker:
 
     def fit(self, train_df, batch_size=256, group_size=10, lr=1E-2,
             iter_mult=500, rank_lambda=1.0, test_df=None, train_dir='.'):
-        split_ratio = 0.1
+        split_ratio = 0.05
         train_df, valid_df, _ = split_df_by_op(train_df, seed=100, ratio=split_ratio)
         # features, labels = get_feature_label(train_df)
         # logging.info(f'#Train = {len(train_df)},'
