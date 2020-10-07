@@ -125,9 +125,9 @@ for dir_name in sorted(os.listdir(args.dir_path)):
             ndcg_group_avg_10 = group_ndcg_score(test_labels, test_scores,
                                                  k=10,
                                                  group_indices=group_indices)
-            spearman_group_score = group_spearman_score(test_labels, test_scores,
-                                                        group_indices=group_indices)
-            print(spearman_group_score)
+            # spearman_group_score = group_spearman_score(test_labels, test_scores,
+            #                                             group_indices=group_indices)
+            # print(spearman_group_score)
             pearson_score, _ = pearsonr(test_scores, test_labels)
             spearman_score, _ = spearmanr(test_scores, test_labels)
             noninvalid_pearson_score, _ = pearsonr(test_scores[valid_indices],
@@ -149,8 +149,7 @@ for dir_name in sorted(os.listdir(args.dir_path)):
                                     ndcg_group_avg_2,
                                     ndcg_group_avg_5,
                                     ndcg_group_avg_8,
-                                    ndcg_group_avg_10,
-                                    spearman_group_score]
+                                    ndcg_group_avg_10]
             if not args.ranking_only:
                 ele_results.append(rmse)
                 ele_results.append(mae)
@@ -179,8 +178,7 @@ for dir_name in sorted(os.listdir(args.dir_path)):
 if args.eval_correlation:
     columns = ['name', 'spearman', 'pearson', 'spearman_v', 'pearson_v',
                'ndcg-2', 'ndcg-5', 'ndcg-8', 'ndcg-10',
-               'ndcg-group-2', 'ndcg-group-5', 'ndcg-group-8', 'ndcg-group-10',
-               'spearman-group']
+               'ndcg-group-2', 'ndcg-group-5', 'ndcg-group-8', 'ndcg-group-10']
     if not args.ranking_only:
         columns += ['rmse', 'mae']
     out_df = pd.DataFrame(correlation_dat, columns=columns)
