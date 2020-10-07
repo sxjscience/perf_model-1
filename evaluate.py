@@ -30,7 +30,7 @@ def group_ndcg_score(truth, prediction, k=None, group_indices=None):
             sel_truth = truth[sel]
             sel_prediction = prediction[sel]
             if len(sel) == 1:
-                pass
+                continue
             else:
                 try:
                     group_ndcg = ndcg_score(np.expand_dims(sel_truth, axis=0),
@@ -54,7 +54,7 @@ def group_spearman_score(truth, prediction, group_indices=None):
         cnt = 0
         for sel in group_indices:
             if len(sel) == 1:
-                pass
+                continue
             else:
                 sel_truth = truth[sel]
                 sel_prediction = prediction[sel]
