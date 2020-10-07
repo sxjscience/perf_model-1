@@ -289,9 +289,7 @@ done;
 for seed in 123
 do
     for model in nn_regression_op_split1_-1_1000_512_3_0.1_1 \
-                 nn_regression_op_split0.5_-1_1000_512_3_0.1_1 \
-                 nn_regression_op_split0.7_-1_1000_512_3_0.1_1 \
-                 nn_regression_op_split0.3_-1_1000_512_3_0.1_1
+                 nn_regression_op_split0.7_-1_1000_512_3_0.1_1
     do
         for K in 2 8
         do
@@ -300,11 +298,9 @@ do
     done;
 done;
 
-for seed in 1234
+for seed in 123
 do
-    for model in nn_regression_op_split1_-1_1000_512_3_0.1_1 \
-                 nn_regression_op_split0.5_-1_1000_512_3_0.1_1 \
-                 nn_regression_op_split0.7_-1_1000_512_3_0.1_1 \
+    for model in nn_regression_op_split0.5_-1_1000_512_3_0.1_1 \
                  nn_regression_op_split0.3_-1_1000_512_3_0.1_1
     do
         for K in 2 8
