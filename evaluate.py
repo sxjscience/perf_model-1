@@ -127,6 +127,7 @@ for dir_name in sorted(os.listdir(args.dir_path)):
                                                  group_indices=group_indices)
             spearman_group_score = group_spearman_score(test_labels, test_scores,
                                                         group_indices=group_indices)
+            print(spearman_group_score)
             pearson_score, _ = pearsonr(test_scores, test_labels)
             spearman_score, _ = spearmanr(test_scores, test_labels)
             noninvalid_pearson_score, _ = pearsonr(test_scores[valid_indices],
