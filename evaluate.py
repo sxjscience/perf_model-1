@@ -61,6 +61,9 @@ def group_spearman_score(truth, prediction, group_indices=None):
                 sel_spearman, _ = spearmanr(sel_truth, sel_prediction)
                 avg_spearman_score += sel_spearman
                 cnt += 1
+        if cnt == 0:
+            print(group_indices)
+            ch = input()
         avg_spearman_score /= cnt
         return avg_spearman_score
 
