@@ -453,15 +453,18 @@ class NNRanker:
 
     def fit(self, train_df, batch_size=256, group_size=10, lr=1E-2,
             iter_mult=500, rank_lambda=1.0, test_df=None, train_dir='.'):
-        features, labels = get_feature_label(train_df)
-        logging.info(f'#Train = {len(train_df)},'
-                     f' #Non-invalid Throughputs in Train = {len((labels >0).nonzero()[0])}')
         split_ratio = 0.1
-        train_num = int(np.ceil((1 - split_ratio) * len(features)))
-        perm = np.random.permutation(len(features))
-        train_features, train_labels = features[perm[:train_num]], labels[perm[:train_num]]
-        valid_features, valid_labels = features[perm[train_num:]], labels[perm[train_num:]]
-        features, labels = train_features, train_labels
+        train_df, valid_df, _ = split_df_by_op(train_df, seed=100, ratio=split_ratio)
+        # features, labels = get_feature_label(train_df)
+        # logging.info(f'#Train = {len(train_df)},'
+        #              f' #Non-invalid Throughputs in Train = {len((labels >0).nonzero()[0])}')
+        # train_num = int(np.ceil((1 - split_ratio) * len(features)))
+        # perm = np.random.permutation(len(features))
+        # train_features, train_labels = features[perm[:train_num]], labels[perm[:train_num]]
+        # valid_features, valid_labels = features[perm[train_num:]], labels[perm[train_num:]]
+        features, labels = get_feature_label(train_df)
+        valid_features, valid_labels = get_feature_label(valid_df)
+
         if test_df is not None:
             test_features, test_labels = get_feature_label(test_df)
         epoch_iters = (len(features) + batch_size - 1) // batch_size
