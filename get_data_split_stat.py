@@ -19,12 +19,12 @@ for folder in sorted(os.listdir(args.dir_path)):
             train_df = pd.read_parquet(os.path.join(args.dir_path, folder, name))
             test_df = pd.read_parquet(os.path.join(args.dir_path, folder,
                                                    name[:-len('.train.pq')] + '.test.pq'))
-            train_group_dfs = get_group_df(train_df)
-            test_group_dfs = get_group_df(test_df)
+            train_group_indices = get_group_indices(train_df)
+            test_group_indices = get_group_indices(test_df)
             info_l.append((os.path.join(folder),
                            len(train_df), len(test_df),
-                           len(train_group_dfs),
-                           len(test_group_dfs)))
+                           len(train_group_indices),
+                           len(test_group_indices)))
 stat_df = pd.DataFrame(info_l, columns=['name', 'train_num', 'test_num',
                                         'train_num_group', 'test_num_group'])
 stat_df.to_csv(args.out_path)
