@@ -4,7 +4,7 @@ import os
 import json
 import numpy as np
 from perf_model.thrpt_model_new import NNRanker, read_pd, get_feature_label, CatRegressor,\
-    CatRanker, get_group_indices
+    CatRanker, get_group_indices, group_ndcg_score
 from scipy.stats import pearsonr, spearmanr
 from sklearn.metrics import ndcg_score
 
@@ -18,31 +18,6 @@ parser.add_argument('--use_op_split', action='store_true')
 parser.add_argument('--correlation_out_name', default=None, type=str)
 args = parser.parse_args()
 
-
-def group_ndcg_score(truth, prediction, k=None, group_indices=None):
-    if group_indices is None:
-        return ndcg_score(np.expand_dims(truth, axis=0),
-                          np.expand_dims(prediction, axis=0), k=k)
-    else:
-        avg_ndcg = 0
-        cnt = 0
-        for sel in group_indices:
-            sel_truth = truth[sel]
-            sel_prediction = prediction[sel]
-            if len(sel) == 1:
-                continue
-            else:
-                try:
-                    group_ndcg = ndcg_score(np.expand_dims(sel_truth, axis=0),
-                                            np.expand_dims(sel_prediction, axis=0), k=k)
-                    avg_ndcg += group_ndcg
-                    cnt += 1
-                except Exception:
-                    print(sel_truth)
-                    print(sel_prediction)
-                    raise Exception
-        avg_ndcg /= cnt
-        return avg_ndcg
 
 
 def group_spearman_score(truth, prediction, group_indices=None):

@@ -261,6 +261,32 @@ def get_group_df(df):
     return group_dfs
 
 
+def group_ndcg_score(truth, prediction, k=None, group_indices=None):
+    if group_indices is None:
+        return ndcg_score(np.expand_dims(truth, axis=0),
+                          np.expand_dims(prediction, axis=0), k=k)
+    else:
+        avg_ndcg = 0
+        cnt = 0
+        for sel in group_indices:
+            sel_truth = truth[sel]
+            sel_prediction = prediction[sel]
+            if len(sel) == 1:
+                continue
+            else:
+                try:
+                    group_ndcg = ndcg_score(np.expand_dims(sel_truth, axis=0),
+                                            np.expand_dims(sel_prediction, axis=0), k=k)
+                    avg_ndcg += group_ndcg
+                    cnt += 1
+                except Exception:
+                    print(sel_truth)
+                    print(sel_prediction)
+                    raise Exception
+        avg_ndcg /= cnt
+        return avg_ndcg
+
+
 class CatRegressor:
     def __init__(self, model=None):
         self.model = model
@@ -455,6 +481,7 @@ class NNRanker:
             iter_mult=500, rank_lambda=1.0, test_df=None, train_dir='.'):
         split_ratio = 0.05
         train_df, valid_df, _ = split_df_by_op(train_df, seed=100, ratio=split_ratio)
+        group_indices = get_group_indices(train_df)
         # features, labels = get_feature_label(train_df)
         # logging.info(f'#Train = {len(train_df)},'
         #              f' #Non-invalid Throughputs in Train = {len((labels >0).nonzero()[0])}')
@@ -627,7 +654,7 @@ class NNRanker:
                 all_preds.append(preds)
         return np.concatenate(all_preds, axis=0)
 
-    def evaluate(self, features, labels, mode='ranking'):
+    def evaluate(self, features, labels, mode='ranking', group_indices=None):
         preds = self.predict(features, use_gpu=True)
         if mode == 'regression':
             original_preds = preds
@@ -641,11 +668,17 @@ class NNRanker:
                                     np.expand_dims(original_preds, axis=0), k=2)
             ndcg_top_8 = ndcg_score(np.expand_dims(labels, axis=0),
                                     np.expand_dims(original_preds, axis=0), k=8)
+            group_ndcg_top2 = group_ndcg_score(labels, original_preds, k=2,
+                                               group_indices=group_indices)
+            group_ndcg_top8 = group_ndcg_score(labels, original_preds, k=8,
+                                               group_indices=group_indices)
             return {'rmse': rmse, 'mae': mae,
                     'valid_rmse': valid_rmse, 'valid_mae': valid_mae,
                     'invalid_acc': np.sum((original_preds <= 0) * (labels <= 0)) / len(preds),
                     'ndcg_top_2': ndcg_top_2,
-                    'ndcg_top_8': ndcg_top_8}
+                    'ndcg_top_8': ndcg_top_8,
+                    'group_ndcg_top2': group_ndcg_top2,
+                    'group_ndcg_top8': group_ndcg_top8}
         elif mode == 'ranking':
             # We calculate two things, the NDCG score and the MRR score.
             ndcg_val = ndcg_score(y_true=labels, y_score=preds)
