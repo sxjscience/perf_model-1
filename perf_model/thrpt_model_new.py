@@ -934,8 +934,10 @@ def main():
                       test_df=test_df,
                       train_dir=args.out_dir)
             model.save(args.out_dir)
+            test_group_indices = get_group_indices(test_df)
             test_features, test_labels = get_feature_label(test_df)
-            test_score = model.evaluate(test_features, test_labels, 'regression')
+            test_score = model.evaluate(test_features, test_labels, 'regression',
+                                        group_indices=test_group_indices)
             # test_ranking_score_all = model.evaluate(rank_test_all['rank_features'],
             #                                         rank_test_all['rank_labels'],
             #                                         'ranking')
