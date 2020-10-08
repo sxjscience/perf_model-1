@@ -481,7 +481,8 @@ class NNRanker:
             iter_mult=500, rank_lambda=1.0, test_df=None, train_dir='.'):
         split_ratio = 0.05
         train_df, valid_df, _ = split_df_by_op(train_df, seed=100, ratio=split_ratio)
-        group_indices = get_group_indices(train_df)
+        if test_df is not None:
+            test_group_indices = get_group_indices(test_df)
         # features, labels = get_feature_label(train_df)
         # logging.info(f'#Train = {len(train_df)},'
         #              f' #Non-invalid Throughputs in Train = {len((labels >0).nonzero()[0])}')
@@ -589,7 +590,7 @@ class NNRanker:
                         no_better += 1
                     if test_df is not None:
                         test_score = self.evaluate(test_features, test_labels, 'regression',
-                                                   group_indices=group_indices)
+                                                   group_indices=test_group_indices)
                         logging.info(f'[{niter + 1}/{num_iters}], Test_score={test_score}')
             niter += 1
             epoch_iter += 1
