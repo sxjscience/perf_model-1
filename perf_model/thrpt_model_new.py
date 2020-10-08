@@ -588,7 +588,8 @@ class NNRanker:
                     else:
                         no_better += 1
                     if test_df is not None:
-                        test_score = self.evaluate(test_features, test_labels, 'regression')
+                        test_score = self.evaluate(test_features, test_labels, 'regression',
+                                                   group_indices=group_indices)
                         logging.info(f'[{niter + 1}/{num_iters}], Test_score={test_score}')
             niter += 1
             epoch_iter += 1
