@@ -1,7 +1,9 @@
 import argparse
+import matplotlib
 import matplotlib.pyplot as plt
 
 split_ratio = [1.0, 0.7, 0.5, 0.3]
+fontsize = 14
 # scores = [0.8361, 0.830, 0.822, 0.734]
 #
 # scores_graviton2 = [0.8423, 0.8666, 0.7818, 0.6603]
@@ -16,8 +18,8 @@ color_hex = ['#488f31', '#88a44f', '#bbba78', '#e3d2a7', '#f4c8a7', '#eb9f7d']
 
 fig = plt.figure(figsize=(6, 4))
 ax = fig.add_subplot(111)
-line1, = plt.plot(split_ratio[::-1], scores[::-1], color=color_hex[0], marker='x',
-                  label='Average')
+line1, = plt.plot(split_ratio[::-1], scores[::-1], color=color_hex[0], marker='o',
+                  label='Average Score')
 # line2, = plt.plot(split_ratio[::-1], scores_graviton2[::-1], color=color_hex[1], marker='x',
 #                   label='Graviton2')
 # line3, = plt.plot(split_ratio[::-1], scores_rasp4b[::-1], color=color_hex[2], marker='.',
@@ -28,13 +30,22 @@ line1, = plt.plot(split_ratio[::-1], scores[::-1], color=color_hex[0], marker='x
 #                   label='T4')
 # line6, = plt.plot(split_ratio[::-1], scores_v100[::-1], color=color_hex[5], marker='x',
 #                   label='V100')
-plt.xticks(split_ratio[::-1])
+font = {'size': fontsize}
+
+matplotlib.rc('font', **font)
+plt.xticks(split_ratio[::-1], size=fontsize)
+plt.yticks(size=fontsize)
 plt.xlim([0.22, 1.05])
-plt.ylim([0.72, 0.85])
+plt.ylim([0.75, 0.89])
 plt.legend(handles=[line1], loc='lower right')
-plt.xlabel('Sample Ratio')
-plt.ylabel('NDCG@8')
+plt.xlabel('Sample Ratio', size=fontsize)
+plt.ylabel('NDCG@8', size=fontsize)
 for i, v in zip(split_ratio[::-1], scores[::-1]):
-    ax.annotate(str(v), xy=(i - 0.058, v + 0.0062))
+    if i == 1.0:
+        ax.annotate(str(v), xy=(i - 0.078, v + 0.008))
+    elif i == 0.5:
+        ax.annotate(str(v), xy=(i - 0.078, v + 0.010))
+    else:
+        ax.annotate(str(v), xy=(i - 0.058, v + 0.012))
 fig.savefig('impact_data_size.pdf', bbox_inches='tight')
 fig.savefig('impact_data_size.png', bbox_inches='tight')
