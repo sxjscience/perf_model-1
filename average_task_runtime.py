@@ -16,4 +16,5 @@ for file_path in sorted(glob.glob(os.path.join(args.dir_path, '*.txt'))):
         out = [float(ele) for ele in out if len(ele) > 0]
         all_workload_times.extend(out)
 mean_workload_time = np.mean(all_workload_times)
-print(mean_workload_time)
+print(all_workload_times)
+print('Average: ', mean_workload_time)
