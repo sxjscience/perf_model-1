@@ -21,7 +21,7 @@ for folder in sorted(os.listdir(args.dir_path)):
                                                    name[:-len('.train.pq')] + '.test.pq'))
             train_group_indices = get_group_indices(train_df)
             test_group_indices = get_group_indices(test_df)
-            info_l.append((os.path.join(folder),
+            info_l.append((os.path.join(folder, name[:-len('.train.pq')]),
                            len(train_df), len(test_df),
                            len(train_group_indices),
                            len(test_group_indices)))
