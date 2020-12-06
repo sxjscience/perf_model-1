@@ -342,6 +342,7 @@ def main():
             if not os.path.isdir(model_path):
                 continue
             task_name = os.path.basename(model_path)
+            print('task_name=', task_name, 'model_path=', model_path)
             if configs.model_type == 'cat_ranking_old':
                 models[task_name] = ListwiseRankModel(task_name, model_path)
             elif configs.model_type == 'cat_ranking':
