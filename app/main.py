@@ -262,7 +262,7 @@ def tune_and_evaluate(mod, params, input_shape, dtype, measure_top_n, target, tu
         tune_graph(mod["main"], input_shape[1], target, tuning_opt['log_filename'], graph_log_file)
     else:
         best_results = tune_kernels(tasks, False, measure_top_n, **tuning_opt)
-    with open(best_results_file, 'r') as of:
+    with open(best_results_file, 'w') as of:
         json.dump(best_results, of)
 
     dispatch_ctx = tvm.autotvm.task.DispatchContext.current
