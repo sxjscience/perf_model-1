@@ -234,6 +234,7 @@ def tune_kernels(tasks,
             sys.stderr.write('{} Measure Top {} Configs'.format(prefix, len(inputs)))
             results = measure_batch(inputs)
             print(inputs, results)
+            ch = input()
             best_idx, best_flops = max([
                 (idx, i.task.flop / np.mean(r.costs) / 1e9 if r.error_no == 0 else 0)
                 for idx, (i, r) in enumerate(zip(inputs, results))
