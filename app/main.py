@@ -9,6 +9,7 @@ import sys
 import time
 import logging
 import random
+import json
 import numpy as np
 
 import tvm
@@ -59,7 +60,9 @@ def create_config():
     parser.add_argument('--graph',
                         action='store_true',
                         help='Enable graph tuning (X86 only)')
-
+    parser.add_argument('--best_result_file',
+                        default='best_results.json'
+                        help='File to store the best results.')
     model_group = parser.add_mutually_exclusive_group(required=True)
     model_group.add_argument('--gcv', help='model name in gluon cv model zoo')
     model_group.add_argument('--tf', help='TensorFlow model')
@@ -239,7 +242,7 @@ def tune_kernels(tasks,
                 (idx, i.task.flop / np.mean(r.costs) / 1e9 if r.error_no == 0 else 0)
                 for idx, (i, r) in enumerate(zip(inputs, results))
             ], key=lambda x: x[1])
-            assert task.workload is not in best_results
+            assert task.workload not in best_results
             best_results[task.workload] = (best_idx, best_flops)
             sys.stderr.write(' | Best %.2f GFLOPS at Top %d | %.2fs\n' %
                              (best_flops, best_idx, time.time() - tic))
@@ -248,17 +251,19 @@ def tune_kernels(tasks,
 
 
 def tune_and_evaluate(mod, params, input_shape, dtype, measure_top_n, target, tuning_opt,
-                      graph_log_file):
+                      graph_log_file, best_results_file):
     """Tune a model with the ranking model and evaluate the performance."""
 
     sys.stderr.write("Extract conv2d tasks...\n")
     tasks = autotvm.task.extract_from_program(mod["main"], target=target, params=params)
     # Run tuning tasks.
     if graph_log_file is not None and not os.path.exists(graph_log_file):
-        tune_kernels(tasks, True, measure_top_n, **tuning_opt)
+        best_results = tune_kernels(tasks, True, measure_top_n, **tuning_opt)
         tune_graph(mod["main"], input_shape[1], target, tuning_opt['log_filename'], graph_log_file)
     else:
-        tune_kernels(tasks, False, measure_top_n, **tuning_opt)
+        best_results = tune_kernels(tasks, False, measure_top_n, **tuning_opt)
+    with open(best_results_file, 'r') as of:
+        json.dump(best_results, of)
 
     dispatch_ctx = tvm.autotvm.task.DispatchContext.current
 
@@ -377,7 +382,7 @@ def main():
     graph_log_file = 'graph.log' if configs.graph else None
     tune_and_evaluate(mod, params, input_shape, 'float32',
                       configs.measure_top_n, configs.target, tuning_option,
-                      graph_log_file)
+                      graph_log_file, configs.best_result_file)
 
     if verify_model:
         valid, rank = measure_option['runner'].get_model_acc()
