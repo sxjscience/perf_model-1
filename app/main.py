@@ -61,7 +61,7 @@ def create_config():
                         action='store_true',
                         help='Enable graph tuning (X86 only)')
     parser.add_argument('--best_result_file',
-                        default='best_results.json'
+                        default='best_results.json',
                         help='File to store the best results.')
     model_group = parser.add_mutually_exclusive_group(required=True)
     model_group.add_argument('--gcv', help='model name in gluon cv model zoo')

@@ -45,6 +45,7 @@ do
                       --n-parallel ${n_parallel} \
                       --measure-top-n ${measure_top_n} \
                       --seed ${seed} \
+                      --best_result_file ${OUT_DIR}/${network}_best_op_results.json \
                       --target "${TARGET}" --gcv ${network} 2>&1 | tee -a ${OUT_DIR}/${network}.txt
     mv tune.log $network.log
   else
@@ -53,6 +54,7 @@ do
                         --n-parallel ${n_parallel} \
                         --measure-top-n ${measure_top_n} \
                         --seed ${seed} \
+                        --best_result_file ${OUT_DIR}/${network}_best_op_results.json \
                         --graph \
                         --target "${TARGET}" --gcv ${network} 2>&1 | tee -a ${OUT_DIR}/${network}.txt
     mv tune.log $network.log
