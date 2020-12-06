@@ -239,7 +239,7 @@ def tune_kernels(tasks,
                 (idx, i.task.flop / np.mean(r.costs) / 1e9 if r.error_no == 0 else 0)
                 for idx, (i, r) in enumerate(zip(inputs, results))
             ], key=lambda x: x[1])
-            best_results[task] = (best_idx, best_flops)
+            best_results[task.workload] = (best_idx, best_flops)
             sys.stderr.write(' | Best %.2f GFLOPS at Top %d | %.2fs\n' %
                              (best_flops, best_idx, time.time() - tic))
             autotvm.callback.log_to_file(log_filename)(None, inputs, results)
