@@ -180,6 +180,8 @@ def tune_kernels(tasks,
         )
         assert isinstance(measure_option['runner'], RankModelRunner)
 
+    best_results = dict()
+
     for i, task in enumerate(tasks):
         prefix = "[Task %2d/%2d] " % (i + 1, len(tasks))
 
@@ -233,17 +235,15 @@ def tune_kernels(tasks,
             ]
             sys.stderr.write('{} Measure Top {} Configs'.format(prefix, len(inputs)))
             results = measure_batch(inputs)
-            print(inputs, results)
-            ch = input()
             best_idx, best_flops = max([
                 (idx, i.task.flop / np.mean(r.costs) / 1e9 if r.error_no == 0 else 0)
                 for idx, (i, r) in enumerate(zip(inputs, results))
             ], key=lambda x: x[1])
-
+            best_results[task] = (best_idx, best_flops)
             sys.stderr.write(' | Best %.2f GFLOPS at Top %d | %.2fs\n' %
                              (best_flops, best_idx, time.time() - tic))
             autotvm.callback.log_to_file(log_filename)(None, inputs, results)
-
+    return best_results
 
 
 def tune_and_evaluate(mod, params, input_shape, dtype, measure_top_n, target, tuning_opt,
