@@ -251,7 +251,7 @@ def tune_and_evaluate(mod, params, input_shape, dtype, measure_top_n, target, tu
 
     sys.stderr.write("Extract conv2d tasks...\n")
     tasks = autotvm.task.extract_from_program(mod["main"], target=target, params=params)
-
+    print('tasks=', tasks)
     # Run tuning tasks.
     if graph_log_file is not None and not os.path.exists(graph_log_file):
         tune_kernels(tasks, True, measure_top_n, **tuning_opt)
