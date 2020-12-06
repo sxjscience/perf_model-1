@@ -233,7 +233,7 @@ def tune_kernels(tasks,
             ]
             sys.stderr.write('{} Measure Top {} Configs'.format(prefix, len(inputs)))
             results = measure_batch(inputs)
-
+            print(inputs, results)
             best_idx, best_flops = max([
                 (idx, i.task.flop / np.mean(r.costs) / 1e9 if r.error_no == 0 else 0)
                 for idx, (i, r) in enumerate(zip(inputs, results))
@@ -251,7 +251,6 @@ def tune_and_evaluate(mod, params, input_shape, dtype, measure_top_n, target, tu
 
     sys.stderr.write("Extract conv2d tasks...\n")
     tasks = autotvm.task.extract_from_program(mod["main"], target=target, params=params)
-    print('tasks=', tasks)
     # Run tuning tasks.
     if graph_log_file is not None and not os.path.exists(graph_log_file):
         tune_kernels(tasks, True, measure_top_n, **tuning_opt)
