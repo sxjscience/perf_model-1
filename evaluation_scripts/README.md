@@ -75,6 +75,8 @@ do
         done;
     done;
 done;
+
+bash evaluate_e2e.sh g4 cat_regression_op_5000_split1 cat_regression
 ```
 
 
